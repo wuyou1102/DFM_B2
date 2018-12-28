@@ -1,0 +1,503 @@
+[2018-12-18 17:36:06] DEBUG [libs.Utility.Common:59] ********************************************************
+[2018-12-18 17:36:06] DEBUG [libs.Utility.Common:60] * EXECUTED COMMAND:"pyinstaller -w -y --icon=favicon.ico --workpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp --distpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out  C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py"
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 77 INFO: PyInstaller: 3.3.1
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 77 INFO: Python: 2.7.15
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 77 INFO: Platform: Windows-7-6.1.7601-SP1
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 79 INFO: wrote C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\B3.spec
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 83 INFO: UPX is not available.
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 86 INFO: Extending PYTHONPATH with paths
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: ['C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool',
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT:  'C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool\\packages']
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 86 INFO: checking Analysis
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 86 INFO: Building Analysis because out00-Analysis.toc is non existent
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 86 INFO: Initializing module dependency graph...
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 88 INFO: Initializing module graph hooks...
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 146 INFO: running Analysis out00-Analysis.toc
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 149 INFO: Adding Microsoft.VC90.CRT to dependent assemblies of final executable
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT:   required by c:\python27\python.exe
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 209 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 210 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 211 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 211 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 212 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 268 INFO: Searching for assembly x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.6161_none ...
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 268 INFO: Found manifest C:\Windows\WinSxS\Manifests\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 269 INFO: Searching for file msvcr90.dll
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 269 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcr90.dll
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 269 INFO: Searching for file msvcp90.dll
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 270 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcp90.dll
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 270 INFO: Searching for file msvcm90.dll
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 270 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcm90.dll
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 325 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 325 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 326 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 327 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 327 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 328 INFO: Adding redirect Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 431 INFO: Caching module hooks...
+[2018-12-18 17:36:07] DEBUG [libs.Utility.Common:67] * STDOUT: 435 INFO: Analyzing C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py
+[2018-12-18 17:36:10] DEBUG [libs.Utility.Common:67] * STDOUT: 3135 INFO: Processing pre-safe import module hook   _xmlplus
+[2018-12-18 17:36:10] DEBUG [libs.Utility.Common:67] * STDOUT: 3463 INFO: Processing pre-find module path hook   distutils
+[2018-12-18 17:36:14] DEBUG [libs.Utility.Common:67] * STDOUT: 6830 INFO: Processing pre-find module path hook   site
+[2018-12-18 17:36:14] DEBUG [libs.Utility.Common:67] * STDOUT: 6830 INFO: site: retargeting to fake-dir 'c:\\python27\\lib\\site-packages\\PyInstaller\\fake-modules'
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10039 INFO: Loading module hooks...
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10040 INFO: Loading module hook "hook-distutils.py"...
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10040 INFO: Loading module hook "hook-sysconfig.py"...
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10041 INFO: Loading module hook "hook-xml.py"...
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10111 INFO: Loading module hook "hook-httplib.py"...
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10112 INFO: Loading module hook "hook-pydoc.py"...
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10113 INFO: Excluding import 'Tkinter'
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10113 INFO:   Removing import of Tkinter from module pydoc
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10113 INFO: Loading module hook "hook-_tkinter.py"...
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10235 INFO: checking Tree
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10235 INFO: Building Tree because out00-Tree.toc is non existent
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10235 INFO: Building Tree out00-Tree.toc
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10473 INFO: checking Tree
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10473 INFO: Building Tree because out01-Tree.toc is non existent
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10473 INFO: Building Tree out01-Tree.toc
+[2018-12-18 17:36:17] DEBUG [libs.Utility.Common:67] * STDOUT: 10497 INFO: Loading module hook "hook-pkg_resources.py"...
+[2018-12-18 17:36:18] DEBUG [libs.Utility.Common:67] * STDOUT: 10817 INFO: Processing pre-safe import module hook   win32com
+[2018-12-18 17:36:18] DEBUG [libs.Utility.Common:67] * STDOUT: 11126 INFO: Loading module hook "hook-pywintypes.py"...
+[2018-12-18 17:36:18] DEBUG [libs.Utility.Common:67] * STDOUT: 11365 INFO: Loading module hook "hook-setuptools.py"...
+[2018-12-18 17:36:18] DEBUG [libs.Utility.Common:67] * STDOUT: 11400 INFO: Loading module hook "hook-encodings.py"...
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 11894 INFO: Loading module hook "hook-numpy.core.py"...
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 11949 INFO: Loading module hook "hook-win32com.py"...
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12380 INFO: Loading module hook "hook-pythoncom.py"...
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12640 INFO: Looking for ctypes DLLs
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12730 INFO: Analyzing run-time hooks ...
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12735 INFO: Including run-time hook 'pyi_rth__tkinter.py'
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12736 INFO: Including run-time hook 'pyi_rth_multiprocessing.py'
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12740 INFO: Including run-time hook 'pyi_rth_pkgres.py'
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12742 INFO: Including run-time hook 'pyi_rth_win32comgenpy.py'
+[2018-12-18 17:36:19] DEBUG [libs.Utility.Common:67] * STDOUT: 12753 INFO: Looking for dynamic libraries
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12904 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.1_none_7dd1e0ebd6590e0b.manifest
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12905 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.5054_none_ed009380fb24449c.manifest
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12906 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_ed01d9e4fb230e88.manifest
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12960 INFO: Searching for assembly x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.30729.6161_none ...
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12960 INFO: Found manifest C:\Windows\WinSxS\Manifests\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c.manifest
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12962 INFO: Searching for file mfc90.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12962 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfc90.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12962 INFO: Searching for file mfc90u.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12962 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfc90u.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12962 INFO: Searching for file mfcm90.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12962 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfcm90.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12962 INFO: Searching for file mfcm90u.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 12963 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfcm90u.dll
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 13014 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.1_none_7dd1e0ebd6590e0b.manifest
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 13015 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.5054_none_ed009380fb24449c.manifest
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 13016 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_ed01d9e4fb230e88.manifest
+[2018-12-18 17:36:20] DEBUG [libs.Utility.Common:67] * STDOUT: 13017 INFO: Adding redirect Microsoft.VC90.MFC version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:36:31] DEBUG [libs.Utility.Common:67] * STDOUT: 24627 INFO: Looking for eggs
+[2018-12-18 17:36:31] DEBUG [libs.Utility.Common:67] * STDOUT: 24627 INFO: Using Python library C:\Windows\system32\python27.dll
+[2018-12-18 17:36:31] DEBUG [libs.Utility.Common:67] * STDOUT: 24627 INFO: Found binding redirects: 
+[2018-12-18 17:36:31] DEBUG [libs.Utility.Common:67] * STDOUT: [BindingRedirect(name=u'Microsoft.VC90.MFC', language=None, arch=u'x86', oldVersion=(9, 0, 21022, 8), newVersion=(9, 0, 30729, 6161), publicKeyToken=u'1fc8b3b9a1e18e3b'), BindingRedirect(name=u'Microsoft.VC90.CRT', language=None, arch=u'x86', oldVersion=(9, 0, 21022, 8), newVersion=(9, 0, 30729, 6161), publicKeyToken=u'1fc8b3b9a1e18e3b')]
+[2018-12-18 17:36:31] DEBUG [libs.Utility.Common:67] * STDOUT: 24633 INFO: Warnings written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\warnB3.txt
+[2018-12-18 17:36:31] DEBUG [libs.Utility.Common:67] * STDOUT: 24718 INFO: Graph cross-reference written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\xref-B3.html
+[2018-12-18 17:36:32] DEBUG [libs.Utility.Common:67] * STDOUT: 24974 INFO: checking PYZ
+[2018-12-18 17:36:32] DEBUG [libs.Utility.Common:67] * STDOUT: 24974 INFO: Building PYZ because out00-PYZ.toc is non existent
+[2018-12-18 17:36:32] DEBUG [libs.Utility.Common:67] * STDOUT: 24974 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26158 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz completed successfully.
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26270 INFO: checking PKG
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26270 INFO: Building PKG because out00-PKG.toc is non existent
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26270 INFO: Building PKG (CArchive) out00-PKG.pkg
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26293 INFO: Building PKG (CArchive) out00-PKG.pkg completed successfully.
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26297 INFO: Bootloader c:\python27\lib\site-packages\PyInstaller\bootloader\Windows-32bit\runw.exe
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26297 INFO: checking EXE
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26297 INFO: Building EXE because out00-EXE.toc is non existent
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26297 INFO: Building EXE from out00-EXE.toc
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26302 INFO: SRCPATH [('favicon.ico', None)]
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26303 INFO: Updating icons from ['favicon.ico'] to d:\temp\tmpmglg6b
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26303 INFO: Writing RT_GROUP_ICON 0 resource with 76 bytes
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26303 INFO: Writing RT_ICON 1 resource with 19496 bytes
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26303 INFO: Writing RT_ICON 2 resource with 5672 bytes
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26303 INFO: Writing RT_ICON 3 resource with 2216 bytes
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26303 INFO: Writing RT_ICON 4 resource with 1384 bytes
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26303 INFO: Writing RT_ICON 5 resource with 3752 bytes
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26307 INFO: Appending archive to EXE C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\B3.exe
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26312 INFO: Building EXE from out00-EXE.toc completed successfully.
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26320 INFO: checking COLLECT
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26320 INFO: Building COLLECT because out00-COLLECT.toc is non existent
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26321 INFO: Building COLLECT out00-COLLECT.toc
+[2018-12-18 17:36:33] DEBUG [libs.Utility.Common:67] * STDOUT: 26331 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:36:36] DEBUG [libs.Utility.Common:67] * STDOUT: 29233 INFO: Building COLLECT out00-COLLECT.toc completed successfully.
+[2018-12-18 17:36:36] DEBUG [libs.Utility.Common:72] * EXIT CODE: "0"
+[2018-12-18 17:36:36] DEBUG [libs.Utility.Common:73] ********************************************************
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:59] ********************************************************
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:60] * EXECUTED COMMAND:"pyinstaller -w -y --icon=favicon.ico --workpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp --distpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out  C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py"
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 72 INFO: PyInstaller: 3.3.1
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 72 INFO: Python: 2.7.15
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 72 INFO: Platform: Windows-7-6.1.7601-SP1
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 73 INFO: wrote C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\B3.spec
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 78 INFO: UPX is not available.
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 78 INFO: Extending PYTHONPATH with paths
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: ['C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool',
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT:  'C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool\\packages']
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 78 INFO: checking Analysis
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 300 INFO: checking PYZ
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 356 INFO: checking PKG
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 358 INFO: Bootloader c:\python27\lib\site-packages\PyInstaller\bootloader\Windows-32bit\runw.exe
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 358 INFO: checking EXE
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 361 INFO: checking COLLECT
+[2018-12-18 17:37:19] DEBUG [libs.Utility.Common:67] * STDOUT: 368 INFO: Removing dir C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out\B3
+[2018-12-18 17:37:20] DEBUG [libs.Utility.Common:67] * STDOUT: 983 INFO: Building COLLECT out00-COLLECT.toc
+[2018-12-18 17:37:20] DEBUG [libs.Utility.Common:67] * STDOUT: 993 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:37:23] DEBUG [libs.Utility.Common:67] * STDOUT: 3728 INFO: Building COLLECT out00-COLLECT.toc completed successfully.
+[2018-12-18 17:37:23] DEBUG [libs.Utility.Common:72] * EXIT CODE: "0"
+[2018-12-18 17:37:23] DEBUG [libs.Utility.Common:73] ********************************************************
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:59] ********************************************************
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:60] * EXECUTED COMMAND:"pyinstaller -w -y --icon=favicon.ico --workpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp --distpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out  C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py"
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 68 INFO: PyInstaller: 3.3.1
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 68 INFO: Python: 2.7.15
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 69 INFO: Platform: Windows-7-6.1.7601-SP1
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 69 INFO: wrote C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\B3.spec
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 74 INFO: UPX is not available.
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 75 INFO: Extending PYTHONPATH with paths
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: ['C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool',
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT:  'C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool\\packages']
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 75 INFO: checking Analysis
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 295 INFO: checking PYZ
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 351 INFO: checking PKG
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 353 INFO: Bootloader c:\python27\lib\site-packages\PyInstaller\bootloader\Windows-32bit\runw.exe
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 353 INFO: checking EXE
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 355 INFO: checking COLLECT
+[2018-12-18 17:37:58] DEBUG [libs.Utility.Common:67] * STDOUT: 361 INFO: Removing dir C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out\B3
+[2018-12-18 17:37:59] DEBUG [libs.Utility.Common:67] * STDOUT: 975 INFO: Building COLLECT out00-COLLECT.toc
+[2018-12-18 17:37:59] DEBUG [libs.Utility.Common:67] * STDOUT: 985 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:38:02] DEBUG [libs.Utility.Common:67] * STDOUT: 3616 INFO: Building COLLECT out00-COLLECT.toc completed successfully.
+[2018-12-18 17:38:02] DEBUG [libs.Utility.Common:72] * EXIT CODE: "0"
+[2018-12-18 17:38:02] DEBUG [libs.Utility.Common:73] ********************************************************
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:59] ********************************************************
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:60] * EXECUTED COMMAND:"pyinstaller -w -y --icon=favicon.ico --workpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp --distpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out  C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py"
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 84 INFO: PyInstaller: 3.3.1
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 84 INFO: Python: 2.7.15
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 84 INFO: Platform: Windows-7-6.1.7601-SP1
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 85 INFO: wrote C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\B3.spec
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 90 INFO: UPX is not available.
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 94 INFO: Extending PYTHONPATH with paths
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: ['C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool',
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT:  'C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool\\packages']
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 94 INFO: checking Analysis
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 94 INFO: Building Analysis because out00-Analysis.toc is non existent
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 94 INFO: Initializing module dependency graph...
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 96 INFO: Initializing module graph hooks...
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 154 INFO: running Analysis out00-Analysis.toc
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 157 INFO: Adding Microsoft.VC90.CRT to dependent assemblies of final executable
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT:   required by c:\python27\python.exe
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 217 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 218 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 219 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 219 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 220 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 274 INFO: Searching for assembly x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.6161_none ...
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 274 INFO: Found manifest C:\Windows\WinSxS\Manifests\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 275 INFO: Searching for file msvcr90.dll
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 276 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcr90.dll
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 276 INFO: Searching for file msvcp90.dll
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 276 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcp90.dll
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 276 INFO: Searching for file msvcm90.dll
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 276 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcm90.dll
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 330 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 331 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 332 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 333 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 333 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-18 17:47:55] DEBUG [libs.Utility.Common:67] * STDOUT: 334 INFO: Adding redirect Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:47:56] DEBUG [libs.Utility.Common:67] * STDOUT: 439 INFO: Caching module hooks...
+[2018-12-18 17:47:56] DEBUG [libs.Utility.Common:67] * STDOUT: 444 INFO: Analyzing C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py
+[2018-12-18 17:47:58] DEBUG [libs.Utility.Common:67] * STDOUT: 3144 INFO: Processing pre-safe import module hook   _xmlplus
+[2018-12-18 17:47:59] DEBUG [libs.Utility.Common:67] * STDOUT: 3478 INFO: Processing pre-find module path hook   distutils
+[2018-12-18 17:48:02] DEBUG [libs.Utility.Common:67] * STDOUT: 6844 INFO: Processing pre-find module path hook   site
+[2018-12-18 17:48:02] DEBUG [libs.Utility.Common:67] * STDOUT: 6844 INFO: site: retargeting to fake-dir 'c:\\python27\\lib\\site-packages\\PyInstaller\\fake-modules'
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10140 INFO: Loading module hooks...
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10140 INFO: Loading module hook "hook-distutils.py"...
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10141 INFO: Loading module hook "hook-sysconfig.py"...
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10141 INFO: Loading module hook "hook-xml.py"...
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10213 INFO: Loading module hook "hook-httplib.py"...
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10213 INFO: Loading module hook "hook-pydoc.py"...
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10215 INFO: Excluding import 'Tkinter'
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10216 INFO:   Removing import of Tkinter from module pydoc
+[2018-12-18 17:48:05] DEBUG [libs.Utility.Common:67] * STDOUT: 10216 INFO: Loading module hook "hook-_tkinter.py"...
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10346 INFO: checking Tree
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10346 INFO: Building Tree because out00-Tree.toc is non existent
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10346 INFO: Building Tree out00-Tree.toc
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10583 INFO: checking Tree
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10584 INFO: Building Tree because out01-Tree.toc is non existent
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10584 INFO: Building Tree out01-Tree.toc
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10608 INFO: Loading module hook "hook-pkg_resources.py"...
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 10953 INFO: Processing pre-safe import module hook   win32com
+[2018-12-18 17:48:06] DEBUG [libs.Utility.Common:67] * STDOUT: 11274 INFO: Loading module hook "hook-pywintypes.py"...
+[2018-12-18 17:48:07] DEBUG [libs.Utility.Common:67] * STDOUT: 11528 INFO: Loading module hook "hook-setuptools.py"...
+[2018-12-18 17:48:07] DEBUG [libs.Utility.Common:67] * STDOUT: 11565 INFO: Loading module hook "hook-encodings.py"...
+[2018-12-18 17:48:07] DEBUG [libs.Utility.Common:67] * STDOUT: 12088 INFO: Loading module hook "hook-numpy.core.py"...
+[2018-12-18 17:48:07] DEBUG [libs.Utility.Common:67] * STDOUT: 12156 INFO: Loading module hook "hook-win32com.py"...
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 12615 INFO: Loading module hook "hook-pythoncom.py"...
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 12888 INFO: Looking for ctypes DLLs
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 12979 INFO: Analyzing run-time hooks ...
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 12983 INFO: Including run-time hook 'pyi_rth__tkinter.py'
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 12985 INFO: Including run-time hook 'pyi_rth_multiprocessing.py'
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 12989 INFO: Including run-time hook 'pyi_rth_pkgres.py'
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 12991 INFO: Including run-time hook 'pyi_rth_win32comgenpy.py'
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13002 INFO: Looking for dynamic libraries
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13163 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.1_none_7dd1e0ebd6590e0b.manifest
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13164 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.5054_none_ed009380fb24449c.manifest
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13164 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_ed01d9e4fb230e88.manifest
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13220 INFO: Searching for assembly x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.30729.6161_none ...
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13220 INFO: Found manifest C:\Windows\WinSxS\Manifests\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c.manifest
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13222 INFO: Searching for file mfc90.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13222 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfc90.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13222 INFO: Searching for file mfc90u.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13222 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfc90u.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13222 INFO: Searching for file mfcm90.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13223 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfcm90.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13223 INFO: Searching for file mfcm90u.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13223 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfcm90u.dll
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13275 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.1_none_7dd1e0ebd6590e0b.manifest
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13276 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.5054_none_ed009380fb24449c.manifest
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13277 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_ed01d9e4fb230e88.manifest
+[2018-12-18 17:48:08] DEBUG [libs.Utility.Common:67] * STDOUT: 13277 INFO: Adding redirect Microsoft.VC90.MFC version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:48:20] DEBUG [libs.Utility.Common:67] * STDOUT: 25098 INFO: Looking for eggs
+[2018-12-18 17:48:20] DEBUG [libs.Utility.Common:67] * STDOUT: 25100 INFO: Using Python library C:\Windows\system32\python27.dll
+[2018-12-18 17:48:20] DEBUG [libs.Utility.Common:67] * STDOUT: 25100 INFO: Found binding redirects: 
+[2018-12-18 17:48:20] DEBUG [libs.Utility.Common:67] * STDOUT: [BindingRedirect(name=u'Microsoft.VC90.MFC', language=None, arch=u'x86', oldVersion=(9, 0, 21022, 8), newVersion=(9, 0, 30729, 6161), publicKeyToken=u'1fc8b3b9a1e18e3b'), BindingRedirect(name=u'Microsoft.VC90.CRT', language=None, arch=u'x86', oldVersion=(9, 0, 21022, 8), newVersion=(9, 0, 30729, 6161), publicKeyToken=u'1fc8b3b9a1e18e3b')]
+[2018-12-18 17:48:20] DEBUG [libs.Utility.Common:67] * STDOUT: 25105 INFO: Warnings written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\warnB3.txt
+[2018-12-18 17:48:20] DEBUG [libs.Utility.Common:67] * STDOUT: 25190 INFO: Graph cross-reference written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\xref-B3.html
+[2018-12-18 17:48:21] DEBUG [libs.Utility.Common:67] * STDOUT: 25446 INFO: checking PYZ
+[2018-12-18 17:48:21] DEBUG [libs.Utility.Common:67] * STDOUT: 25446 INFO: Building PYZ because out00-PYZ.toc is non existent
+[2018-12-18 17:48:21] DEBUG [libs.Utility.Common:67] * STDOUT: 25446 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26592 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz completed successfully.
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26702 INFO: checking PKG
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26702 INFO: Building PKG because out00-PKG.toc is non existent
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26702 INFO: Building PKG (CArchive) out00-PKG.pkg
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26723 INFO: Building PKG (CArchive) out00-PKG.pkg completed successfully.
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26726 INFO: Bootloader c:\python27\lib\site-packages\PyInstaller\bootloader\Windows-32bit\runw.exe
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26726 INFO: checking EXE
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26726 INFO: Building EXE because out00-EXE.toc is non existent
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26726 INFO: Building EXE from out00-EXE.toc
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: SRCPATH [('favicon.ico', None)]
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: Updating icons from ['favicon.ico'] to d:\temp\tmpx8htnh
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: Writing RT_GROUP_ICON 0 resource with 76 bytes
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: Writing RT_ICON 1 resource with 19496 bytes
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: Writing RT_ICON 2 resource with 5672 bytes
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: Writing RT_ICON 3 resource with 2216 bytes
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: Writing RT_ICON 4 resource with 1384 bytes
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26733 INFO: Writing RT_ICON 5 resource with 3752 bytes
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26736 INFO: Appending archive to EXE C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\B3.exe
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26741 INFO: Building EXE from out00-EXE.toc completed successfully.
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26749 INFO: checking COLLECT
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26749 INFO: Building COLLECT because out00-COLLECT.toc is non existent
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26750 INFO: Building COLLECT out00-COLLECT.toc
+[2018-12-18 17:48:22] DEBUG [libs.Utility.Common:67] * STDOUT: 26759 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:48:25] DEBUG [libs.Utility.Common:67] * STDOUT: 29585 INFO: Building COLLECT out00-COLLECT.toc completed successfully.
+[2018-12-18 17:48:25] DEBUG [libs.Utility.Common:72] * EXIT CODE: "0"
+[2018-12-18 17:48:25] DEBUG [libs.Utility.Common:73] ********************************************************
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:59] ********************************************************
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:60] * EXECUTED COMMAND:"pyinstaller -w -y --icon=favicon.ico --workpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp --distpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out  C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py"
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 92 INFO: PyInstaller: 3.3.1
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 92 INFO: Python: 2.7.15
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 92 INFO: Platform: Windows-7-6.1.7601-SP1
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 92 INFO: wrote C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\B3.spec
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 100 INFO: UPX is not available.
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 105 INFO: Extending PYTHONPATH with paths
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: ['C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool',
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT:  'C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool\\packages']
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 105 INFO: checking Analysis
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 105 INFO: Building Analysis because out00-Analysis.toc is non existent
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 105 INFO: Initializing module dependency graph...
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 106 INFO: Initializing module graph hooks...
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 174 INFO: running Analysis out00-Analysis.toc
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 176 INFO: Adding Microsoft.VC90.CRT to dependent assemblies of final executable
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT:   required by c:\python27\python.exe
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 234 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 234 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 235 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 236 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 237 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 292 INFO: Searching for assembly x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.6161_none ...
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 293 INFO: Found manifest C:\Windows\WinSxS\Manifests\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 294 INFO: Searching for file msvcr90.dll
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 296 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcr90.dll
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 296 INFO: Searching for file msvcp90.dll
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 296 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcp90.dll
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 296 INFO: Searching for file msvcm90.dll
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 296 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcm90.dll
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 365 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 366 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 368 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 368 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 368 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 368 INFO: Adding redirect Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 516 INFO: Caching module hooks...
+[2018-12-18 17:49:16] DEBUG [libs.Utility.Common:67] * STDOUT: 520 INFO: Analyzing C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py
+[2018-12-18 17:49:19] DEBUG [libs.Utility.Common:67] * STDOUT: 3283 INFO: Processing pre-safe import module hook   _xmlplus
+[2018-12-18 17:49:20] DEBUG [libs.Utility.Common:67] * STDOUT: 3626 INFO: Processing pre-find module path hook   distutils
+[2018-12-18 17:49:23] DEBUG [libs.Utility.Common:67] * STDOUT: 7153 INFO: Processing pre-find module path hook   site
+[2018-12-18 17:49:23] DEBUG [libs.Utility.Common:67] * STDOUT: 7154 INFO: site: retargeting to fake-dir 'c:\\python27\\lib\\site-packages\\PyInstaller\\fake-modules'
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10485 INFO: Loading module hooks...
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10485 INFO: Loading module hook "hook-distutils.py"...
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10486 INFO: Loading module hook "hook-sysconfig.py"...
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10487 INFO: Loading module hook "hook-xml.py"...
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10562 INFO: Loading module hook "hook-httplib.py"...
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10563 INFO: Loading module hook "hook-pydoc.py"...
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10564 INFO: Excluding import 'Tkinter'
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10565 INFO:   Removing import of Tkinter from module pydoc
+[2018-12-18 17:49:26] DEBUG [libs.Utility.Common:67] * STDOUT: 10565 INFO: Loading module hook "hook-_tkinter.py"...
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 10699 INFO: checking Tree
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 10699 INFO: Building Tree because out00-Tree.toc is non existent
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 10699 INFO: Building Tree out00-Tree.toc
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 10929 INFO: checking Tree
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 10929 INFO: Building Tree because out01-Tree.toc is non existent
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 10929 INFO: Building Tree out01-Tree.toc
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 10954 INFO: Loading module hook "hook-pkg_resources.py"...
+[2018-12-18 17:49:27] DEBUG [libs.Utility.Common:67] * STDOUT: 11286 INFO: Processing pre-safe import module hook   win32com
+[2018-12-18 17:49:28] DEBUG [libs.Utility.Common:67] * STDOUT: 11597 INFO: Loading module hook "hook-pywintypes.py"...
+[2018-12-18 17:49:28] DEBUG [libs.Utility.Common:67] * STDOUT: 11849 INFO: Loading module hook "hook-setuptools.py"...
+[2018-12-18 17:49:28] DEBUG [libs.Utility.Common:67] * STDOUT: 11885 INFO: Loading module hook "hook-encodings.py"...
+[2018-12-18 17:49:28] DEBUG [libs.Utility.Common:67] * STDOUT: 12384 INFO: Loading module hook "hook-numpy.core.py"...
+[2018-12-18 17:49:28] DEBUG [libs.Utility.Common:67] * STDOUT: 12437 INFO: Loading module hook "hook-win32com.py"...
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 12870 INFO: Loading module hook "hook-pythoncom.py"...
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13146 INFO: Looking for ctypes DLLs
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13238 INFO: Analyzing run-time hooks ...
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13243 INFO: Including run-time hook 'pyi_rth__tkinter.py'
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13244 INFO: Including run-time hook 'pyi_rth_multiprocessing.py'
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13248 INFO: Including run-time hook 'pyi_rth_pkgres.py'
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13250 INFO: Including run-time hook 'pyi_rth_win32comgenpy.py'
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13260 INFO: Looking for dynamic libraries
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13416 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.1_none_7dd1e0ebd6590e0b.manifest
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13417 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.5054_none_ed009380fb24449c.manifest
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13418 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_ed01d9e4fb230e88.manifest
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13472 INFO: Searching for assembly x86_Microsoft.VC90.MFC_1fc8b3b9a1e18e3b_9.0.30729.6161_none ...
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13472 INFO: Found manifest C:\Windows\WinSxS\Manifests\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c.manifest
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Searching for file mfc90.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfc90.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Searching for file mfc90u.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfc90u.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Searching for file mfcm90.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfcm90.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Searching for file mfcm90u.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13474 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_4bf7e3e2bf9ada4c\mfcm90u.dll
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13527 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.1_none_7dd1e0ebd6590e0b.manifest
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13527 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.5054_none_ed009380fb24449c.manifest
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13528 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.mfc_1fc8b3b9a1e18e3b_9.0.30729.6161_none_ed01d9e4fb230e88.manifest
+[2018-12-18 17:49:29] DEBUG [libs.Utility.Common:67] * STDOUT: 13529 INFO: Adding redirect Microsoft.VC90.MFC version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:49:41] DEBUG [libs.Utility.Common:67] * STDOUT: 25316 INFO: Looking for eggs
+[2018-12-18 17:49:41] DEBUG [libs.Utility.Common:67] * STDOUT: 25316 INFO: Using Python library C:\Windows\system32\python27.dll
+[2018-12-18 17:49:41] DEBUG [libs.Utility.Common:67] * STDOUT: 25316 INFO: Found binding redirects: 
+[2018-12-18 17:49:41] DEBUG [libs.Utility.Common:67] * STDOUT: [BindingRedirect(name=u'Microsoft.VC90.MFC', language=None, arch=u'x86', oldVersion=(9, 0, 21022, 8), newVersion=(9, 0, 30729, 6161), publicKeyToken=u'1fc8b3b9a1e18e3b'), BindingRedirect(name=u'Microsoft.VC90.CRT', language=None, arch=u'x86', oldVersion=(9, 0, 21022, 8), newVersion=(9, 0, 30729, 6161), publicKeyToken=u'1fc8b3b9a1e18e3b')]
+[2018-12-18 17:49:41] DEBUG [libs.Utility.Common:67] * STDOUT: 25322 INFO: Warnings written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\warnB3.txt
+[2018-12-18 17:49:41] DEBUG [libs.Utility.Common:67] * STDOUT: 25407 INFO: Graph cross-reference written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\xref-B3.html
+[2018-12-18 17:49:42] DEBUG [libs.Utility.Common:67] * STDOUT: 25664 INFO: checking PYZ
+[2018-12-18 17:49:42] DEBUG [libs.Utility.Common:67] * STDOUT: 25665 INFO: Building PYZ because out00-PYZ.toc is non existent
+[2018-12-18 17:49:42] DEBUG [libs.Utility.Common:67] * STDOUT: 25665 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26809 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz completed successfully.
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26918 INFO: checking PKG
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26918 INFO: Building PKG because out00-PKG.toc is non existent
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26918 INFO: Building PKG (CArchive) out00-PKG.pkg
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26939 INFO: Building PKG (CArchive) out00-PKG.pkg completed successfully.
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26944 INFO: Bootloader c:\python27\lib\site-packages\PyInstaller\bootloader\Windows-32bit\runw.exe
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26944 INFO: checking EXE
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26944 INFO: Building EXE because out00-EXE.toc is non existent
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26944 INFO: Building EXE from out00-EXE.toc
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26948 INFO: SRCPATH [('favicon.ico', None)]
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26949 INFO: Updating icons from ['favicon.ico'] to d:\temp\tmpjhzphi
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26949 INFO: Writing RT_GROUP_ICON 0 resource with 76 bytes
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26949 INFO: Writing RT_ICON 1 resource with 19496 bytes
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26949 INFO: Writing RT_ICON 2 resource with 5672 bytes
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26949 INFO: Writing RT_ICON 3 resource with 2216 bytes
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26949 INFO: Writing RT_ICON 4 resource with 1384 bytes
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26949 INFO: Writing RT_ICON 5 resource with 3752 bytes
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26953 INFO: Appending archive to EXE C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\B3.exe
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26957 INFO: Building EXE from out00-EXE.toc completed successfully.
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26964 INFO: checking COLLECT
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26965 INFO: Building COLLECT because out00-COLLECT.toc is non existent
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26965 INFO: Building COLLECT out00-COLLECT.toc
+[2018-12-18 17:49:43] DEBUG [libs.Utility.Common:67] * STDOUT: 26975 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-18 17:49:45] DEBUG [libs.Utility.Common:67] * STDOUT: 29554 INFO: Building COLLECT out00-COLLECT.toc completed successfully.
+[2018-12-18 17:49:46] DEBUG [libs.Utility.Common:72] * EXIT CODE: "0"
+[2018-12-18 17:49:46] DEBUG [libs.Utility.Common:73] ********************************************************
+[2018-12-19 09:38:32] DEBUG [libs.Utility.Common:59] ********************************************************
+[2018-12-19 09:38:32] DEBUG [libs.Utility.Common:60] * EXECUTED COMMAND:"pyinstaller -w -y --icon=favicon.ico --workpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp --distpath C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\out  C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py"
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 72 INFO: PyInstaller: 3.3.1
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 72 INFO: Python: 2.7.15
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 72 INFO: Platform: Windows-7-6.1.7601-SP1
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 72 INFO: wrote C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\B3.spec
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 77 INFO: UPX is not available.
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 80 INFO: Extending PYTHONPATH with paths
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: ['C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool',
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT:  'C:\\Users\\OEMUSER\\PycharmProjects\\B3AssistantTool\\packages']
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 80 INFO: checking Analysis
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 80 INFO: Building Analysis because out00-Analysis.toc is non existent
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 80 INFO: Initializing module dependency graph...
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 82 INFO: Initializing module graph hooks...
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 146 INFO: running Analysis out00-Analysis.toc
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 148 INFO: Adding Microsoft.VC90.CRT to dependent assemblies of final executable
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT:   required by c:\python27\python.exe
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 216 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 217 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 217 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 218 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 219 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 281 INFO: Searching for assembly x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.6161_none ...
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 281 INFO: Found manifest C:\Windows\WinSxS\Manifests\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 282 INFO: Searching for file msvcr90.dll
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 282 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcr90.dll
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 282 INFO: Searching for file msvcp90.dll
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 282 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcp90.dll
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 282 INFO: Searching for file msvcm90.dll
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 282 INFO: Found file C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\msvcm90.dll
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 338 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_8550c6b5d18a9128.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 340 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_f47e1bd6f6571810.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 341 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_f47ed0f6f6564d90.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 341 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.5054_none_f47f794af655c7b9.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 342 INFO: Found C:\Windows\WinSxS\Manifests\x86_policy.9.0.microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_f480bfaef65491a5.manifest
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 342 INFO: Adding redirect Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 447 INFO: Caching module hooks...
+[2018-12-19 09:38:33] DEBUG [libs.Utility.Common:67] * STDOUT: 452 INFO: Analyzing C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\B3.py
+[2018-12-19 09:38:34] DEBUG [libs.Utility.Common:67] * STDOUT: 1957 INFO: Loading module hooks...
+[2018-12-19 09:38:34] DEBUG [libs.Utility.Common:67] * STDOUT: 1958 INFO: Loading module hook "hook-encodings.py"...
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2486 INFO: Looking for ctypes DLLs
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2486 INFO: Analyzing run-time hooks ...
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2492 INFO: Looking for dynamic libraries
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2687 INFO: Looking for eggs
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2687 INFO: Using Python library C:\Windows\system32\python27.dll
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2687 INFO: Found binding redirects: 
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: [BindingRedirect(name=u'Microsoft.VC90.CRT', language=None, arch=u'x86', oldVersion=(9, 0, 21022, 8), newVersion=(9, 0, 30729, 6161), publicKeyToken=u'1fc8b3b9a1e18e3b')]
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2689 INFO: Warnings written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\warnB3.txt
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2708 INFO: Graph cross-reference written to C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\xref-B3.html
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2741 INFO: checking PYZ
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2742 INFO: Building PYZ because out00-PYZ.toc is non existent
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 2742 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz
+[2018-12-19 09:38:35] DEBUG [libs.Utility.Common:67] * STDOUT: 3006 INFO: Building PYZ (ZlibArchive) C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\out00-PYZ.pyz completed successfully.
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3042 INFO: checking PKG
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3042 INFO: Building PKG because out00-PKG.toc is non existent
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3042 INFO: Building PKG (CArchive) out00-PKG.pkg
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3058 INFO: Building PKG (CArchive) out00-PKG.pkg completed successfully.
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3062 INFO: Bootloader c:\python27\lib\site-packages\PyInstaller\bootloader\Windows-32bit\runw.exe
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3062 INFO: checking EXE
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3062 INFO: Building EXE because out00-EXE.toc is non existent
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3062 INFO: Building EXE from out00-EXE.toc
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3069 INFO: SRCPATH [('favicon.ico', None)]
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3069 INFO: Updating icons from ['favicon.ico'] to d:\temp\tmp5we6wa
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3070 INFO: Writing RT_GROUP_ICON 0 resource with 76 bytes
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3070 INFO: Writing RT_ICON 1 resource with 19496 bytes
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3070 INFO: Writing RT_ICON 2 resource with 5672 bytes
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3070 INFO: Writing RT_ICON 3 resource with 2216 bytes
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3070 INFO: Writing RT_ICON 4 resource with 1384 bytes
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3070 INFO: Writing RT_ICON 5 resource with 3752 bytes
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3072 INFO: Appending archive to EXE C:\Users\OEMUSER\PycharmProjects\B3AssistantTool\packages\tmp\B3\B3.exe
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3075 INFO: Building EXE from out00-EXE.toc completed successfully.
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3080 INFO: checking COLLECT
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3080 INFO: Building COLLECT because out00-COLLECT.toc is non existent
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3081 INFO: Building COLLECT out00-COLLECT.toc
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3085 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3144 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3144 INFO: Updating manifest in C:\Users\OEMUSER\AppData\Roaming\pyinstaller\bincache00_py27_32bit\python27.dll
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3144 INFO: Updating resource type 24 name 2 language 1033
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3210 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3212 INFO: Updating manifest in C:\Users\OEMUSER\AppData\Roaming\pyinstaller\bincache00_py27_32bit\wx.siplib.pyd
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3212 INFO: Updating resource type 24 name 2 language 1033
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3243 INFO: Redirecting Microsoft.VC90.CRT version (9, 0, 21022, 8) -> (9, 0, 30729, 6161)
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3245 INFO: Updating manifest in C:\Users\OEMUSER\AppData\Roaming\pyinstaller\bincache00_py27_32bit\wx._core.pyd
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3245 INFO: Updating resource type 24 name 2 language 1033
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:67] * STDOUT: 3328 INFO: Building COLLECT out00-COLLECT.toc completed successfully.
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:72] * EXIT CODE: "0"
+[2018-12-19 09:38:36] DEBUG [libs.Utility.Common:73] ********************************************************
