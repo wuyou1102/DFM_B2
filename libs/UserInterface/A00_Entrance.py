@@ -24,7 +24,6 @@ class Panel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.parent = parent
-        print 'sss'
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         CIT = wx.Button(self, wx.ID_ANY, u"工程测试", wx.DefaultPosition, wx.DefaultSize, 0)
         RF = wx.Button(self, wx.ID_ANY, u"射频测试", wx.DefaultPosition, wx.DefaultSize, 0)
