@@ -46,8 +46,7 @@ class Serial(object):
         cmd = cmd.strip('\r\n') + '\r'
         Logger.debug('Serial| Send Command: %s ' % cmd)
         if self.is_open():
-            Logger.debug('Serial| Port is already open.')
-            self.__session.write(cmd.encode())
+            self.__session.write(cmd)
 
     def is_open(self):
         return self.__session.is_open
@@ -58,7 +57,7 @@ class Serial(object):
         return True
 
     @staticmethod
-    def get_ports():
+    def list_ports():
         ports = list()
         port_list = serial.tools.list_ports.comports()
         if len(port_list) == 0:
@@ -66,6 +65,6 @@ class Serial(object):
             return ports
         else:
             for port in list(port_list):
-                port_name = port[1]
+                port_name = port[0]
                 ports.append(port_name)
-            return sorted(ports, reverse=True)
+            return sorted(ports, reverse=False)
