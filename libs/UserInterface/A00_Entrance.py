@@ -2,6 +2,7 @@
 
 import logging
 import sys
+
 import wx
 
 logger = logging.getLogger(__name__)
