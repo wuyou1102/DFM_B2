@@ -1,5 +1,5 @@
-from A import A
-from B import B
+from EthernetInterfaceTest import EthernetInterfaceTest
+from SwitchTest import SwitchTest
 
-PCBA_CASES = [A, B]
-MACHINE_CASES = [A]
+PCBA_CASES = [EthernetInterfaceTest, SwitchTest]
+MACHINE_CASES = [EthernetInterfaceTest]

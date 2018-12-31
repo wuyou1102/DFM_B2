@@ -18,6 +18,7 @@ class Frame(wx.Frame):
     def __init__(self, title, _type):
         wx.Frame.__init__(self, None, id=wx.ID_ANY, title=title, size=(800, 600))
         self.panel = Panel(self, _type=_type)
+        self.SetBackgroundColour(Color.Azure2)
         self.Center()
 
 
@@ -100,19 +101,28 @@ class Panel(wx.Panel):
 
     def connect_uart(self):
         print 'connect'
-        self.Enable(True)
+        if True:
+            Utility.append_thread(target=self.update_case_result, allow_dupl=False)
+        else:
+            Utility.Alert.Error(u"无法打开设备")
 
     def disconnect_uart(self):
         print 'disconnect'
+        self.test_view.clear_case_result()
+        self.Layout()
         self.Enable(False)
 
     def Enable(self, enable=True):
-        lst1 = [self.disconnect, self.button_sn]
+        lst1 = [self.disconnect, self.button_sn, self.test_view]
         lst2 = [self.connect]
         for ctrl in lst1:
             ctrl.Enable(enable)
         for ctrl in lst2:
             ctrl.Enable(not enable)
+
+    def update_case_result(self):
+        self.test_view.update_case_result()
+        self.Enable()
 
 
 class ListBook(wx.Panel):
@@ -125,8 +135,8 @@ class ListBook(wx.Panel):
         self.__CaseView = CaseView(parent=self)
         left_sizer = wx.BoxSizer(wx.VERTICAL)
         right_sizer = wx.BoxSizer(wx.VERTICAL)
-        left_sizer.Add(self.__ScrolledWindow, 1, wx.EXPAND | wx.ALL, 1)
-        right_sizer.Add(self.__CaseView, 1, wx.EXPAND | wx.ALL, 1)
+        left_sizer.Add(self.__ScrolledWindow, 1, wx.EXPAND | wx.ALL, 0)
+        right_sizer.Add(self.__CaseView, 1, wx.EXPAND | wx.ALL, 0)
         main_sizer.Add(left_sizer, 2, wx.EXPAND | wx.ALL, 0)
         main_sizer.Add(right_sizer, 7, wx.EXPAND | wx.ALL, 0)
         self.__init_cases(cases=cases)
@@ -135,11 +145,17 @@ class ListBook(wx.Panel):
 
     def __init_cases(self, cases):
         for case in cases:
-            for x in range(10):
-                c = case(self.__CaseView)
-                self.__ScrolledWindow.append(c)
-                self.__CaseView.append(c)
+            c = case(self.__CaseView)
+            self.__ScrolledWindow.append(c)
+            self.__CaseView.append(c)
         self.__ScrolledWindow.refresh_scroll_window()
+
+    def update_case_result(self):
+        self.__ScrolledWindow.update_case_result()
+
+    def clear_case_result(self):
+        self.__ScrolledWindow.clear_case_result()
+        self.__ScrolledWindow.hide_last_select()
 
 
 class ScrolledWindow(wx.Panel):
@@ -179,29 +195,36 @@ class ScrolledWindow(wx.Panel):
         self.__ScrolledWindow.SetSizer(self.__container, deleteOld=True)
         self.__ScrolledWindow.Scroll(0, 0)
         self.main_sizer.Layout()
-        self.refresh_case_result()
 
-    def refresh_case_result(self):
+    def update_case_result(self):
         for button in self.__buttons:
-            button.refresh()
+            button.update_result()
+
+    def clear_case_result(self):
+        for button in self.__buttons:
+            button.clear_result()
 
     def on_click(self, event):
-        button = event.GetEventObject()
         if self.__previous_select is not None: self.__previous_select.deselect()
+        button = event.GetEventObject()
         button.select()
         self.__previous_select = button
+
+    def hide_last_select(self):
+        self.__previous_select.deselect()
 
 
 class ScrollButton(wx.Button):
     def __init__(self, parent, case, index):
-        wx.Button.__init__(self, parent, wx.ID_ANY, case.get_name() + str(index), wx.DefaultPosition, (-1, 30), 0)
+        wx.Button.__init__(self, parent, wx.ID_ANY, case.get_name(), wx.DefaultPosition, (-1, 30),
+                           style=wx.NO_BORDER)
         self.__case = case
         self.index = index
         self.__result = "NotTest"
         self.__color = {
             "Pass": Color.SpringGreen3,
             "Fail": Color.Red1,
-            "NotTest": Color.gray91,
+            "NotTest": Color.gray81,
         }
 
     def __refresh_result(self):
@@ -210,8 +233,12 @@ class ScrollButton(wx.Button):
     def __refresh_button(self):
         self.SetBackgroundColour(self.color)
 
-    def refresh(self):
+    def update_result(self):
         self.__refresh_result()
+        self.__refresh_button()
+
+    def clear_result(self):
+        self.__result = "NotTest"
         self.__refresh_button()
 
     def select(self, select=True):
