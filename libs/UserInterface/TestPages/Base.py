@@ -21,10 +21,11 @@ class Variable(object):
 
 
 class Page(wx.Panel):
-    def __init__(self, parent, name):
+    def __init__(self, parent, name, flag):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.__parent = parent
         self.name = name
+        self.flag = flag
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         title = wx.StaticText(self, wx.ID_ANY, self.name, wx.DefaultPosition, wx.DefaultSize,
                               wx.ALIGN_CENTER | wx.SIMPLE_BORDER)
@@ -58,7 +59,7 @@ class Page(wx.Panel):
 
     def get_result(self):
         uart = self.get_uart()
-        return uart.get_flag_result("heelo")
+        return uart.get_flag_result(self.flag)
 
     def Show(self):
         super(wx.Panel, self).Show()
@@ -74,6 +75,7 @@ class Page(wx.Panel):
         button = wx.Button(self, wx.ID_ANY, label, wx.DefaultPosition, (-1, 40), 0)
         button.SetBackgroundColour(color)
         button.SetFont(Font.COMMON_1_LARGE_BOLD)
+        button.Bind(wx.EVT_BUTTON, self.on_result_button)
         if isPass: button.Disable()
         return button
 
@@ -81,13 +83,18 @@ class Page(wx.Panel):
         obj = event.GetEventObject()
         if obj.Name == "Pass":
             logger.debug("\"%s\" Result is : <Pass>" % self.name)
+            self.set_result("Pass")
         else:
             logger.debug("\"%s\" Result is : <Pass>" % self.name)
+            self.set_result("Fail")
         self.stop_test()
-
 
     def start_test(self):
         raise NotImplementedError
 
     def stop_test(self):
         raise NotImplementedError
+
+    def set_result(self, result):
+        uart = self.get_uart()
+        uart.set_flag_result(flag=self.flag, result=result)

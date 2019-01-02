@@ -55,7 +55,7 @@ def timeout(seconds):
             alive = thd.isAlive()
             thd.kill()  # kill the child thread
             if alive:
-                raise Timeout(u'function run too long, timeout %d seconds.' % seconds)
+                raise Timeout(u'Function run too long, Timeout %d seconds.' % seconds)
             else:
                 return result[0]
 

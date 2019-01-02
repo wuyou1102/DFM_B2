@@ -18,30 +18,22 @@ class Serial(object):
     def read_line(self):
         data = ''
         while self.is_open():
-            try:
-                s = self.__session.read()
-            except TypeError:
-                continue
-            except serial.serialwin32.SerialException:
-                continue
-            except AttributeError:
-                continue
+            s = self.__session.read()
             data += s
-            if data.endswith('\r') or data.endswith('\n'):
+            Logger.debug(s)
+            if data.endswith('\n'):
                 data = data.strip('\r\n')
-                if data:
-                    return data
         return data
 
     def send_command(self, cmd):
-        cmd = cmd.strip('\r\n') + '\r'
         Logger.debug('Serial| Send Command: %s ' % cmd)
+        cmd = cmd + '\n'
         if self.is_open():
             self.__session.write(cmd)
 
     def is_open(self):
         return self.__session.is_open
-    
+
     def close(self):
         if self.is_open():
             self.__session.close()

@@ -74,6 +74,7 @@ class Panel(wx.Panel):
         title = wx.StaticText(self, wx.ID_ANY, u"序列号: ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.serial_number = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
         self.button_sn = wx.Button(self, wx.ID_ANY, u"写", wx.DefaultPosition, (25, 25), 0, name="set_sn")
+        self.button_sn.Bind(wx.EVT_BUTTON, self.on_button_click)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.TOP, 5)
         sizer.Add(self.serial_number, 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
         sizer.Add(self.button_sn, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
@@ -91,22 +92,23 @@ class Panel(wx.Panel):
         obj = event.GetEventObject()
         name = obj.Name
         if name == "refresh":
-            self.port_choice.SetItems(Utility.Serial.list_ports())
+            self.port_choice.SetItems(UART.list_ports())
         elif name == "connect":
             self.connect()
         elif name == "disconnect":
             self.disconnect()
         elif name == "set_sn":
-            print 'set_sn'
+            self.set_serial_number_via_uart()
         elif name == "get_sn":
-            print 'get_sn'
+            self.update_serial_number()
 
     def connect(self):
         port = self.get_selected_port()
         if port is False: return
         uart = UART(port=port)
-        self.set_variable(uart=uart)
-        if uart.is_open():
+        if uart.is_connect():
+            self.set_variable(uart=uart)
+            self.update_serial_number()
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
         else:
             Utility.Alert.Error(u"无法打开设备")
@@ -119,6 +121,24 @@ class Panel(wx.Panel):
         self.clear_variable()
         self.Layout()
         self.Enable(False)
+
+    def set_serial_number_via_uart(self):
+        serial = self.serial_number.GetValue()
+        if not serial:
+            Utility.Alert.Error(u"请输入正确的序列号")
+            return False
+        else:
+            uart = Variable.get_uart()
+            if not uart.set_serial_number():
+                Utility.Alert.Error(u"序列号设置失败")
+
+    def update_serial_number(self):
+        uart = Variable.get_uart()
+        serial = uart.get_serial_number()
+        if serial is not None:
+            self.serial_number.SetValue(value=serial)
+        else:
+            Utility.Alert.Error(u"序列号获取失败")
 
     def Enable(self, enable=True):
         lst1 = [self.btn_disconnect, self.button_sn, self.test_view]
