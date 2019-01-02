@@ -3,10 +3,8 @@ import serial
 import logging
 import serial.tools.list_ports
 import threading
-import re
 
 Logger = logging.getLogger(__name__)
-port_pattern = re.compile(r'(COM\d+)')
 
 
 class Serial(object):
@@ -15,14 +13,7 @@ class Serial(object):
         self.lock = threading.Lock()
         baudrate = baudrate if baudrate in [110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200,
                                             230400, 380400, 460800, 921600] else 115200
-        self.port = self.__convert_port(port=port)
-        self.__session = serial.Serial(port=self.port, baudrate=baudrate, bytesize=8, parity='N', stopbits=1, timeout=2)
-
-    def __convert_port(self, port):
-        return re.findall(port_pattern, port)[0]
-
-    def get_port(self):
-        return self.port
+        self.__session = serial.Serial(port=port, baudrate=baudrate, bytesize=8, parity='N', stopbits=1, timeout=2)
 
     def read_line(self):
         data = ''
@@ -50,7 +41,7 @@ class Serial(object):
 
     def is_open(self):
         return self.__session.is_open
-
+    
     def close(self):
         if self.is_open():
             self.__session.close()

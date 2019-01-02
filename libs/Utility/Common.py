@@ -3,6 +3,7 @@ import subprocess
 import logging
 from libs import Command
 import time
+from Serial import Serial
 
 __logger = logging.getLogger(__name__)
 
@@ -106,6 +107,8 @@ def get_serial_ports():
 def get_timestamp(time_fmt='%Y_%m_%d-%H_%M_%S', t=None):
     t = t if t else time.time()
     return time.strftime(time_fmt, time.localtime(t))
+
+
 
 
 def generator():

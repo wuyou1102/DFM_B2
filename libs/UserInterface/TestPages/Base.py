@@ -1,12 +1,23 @@
 # -*- encoding:UTF-8 -*-
 import wx
 import logging
-from libs import Utility
 from libs.Config import Color
 from libs.Config import Font
-import random
 
 logger = logging.getLogger(__name__)
+
+
+class Variable(object):
+    __uart = None
+
+    @classmethod
+    def get_uart(cls):
+        return cls.__uart
+
+    @classmethod
+    def set_uart(cls, uart=None):
+        cls.__uart = uart
+        return True
 
 
 class Page(wx.Panel):
@@ -15,10 +26,13 @@ class Page(wx.Panel):
         self.__parent = parent
         self.name = name
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
-        title =
+        title = wx.StaticText(self, wx.ID_ANY, self.name, wx.DefaultPosition, wx.DefaultSize,
+                              wx.ALIGN_CENTER | wx.SIMPLE_BORDER)
+        title.SetFont(Font.TEST_TITLE)
+        title.SetBackgroundColour(Color.LightYellow1)
         test_sizer = self.init_test_sizer()
         result_sizer = self.init_result_sizer()
-        self.main_sizer.Add(test_sizer, 1, wx.EXPAND | wx.ALL, 1)
+        self.main_sizer.Add(title, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.main_sizer.Add(test_sizer, 1, wx.EXPAND | wx.ALL, 1)
         self.main_sizer.Add(result_sizer, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.ALL, 1)
         self.SetSizer(self.main_sizer)
@@ -35,11 +49,16 @@ class Page(wx.Panel):
         sizer.Add(self.FailButton, 1, wx.EXPAND | wx.ALL, 1)
         return sizer
 
+    @staticmethod
+    def get_uart():
+        return Variable.get_uart()
+
     def get_name(self):
         return self.name
 
     def get_result(self):
-        return random.choice(["Pass", "Fail", "NotTest"])
+        uart = self.get_uart()
+        return uart.get_flag_result("heelo")
 
     def Show(self):
         super(wx.Panel, self).Show()
@@ -64,3 +83,11 @@ class Page(wx.Panel):
             logger.debug("\"%s\" Result is : <Pass>" % self.name)
         else:
             logger.debug("\"%s\" Result is : <Pass>" % self.name)
+        self.stop_test()
+
+
+    def start_test(self):
+        raise NotImplementedError
+
+    def stop_test(self):
+        raise NotImplementedError

@@ -1,17 +1,17 @@
 # -*- encoding:UTF-8 -*-
 import logging
 import sys
-
 import wx
-
 from libs import Utility
 from libs.Config import Color
+from TestPages import MACHINE_CASES
+from TestPages import PCBA_CASES
+from libs.Utility.UART import UART
+from TestPages import Variable
 
 logger = logging.getLogger(__name__)
 reload(sys)
 sys.setdefaultencoding('utf-8')
-from TestPages import MACHINE_CASES
-from TestPages import PCBA_CASES
 
 
 class Frame(wx.Frame):
@@ -53,18 +53,20 @@ class Panel(wx.Panel):
         pic_refresh = wx.Image('resource/icon/Refresh.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
         pic_connect = wx.Image('resource/icon/Connect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
         pic_disconnect = wx.Image('resource/icon/Disconnect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
-        refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0, name='refresh')
-        self.connect = wx.BitmapButton(self, wx.ID_ANY, pic_connect, wx.DefaultPosition, size, style=0, name='connect')
-        self.disconnect = wx.BitmapButton(self, wx.ID_ANY, pic_disconnect, wx.DefaultPosition, size, style=0,
-                                          name='disconnect')
-        refresh.Bind(wx.EVT_BUTTON, self.on_button_click)
-        self.connect.Bind(wx.EVT_BUTTON, self.on_button_click)
-        self.disconnect.Bind(wx.EVT_BUTTON, self.on_button_click)
+        self.btn_refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0,
+                                           name='refresh')
+        self.btn_connect = wx.BitmapButton(self, wx.ID_ANY, pic_connect, wx.DefaultPosition, size, style=0,
+                                           name='connect')
+        self.btn_disconnect = wx.BitmapButton(self, wx.ID_ANY, pic_disconnect, wx.DefaultPosition, size, style=0,
+                                              name='disconnect')
+        self.btn_refresh.Bind(wx.EVT_BUTTON, self.on_button_click)
+        self.btn_connect.Bind(wx.EVT_BUTTON, self.on_button_click)
+        self.btn_disconnect.Bind(wx.EVT_BUTTON, self.on_button_click)
         port_sizer.Add(port_title, 0, wx.EXPAND | wx.TOP, 5)
         port_sizer.Add(self.port_choice, 1, wx.EXPAND | wx.ALL, 1)
-        port_sizer.Add(refresh, 0, wx.EXPAND | wx.ALL, 1)
-        port_sizer.Add(self.connect, 0, wx.EXPAND | wx.ALL, 1)
-        port_sizer.Add(self.disconnect, 0, wx.EXPAND | wx.ALL, 1)
+        port_sizer.Add(self.btn_refresh, 0, wx.EXPAND | wx.ALL, 1)
+        port_sizer.Add(self.btn_connect, 0, wx.EXPAND | wx.ALL, 1)
+        port_sizer.Add(self.btn_disconnect, 0, wx.EXPAND | wx.ALL, 1)
         return port_sizer
 
     def __init_serial_number_sizer(self):
@@ -91,30 +93,36 @@ class Panel(wx.Panel):
         if name == "refresh":
             self.port_choice.SetItems(Utility.Serial.list_ports())
         elif name == "connect":
-            self.connect_uart()
+            self.connect()
         elif name == "disconnect":
-            self.disconnect_uart()
+            self.disconnect()
         elif name == "set_sn":
             print 'set_sn'
         elif name == "get_sn":
             print 'get_sn'
 
-    def connect_uart(self):
-        print 'connect'
-        if True:
+    def connect(self):
+        port = self.get_selected_port()
+        if port is False: return
+        uart = UART(port=port)
+        self.set_variable(uart=uart)
+        if uart.is_open():
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
         else:
             Utility.Alert.Error(u"无法打开设备")
 
-    def disconnect_uart(self):
-        print 'disconnect'
+    def disconnect(self):
         self.test_view.clear_case_result()
+        uart = Variable.get_uart()
+        if uart is not None:
+            uart.close()
+        self.clear_variable()
         self.Layout()
         self.Enable(False)
 
     def Enable(self, enable=True):
-        lst1 = [self.disconnect, self.button_sn, self.test_view]
-        lst2 = [self.connect]
+        lst1 = [self.btn_disconnect, self.button_sn, self.test_view]
+        lst2 = [self.btn_connect, self.port_choice, self.btn_refresh]
         for ctrl in lst1:
             ctrl.Enable(enable)
         for ctrl in lst2:
@@ -123,6 +131,22 @@ class Panel(wx.Panel):
     def update_case_result(self):
         self.test_view.update_case_result()
         self.Enable()
+
+    @staticmethod
+    def set_variable(**kwargs):
+        Variable.set_uart(uart=kwargs['uart'])
+
+    @staticmethod
+    def clear_variable():
+        Variable.set_uart()
+
+    def get_selected_port(self):
+        selected = self.port_choice.GetStringSelection()
+        if selected:
+            return selected
+        else:
+            Utility.Alert.Error(u"请选择端口号")
+            return False
 
 
 class ListBook(wx.Panel):
@@ -211,7 +235,8 @@ class ScrolledWindow(wx.Panel):
         self.__previous_select = button
 
     def hide_last_select(self):
-        self.__previous_select.deselect()
+        if self.__previous_select is not None:
+            self.__previous_select.deselect()
 
 
 class ScrollButton(wx.Button):
