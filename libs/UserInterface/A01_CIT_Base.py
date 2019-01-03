@@ -8,6 +8,7 @@ from TestPages import MACHINE_CASES
 from TestPages import PCBA_CASES
 from libs.Utility.UART import UART
 from TestPages import Variable
+from TestPages.Base import Report
 
 logger = logging.getLogger(__name__)
 reload(sys)
@@ -129,7 +130,7 @@ class Panel(wx.Panel):
             return False
         else:
             uart = Variable.get_uart()
-            if not uart.set_serial_number():
+            if not uart.set_serial_number(serial):
                 Utility.Alert.Error(u"序列号设置失败")
 
     def update_serial_number(self):
@@ -192,7 +193,13 @@ class ListBook(wx.Panel):
             c = case(self.__CaseView)
             self.__ScrolledWindow.append(c)
             self.__CaseView.append(c)
+        self.__add_report_page()
         self.__ScrolledWindow.refresh_scroll_window()
+
+    def __add_report_page(self):
+        report = Report(self.__CaseView)
+        self.__ScrolledWindow.append(report)
+        self.__CaseView.append(report)
 
     def update_case_result(self):
         self.__ScrolledWindow.update_case_result()
@@ -200,6 +207,9 @@ class ListBook(wx.Panel):
     def clear_case_result(self):
         self.__ScrolledWindow.clear_case_result()
         self.__ScrolledWindow.hide_last_select()
+
+    def next_page(self):
+        self.__ScrolledWindow.next_page()
 
 
 class ScrolledWindow(wx.Panel):
@@ -258,6 +268,15 @@ class ScrolledWindow(wx.Panel):
         if self.__previous_select is not None:
             self.__previous_select.deselect()
 
+    def next_page(self):
+        self.__previous_select.deselect()
+        self.__previous_select.update_result()
+        index = self.__previous_select.index
+        if index <= len(self.__case_pool):
+            button = self.__buttons[index + 1]
+            button.select()
+            self.__previous_select = button
+
 
 class ScrollButton(wx.Button):
     def __init__(self, parent, case, index):
@@ -270,6 +289,7 @@ class ScrollButton(wx.Button):
             "Pass": Color.SpringGreen3,
             "Fail": Color.Red1,
             "NotTest": Color.gray81,
+            "Report": Color.Yellow
         }
 
     def __refresh_result(self):
@@ -307,6 +327,7 @@ class CaseView(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.panel_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.__parent = parent
         self.__pages = list()
         self.SetSizer(self.panel_sizer)
         self.Layout()
@@ -317,3 +338,6 @@ class CaseView(wx.Panel):
 
     def refresh(self):
         self.panel_sizer.Layout()
+
+    def next_page(self):
+        self.__parent.next_page()

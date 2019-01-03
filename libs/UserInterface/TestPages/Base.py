@@ -3,6 +3,11 @@ import wx
 import logging
 from libs.Config import Color
 from libs.Config import Font
+from libs.Config import Path
+from libs import Utility
+import os
+import time
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +29,7 @@ class Page(wx.Panel):
     def __init__(self, parent, name, flag):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.__parent = parent
+        self.lock = threading.Lock()
         self.name = name
         self.flag = flag
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -64,10 +70,12 @@ class Page(wx.Panel):
     def Show(self):
         super(wx.Panel, self).Show()
         self.__parent.refresh()
+        self.start_test()
 
     def Hide(self):
         super(wx.Panel, self).Hide()
         self.__parent.refresh()
+        self.stop_test()
 
     def create_result_button(self, isPass):
         color = Color.SpringGreen3 if isPass else Color.Firebrick2
@@ -83,18 +91,74 @@ class Page(wx.Panel):
         obj = event.GetEventObject()
         if obj.Name == "Pass":
             logger.debug("\"%s\" Result is : <Pass>" % self.name)
-            self.set_result("Pass")
+            self.SetResult("Pass")
         else:
             logger.debug("\"%s\" Result is : <Pass>" % self.name)
-            self.set_result("Fail")
-        self.stop_test()
+            self.SetResult("Fail")
+        self.__parent.next_page()
 
     def start_test(self):
-        raise NotImplementedError
+        print 'start_test'
 
     def stop_test(self):
-        raise NotImplementedError
+        print 'stop_test'
 
-    def set_result(self, result):
+    def SetResult(self, result):
+        self.FormatPrint(result, symbol="=")
         uart = self.get_uart()
         uart.set_flag_result(flag=self.flag, result=result)
+
+    def EnablePass(self):
+        self.PassButton.Enable()
+
+    def LogMessage(self, msg):
+        msg = msg.strip('\r\n')
+        uart = self.get_uart()
+        if uart is None:
+            return
+        serial = uart.get_serial_number()
+        with open(os.path.join(Path.LOG_SAVE, "%s.log" % serial), 'a') as wfile:
+            wfile.write(u"{time}:{message}\n".format(time=Utility.get_timestamp(), message=msg))
+
+    @staticmethod
+    def Sleep(secs):
+        time.sleep(secs)
+
+    def FormatPrint(self, info, symbol="*", length=50):
+        if self.lock.acquire():
+            try:
+                body = " %s: %s" % (self.name, info)
+                self.LogMessage(symbol * length)
+                self.LogMessage(symbol + body)
+                self.LogMessage(symbol * length)
+            finally:
+                self.lock.release()
+
+
+class Report(wx.Panel):
+    def __init__(self, parent, name=u"测试总结"):
+        wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
+        self.__parent = parent
+        self.name = name
+        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
+        title = wx.StaticText(self, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize,
+                              wx.ALIGN_CENTER | wx.SIMPLE_BORDER)
+        title.SetFont(Font.TEST_TITLE)
+        title.SetBackgroundColour(Color.LightYellow1)
+        self.main_sizer.Add(title, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
+        self.SetSizer(self.main_sizer)
+        self.Layout()
+
+    def get_name(self):
+        return self.name
+
+    def Show(self):
+        super(wx.Panel, self).Show()
+        self.__parent.refresh()
+
+    def Hide(self):
+        super(wx.Panel, self).Hide()
+        self.__parent.refresh()
+
+    def get_result(self):
+        return "Report"

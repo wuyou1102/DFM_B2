@@ -29,7 +29,7 @@ class Serial(object):
         Logger.debug('Serial| Send Command: %s ' % cmd)
         cmd = cmd + '\n'
         if self.is_open():
-            self.__session.write(cmd)
+            self.__session.write(cmd.encode())
 
     def is_open(self):
         return self.__session.is_open
