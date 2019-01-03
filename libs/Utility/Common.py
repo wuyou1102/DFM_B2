@@ -109,6 +109,9 @@ def get_timestamp(time_fmt='%Y_%m_%d-%H_%M_%S', t=None):
     return time.strftime(time_fmt, time.localtime(t))
 
 
+def get_time(time_fmt='%H:%M:%S', t=None):
+    t = t if t else time.time()
+    return time.strftime(time_fmt, time.localtime(t))
 
 
 def generator():

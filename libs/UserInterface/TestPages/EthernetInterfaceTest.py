@@ -19,8 +19,12 @@ class EthernetInterfaceTest(Base.Page):
         sizer.Add(self.output, 1, wx.EXPAND | wx.ALL, 0)
         return sizer
 
-    def start_test(self):
+    def before_test(self):
+        super(EthernetInterfaceTest, self).before_test()
+        self.output.SetValue("")
         self.stop_flag = True
+
+    def start_test(self):
         Utility.append_thread(target=self.ping)
         self.FormatPrint(info="Started")
 
@@ -35,9 +39,11 @@ class EthernetInterfaceTest(Base.Page):
             line = result.outputs[2]
             self.append_log(line)
             if "TTL=" in line:
+                self.append_log(u"测试通过，请点击PASS。")
                 self.EnablePass()
+                break
             self.Sleep(1)
 
     def append_log(self, msg):
         self.LogMessage(msg)
-        wx.CallAfter(self.output.AppendText, msg + '\n')
+        wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))

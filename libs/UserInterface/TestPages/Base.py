@@ -68,12 +68,13 @@ class Page(wx.Panel):
         return uart.get_flag_result(self.flag)
 
     def Show(self):
-        super(wx.Panel, self).Show()
+        super(Page, self).Show()
         self.__parent.refresh()
+        self.before_test()
         self.start_test()
 
     def Hide(self):
-        super(wx.Panel, self).Hide()
+        super(Page, self).Hide()
         self.__parent.refresh()
         self.stop_test()
 
@@ -84,7 +85,6 @@ class Page(wx.Panel):
         button.SetBackgroundColour(color)
         button.SetFont(Font.COMMON_1_LARGE_BOLD)
         button.Bind(wx.EVT_BUTTON, self.on_result_button)
-        if isPass: button.Disable()
         return button
 
     def on_result_button(self, event):
@@ -97,6 +97,9 @@ class Page(wx.Panel):
             self.SetResult("Fail")
         self.__parent.next_page()
 
+    def before_test(self):
+        self.EnablePass(enable=False)
+
     def start_test(self):
         print 'start_test'
 
@@ -108,8 +111,8 @@ class Page(wx.Panel):
         uart = self.get_uart()
         uart.set_flag_result(flag=self.flag, result=result)
 
-    def EnablePass(self):
-        self.PassButton.Enable()
+    def EnablePass(self, enable=True):
+        self.PassButton.Enable(enable=enable)
 
     def LogMessage(self, msg):
         msg = msg.strip('\r\n')
@@ -153,11 +156,11 @@ class Report(wx.Panel):
         return self.name
 
     def Show(self):
-        super(wx.Panel, self).Show()
+        super(Report, self).Show()
         self.__parent.refresh()
 
     def Hide(self):
-        super(wx.Panel, self).Hide()
+        super(Report, self).Hide()
         self.__parent.refresh()
 
     def get_result(self):

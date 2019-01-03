@@ -88,3 +88,9 @@ class UART(Serial):
 
     def is_connect(self):
         return True
+
+    def reset_button_click(self):
+        return True
+
+    def get_button_click(self):
+        return random.choice([False,False,False,False,False,False,True])

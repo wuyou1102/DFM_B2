@@ -2,6 +2,8 @@
 import wx
 import logging
 import Base
+from libs.Config import Font
+from libs.Config import Color
 
 logger = logging.getLogger(__name__)
 
@@ -12,4 +14,5 @@ class USBTest(Base.Page):
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         return sizer
