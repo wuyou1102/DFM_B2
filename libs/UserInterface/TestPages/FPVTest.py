@@ -13,7 +13,8 @@ url = "rtsp://admin:admin@192.168.1.103:554"
 class FPVTest(Base.Page):
     def __init__(self, parent):
         Base.Page.__init__(self, parent=parent, name=u"图传测试", flag="FPV")
-        self.player = None
+        self.instance = vlc.Instance()
+        self.player = self.instance.media_player_new()
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -46,16 +47,16 @@ class FPVTest(Base.Page):
         Utility.append_thread(target=self.__play, allow_dupl=False)
 
     def __play(self):
-        instance = vlc.Instance()
-        self.player = instance.media_player_new()
-        self.player.set_hwnd(self.view.GetHandle())
-        rtsp = instance.media_new(self.url.GetValue())
+        rtsp = self.instance.media_new(self.url.GetValue())
         self.player.set_media(rtsp)
+        self.player.set_hwnd(self.view.GetHandle())
         if self.player.play() == -1:
             Utility.Alert.Error(u"播放失败")
         else:
             self.EnablePass()
+            self.view.Layout()
 
     def on_stop(self, event):
         if self.player is not None:
             self.player.stop()
+
