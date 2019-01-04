@@ -52,8 +52,8 @@ def build():
 def deploy():
     shutil.move(os.path.join(abs_path, 'out', python_name),
                 os.path.join(abs_path, "B3AssistantTool_%s" % Utility.get_timestamp()))
-    # shutil.rmtree(os.path.join(abs_path, 'tmp'))
-    # shutil.rmtree(os.path.join(abs_path, 'out'))
+    shutil.rmtree(os.path.join(abs_path, 'tmp'))
+    shutil.rmtree(os.path.join(abs_path, 'out'))
     os.remove(os.path.join(abs_path, '%s.spec' % python_name))
 
 
