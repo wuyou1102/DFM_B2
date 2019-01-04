@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class SwitchTest(Base.Page):
     def __init__(self, parent):
         Base.Page.__init__(self, parent=parent, name=u"开关测试", flag="Switch")
-        self.count = 0
+
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -44,7 +44,6 @@ class SwitchTest(Base.Page):
     def is_clicked(self):
         uart = Variable.get_uart()
         while self.stop_flag:
-            self.count += 1
             result = uart.get_button_click()
             state = u"已触发" if result else u"未触发"
             self.append_log(u"查询开关状态 \"%s\"" % state)

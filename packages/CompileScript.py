@@ -5,8 +5,8 @@ from libs import Utility
 import shutil
 
 root_path = "C:\Users\OEMUSER\PycharmProjects"
-project_name = "B3AssistantTool"
-python_name = "B3"
+project_name = "DFM_B2"
+python_name = "DFM"
 project_path = os.path.join(root_path, project_name)
 python_script = "%s.py" % python_name
 abs_path = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -19,7 +19,10 @@ def find_resource_files(path):
         if os.path.isdir(p):
             find_resource_files(path=p)
         else:
-            relative_path = os.path.relpath(path, project_path)
+            if f.endswith(".dll"):
+                relative_path = "."
+            else:
+                relative_path = os.path.relpath(path, project_path)
             resource_files.append((p, relative_path))
 
 
@@ -49,8 +52,8 @@ def build():
 def deploy():
     shutil.move(os.path.join(abs_path, 'out', python_name),
                 os.path.join(abs_path, "B3AssistantTool_%s" % Utility.get_timestamp()))
-    shutil.rmtree(os.path.join(abs_path, 'tmp'))
-    shutil.rmtree(os.path.join(abs_path, 'out'))
+    # shutil.rmtree(os.path.join(abs_path, 'tmp'))
+    # shutil.rmtree(os.path.join(abs_path, 'out'))
     os.remove(os.path.join(abs_path, '%s.spec' % python_name))
 
 
