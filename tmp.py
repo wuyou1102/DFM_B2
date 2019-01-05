@@ -62,8 +62,17 @@ class Player(wx.Frame):
 
         # Panels
         # The first panel holds the video and it's all black
-        self.videopanel = wx.Panel(self, -1)
+        self.panel1 = wx.Panel(self, -1)
+        self.panel2 = wx.Panel(self.panel1, -1)
+        self.videopanel = wx.Panel(self.panel2, -1)
         self.videopanel.SetBackgroundColour(wx.BLACK)
+        sizer1 = wx.BoxSizer(wx.VERTICAL)
+        sizer1.Add(self.panel2, 1, wx.EXPAND, 0)
+        self.panel1.SetSizer(sizer1)
+        sizer2 = wx.BoxSizer(wx.VERTICAL)
+        sizer2.Add(self.videopanel, 1, wx.EXPAND, 0)
+        self.panel2.SetSizer(sizer2)
+        self.Layout()
 
         # The second panel holds controls
         ctrlpanel = wx.Panel(self, -1)
@@ -101,7 +110,7 @@ class Player(wx.Frame):
         ctrlpanel.SetSizer(ctrlbox)
         # Put everything togheter
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
+        sizer.Add(self.panel1, 1, flag=wx.EXPAND)
         sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
         self.SetSizer(sizer)
         self.SetMinSize((350, 300))
@@ -125,18 +134,9 @@ class Player(wx.Frame):
         # if a file is already running, then stop it.
         self.OnStop(None)
 
-        # Create a file dialog opened in the current home directory, where
-        # you can display all kind of files, having as title "Choose a file".
-
-        # Creation
-        self.Media = self.Instance.media_new("rtsp://admin:admin@192.168.1.103:554")
+        self.Media = self.Instance.media_new("rtsp://admin:Password01!@192.168.1.155:554")
         self.player.set_media(self.Media)
-        # Report the title of the file chosen
 
-        #  if an error was encountred while retriving the title, then use
-        #  filename
-
-        # set the window id where to render VLC's video output
         handle = self.videopanel.GetHandle()
         if sys.platform.startswith('linux'):  # for Linux using the X Server
             self.player.set_xwindow(handle)
@@ -145,12 +145,6 @@ class Player(wx.Frame):
         elif sys.platform == "darwin":  # for MacOS
             self.player.set_nsobject(handle)
         self.OnPlay(None)
-
-        # set the volume slider to the current volume
-        self.volslider.SetValue(self.player.audio_get_volume() / 2)
-
-    # finally destroy the dialog
-
 
     def OnPlay(self, evt):
         """Toggle the status to Play/Pause.
@@ -168,12 +162,10 @@ class Player(wx.Frame):
             else:
                 self.timer.Start()
 
-
     def OnPause(self, evt):
         """Pause the player.
         """
         self.player.pause()
-
 
     def OnStop(self, evt):
         """Stop the player.
@@ -182,7 +174,6 @@ class Player(wx.Frame):
         # reset the time slider
         self.timeslider.SetValue(0)
         self.timer.Stop()
-
 
     def OnTimer(self, evt):
         """Update the time slider according to the current movie time.
@@ -196,7 +187,6 @@ class Player(wx.Frame):
         time = self.player.get_time()
         self.timeslider.SetValue(time)
 
-
     def OnToggleVolume(self, evt):
         """Mute/Unmute according to the audio button.
         """
@@ -208,7 +198,6 @@ class Player(wx.Frame):
         # and our volume slider has range [0, 100], just divide by 2.
         self.volslider.SetValue(self.player.audio_get_volume() / 2)
 
-
     def OnSetVolume(self, evt):
         """Set the volume according to the volume sider.
         """
@@ -216,7 +205,6 @@ class Player(wx.Frame):
         # vlc.MediaPlayer.audio_set_volume returns 0 if success, -1 otherwise
         if self.player.audio_set_volume(volume) == -1:
             self.errorDialog("Failed to set volume")
-
 
     def errorDialog(self, errormessage):
         """Display a simple error dialog.
