@@ -7,6 +7,7 @@ from libs.Config import Color
 from libs import Utility
 import vlc
 
+
 logger = logging.getLogger(__name__)
 url = "rtsp://admin:Password01!@192.168.1.155:554"
 
@@ -18,7 +19,9 @@ class FPVTest(Base.Page):
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
+
         url_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         self.url = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
         self.url.SetValue(url)
         self.url.SetFont(Font.COMMON_1_LARGE)
@@ -30,9 +33,11 @@ class FPVTest(Base.Page):
         sizer.Add(url_sizer, 0, wx.EXPAND | wx.ALL, 0)
         return sizer
 
-    def before_test(self):
-        super(FPVTest, self).before_test()
-        self.player.Stop()
+    def open(self):
+
+        def before_test(self):
+            super(FPVTest, self).before_test()
+            self.player.Stop()
 
     def start_test(self):
         self.FormatPrint(info="Started")
