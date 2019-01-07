@@ -135,16 +135,14 @@ class Panel(wx.Panel):
             return False
         else:
             uart = Variable.get_uart()
-            if not uart.set_serial_number(serial):
-                Utility.Alert.Error(u"序列号设置失败")
+            return uart.set_serial_number(serial)
 
     def update_serial_number(self):
         uart = Variable.get_uart()
         serial = uart.get_serial_number()
         if serial is not None:
             self.serial_number.SetValue(value=serial)
-        else:
-            Utility.Alert.Error(u"序列号获取失败")
+
 
     def Enable(self, enable=True):
         lst1 = [self.btn_disconnect, self.button_sn, self.test_view]

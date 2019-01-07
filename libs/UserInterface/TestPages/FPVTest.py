@@ -35,7 +35,6 @@ class FPVTest(Base.Page):
             sizer.Add(title, 0, wx.EXPAND | wx.TOP, 4)
             sizer.Add(value, 1, wx.EXPAND | wx.ALL, 1)
             return sizer, value
-
         rtsp_sizer = wx.BoxSizer(wx.VERTICAL)
         config = self.__get_config(name=name)
         address_sizer, self.address = create_text_ctrl("地  址: ", config.get("address", "192.168.90.48"))

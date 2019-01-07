@@ -8,6 +8,7 @@ from libs import Utility
 import os
 import time
 import threading
+import serial
 
 logger = logging.getLogger(__name__)
 
@@ -89,13 +90,10 @@ class Page(wx.Panel):
 
     def on_result_button(self, event):
         obj = event.GetEventObject()
-        if obj.Name == "Pass":
-            logger.debug("\"%s\" Result is : <Pass>" % self.name)
-            self.SetResult("Pass")
-        else:
-            logger.debug("\"%s\" Result is : <Pass>" % self.name)
-            self.SetResult("Fail")
-        self.__parent.next_page()
+        result = "Pass" if obj.Name == "Pass" else "Fail"
+        logger.debug("\"%s\" Result is : <%s>" % (self.name, result))
+        if self.SetResult(result):
+            self.__parent.next_page()
 
     def before_test(self):
         self.EnablePass(enable=False)
@@ -109,7 +107,11 @@ class Page(wx.Panel):
     def SetResult(self, result):
         self.FormatPrint(result, symbol="=")
         uart = self.get_uart()
-        uart.set_flag_result(flag=self.flag, result=result)
+        if uart.set_flag_result(flag=self.flag, result=result):
+            return True
+        return False
+
+
 
     def EnablePass(self, enable=True):
         self.PassButton.Enable(enable=enable)
