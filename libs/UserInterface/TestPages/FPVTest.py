@@ -4,12 +4,11 @@ import logging
 import Base
 from libs.Config import Font
 from libs.Config import Color
+from libs.Config import Path
 from libs import Utility
 import vlc
 
-
 logger = logging.getLogger(__name__)
-url = "rtsp://admin:Password01!@192.168.1.155:554"
 
 
 class FPVTest(Base.Page):
@@ -20,24 +19,47 @@ class FPVTest(Base.Page):
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        url_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        address_sizer = self.__init_rtsp_sizer()
 
-        self.url = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.url.SetValue(url)
-        self.url.SetFont(Font.COMMON_1_LARGE)
-        play = wx.Button(self, wx.ID_ANY, u"预览", wx.DefaultPosition, wx.DefaultSize, 0)
-        play.Bind(wx.EVT_BUTTON, self.OnPlay)
+        sizer.Add(address_sizer, 0, wx.EXPAND | wx.ALL, 0)
 
-        url_sizer.Add(self.url, 1, wx.EXPAND | wx.ALL, 1)
-        url_sizer.Add(play, 0, wx.EXPAND | wx.ALL, 1)
-        sizer.Add(url_sizer, 0, wx.EXPAND | wx.ALL, 0)
         return sizer
 
-    def open(self):
+    def __init_rtsp_sizer(self, name="rtsp"):
+        def create_text_ctrl(title, value):
+            sizer = wx.BoxSizer(wx.HORIZONTAL)
+            title = wx.StaticText(self, wx.ID_ANY, title, wx.DefaultPosition, wx.DefaultSize, 0)
+            title.SetFont(Font.COMMON_1)
+            value = wx.TextCtrl(self, wx.ID_ANY, value, wx.DefaultPosition, wx.DefaultSize, 0)
+            value.SetFont(Font.COMMON_1)
+            sizer.Add(title, 0, wx.EXPAND | wx.TOP, 4)
+            sizer.Add(value, 1, wx.EXPAND | wx.ALL, 1)
+            return sizer, value
 
-        def before_test(self):
-            super(FPVTest, self).before_test()
-            self.player.Stop()
+        rtsp_sizer = wx.BoxSizer(wx.VERTICAL)
+        config = self.__get_config(name=name)
+        address_sizer, self.address = create_text_ctrl("地  址: ", config.get("address", "192.168.90.48"))
+        port_sizer, self.port = create_text_ctrl("端口号: ", config.get("port", "554"))
+        username_sizer, self.username = create_text_ctrl("用户名: ", config.get("username", "admin"))
+        password_sizer, self.password = create_text_ctrl("密  码: ", config.get("password", "Password01!"))
+        rtsp_sizer.Add(address_sizer, 0, wx.EXPAND, 1)
+        rtsp_sizer.Add(port_sizer, 0, wx.EXPAND, 1)
+        rtsp_sizer.Add(username_sizer, 0, wx.EXPAND, 1)
+        rtsp_sizer.Add(password_sizer, 0, wx.EXPAND, 1)
+        play = wx.Button(self, wx.ID_ANY, u"预览", wx.DefaultPosition, wx.DefaultSize, wx.NO_BORDER)
+        save = wx.Button(self, wx.ID_ANY, u"保存", wx.DefaultPosition, wx.DefaultSize, wx.NO_BORDER)
+        play.Bind(wx.EVT_BUTTON, self.OnPlay)
+        save.Bind(wx.EVT_BUTTON, self.OnSave)
+        rtsp_sizer.Add(play, 0, wx.EXPAND | wx.ALL, 0)
+        rtsp_sizer.Add(save, 0, wx.EXPAND | wx.ALL, 0)
+        return rtsp_sizer
+
+    def __get_config(self, name):
+        return Utility.ParseConfig.get(path=Path.CONFIG, section=name)
+
+    def before_test(self):
+        super(FPVTest, self).before_test()
+        self.player.Stop()
 
     def start_test(self):
         self.FormatPrint(info="Started")
@@ -50,8 +72,24 @@ class FPVTest(Base.Page):
     def OnPlay(self, event):
         if not self.player.IsShown():
             self.player.Show()
-        self.player.Open(self.url.GetValue())
+        self.player.Open(self.GetUrl())
         self.player.Play()
+
+    def OnSave(self, event):
+        data = dict()
+        data["address"] = self.address.GetValue()
+        data["port"] = self.port.GetValue()
+        data["username"] = self.username.GetValue()
+        data["password"] = self.password.GetValue()
+        Utility.ParseConfig.modify(path=Path.CONFIG, data={"rtsp": data})
+
+    def GetUrl(self):
+        return "rtsp://{username}:{password}@{address}:{port}".format(
+            username=self.username.GetValue(),
+            password=self.password.GetValue(),
+            port=self.port.GetValue(),
+            address=self.address.GetValue(),
+        )
 
 
 class Player(wx.Frame):

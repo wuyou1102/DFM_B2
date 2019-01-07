@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 from ConfigParser import ConfigParser
+import os
 
 
 def read(path):
@@ -59,6 +60,7 @@ def delete(path, section, option=None):
 
 
 def __save(parser, path):
+    # mode = "w+" if os.path.exists(path=path) else "w"
     with open(path, "w+") as config:
         parser.write(config)
 

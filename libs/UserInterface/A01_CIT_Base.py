@@ -9,6 +9,7 @@ from TestPages import PCBA_CASES
 from libs.Utility.UART import UART
 from TestPages import Variable
 from TestPages.Base import Report
+import serial
 
 logger = logging.getLogger(__name__)
 reload(sys)
@@ -105,8 +106,12 @@ class Panel(wx.Panel):
 
     def connect(self):
         port = self.get_selected_port()
-        if port is False: return
-        uart = UART(port=port)
+        if port is False: return False
+        try:
+            uart = UART(port=port)
+        except serial.serialutil.SerialException as e:
+            Utility.Alert.Error(e.message)
+            return False
         if uart.is_connect():
             self.set_variable(uart=uart)
             self.update_serial_number()

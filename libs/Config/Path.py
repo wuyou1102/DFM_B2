@@ -12,3 +12,4 @@ def join(*args):
 
 
 LOG_SAVE = join(__ABS, "Log")
+CONFIG = os.path.join(__ABS, "B2.conf")
