@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class EthernetTest(Base.Page):
-    def __init__(self, parent):
-        Base.Page.__init__(self, parent=parent, name="网口测试", flag="Ethernet")
+    def __init__(self, parent, type):
+        Base.Page.__init__(self, parent=parent, name="网口测试", type=type)
         self.stop_flag = True
 
     def init_test_sizer(self):
@@ -47,3 +47,8 @@ class EthernetTest(Base.Page):
     def append_log(self, msg):
         self.LogMessage(msg)
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
+
+    def get_flag(self):
+        if self.type == "PCBA":
+            return "PCBA_ETH"
+        return "MACH_ETH"

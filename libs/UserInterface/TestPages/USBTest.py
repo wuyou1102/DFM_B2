@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class USBTest(Base.Page):
-    def __init__(self, parent):
-        Base.Page.__init__(self, parent=parent, name=u"USB测试", flag="USB")
+    def __init__(self, parent, type):
+        Base.Page.__init__(self, parent=parent, name=u"USB测试", type=type)
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -53,3 +53,8 @@ class USBTest(Base.Page):
     def append_log(self, msg):
         self.LogMessage(msg)
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
+
+    def get_flag(self):
+        if self.type == "PCBA":
+            return "PCBA_USB"
+        return "MACH_USB"

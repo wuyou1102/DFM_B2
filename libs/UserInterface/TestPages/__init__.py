@@ -9,4 +9,4 @@ PCBA_CASES = [EthernetTest, SwitchTest, LightTest, USBTest,FPVTest]
 
 # MACHINE_CASES = [EthernetTest]
 
-MACHINE_CASES = []
+MACHINE_CASES = [EthernetTest, SwitchTest, LightTest, USBTest,FPVTest]

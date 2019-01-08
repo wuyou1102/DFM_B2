@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class LightTest(Base.Page):
-    def __init__(self, parent):
-        Base.Page.__init__(self, parent=parent, name=u"灯座测试", flag="Light")
+    def __init__(self, parent, type):
+        Base.Page.__init__(self, parent=parent, name=u"灯座测试", type=type)
         self.count = 0
 
     def init_test_sizer(self):
@@ -35,3 +35,8 @@ class LightTest(Base.Page):
 
     def stop_test(self):
         self.FormatPrint(info="Stop")
+
+    def get_flag(self):
+        if self.type == "PCBA":
+            return "PCBA_LIGHT"
+        return "MACH_LIGHT"

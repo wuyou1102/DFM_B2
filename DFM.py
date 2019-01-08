@@ -10,8 +10,6 @@ sys.setdefaultencoding('utf-8')
 if __name__ == "__main__":
     app = wx.App()
     from libs.UserInterface.A00_Entrance import Frame
-    from libs.UserInterface.A01_CIT_PCBA import Frame
-
     f = Frame()
     f.Show()
     app.MainLoop()

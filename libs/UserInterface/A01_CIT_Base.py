@@ -17,18 +17,18 @@ sys.setdefaultencoding('utf-8')
 
 
 class Frame(wx.Frame):
-    def __init__(self, title, _type):
+    def __init__(self, title, type):
         wx.Frame.__init__(self, None, id=wx.ID_ANY, title=title, size=(800, 600))
-        self.panel = Panel(self, _type=_type)
+        self.panel = Panel(self, type=type)
         self.SetBackgroundColour(Color.Azure2)
         self.Center()
 
 
 class Panel(wx.Panel):
-    def __init__(self, parent, _type):
+    def __init__(self, parent, type):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.parent = parent
-        self._type = _type
+        self.type = type
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         horizontal_0 = self.__init_horizontal_sizer_0()
         horizontal_1 = self.__init_horizontal_sizer_1()
@@ -85,7 +85,7 @@ class Panel(wx.Panel):
 
     def __init_horizontal_sizer_1(self):
         sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"测试"), wx.VERTICAL)
-        cases = PCBA_CASES if self._type == "PCBA" else MACHINE_CASES
+        cases = PCBA_CASES if self.type == "PCBA" else MACHINE_CASES
         self.test_view = ListBook(self, cases)
         sizer.Add(self.test_view, 1, wx.EXPAND | wx.ALL, 0)
         return sizer
@@ -143,7 +143,6 @@ class Panel(wx.Panel):
         if serial is not None:
             self.serial_number.SetValue(value=serial)
 
-
     def Enable(self, enable=True):
         lst1 = [self.btn_disconnect, self.button_sn, self.test_view]
         lst2 = [self.btn_connect, self.port_choice, self.btn_refresh]
@@ -172,6 +171,9 @@ class Panel(wx.Panel):
             Utility.Alert.Error(u"请选择端口号")
             return False
 
+    def get_type(self):
+        return self._type
+
 
 class ListBook(wx.Panel):
     def __init__(self, parent, cases):
@@ -193,7 +195,7 @@ class ListBook(wx.Panel):
 
     def __init_cases(self, cases):
         for case in cases:
-            c = case(self.__CaseView)
+            c = case(self.__CaseView, type=self.parent.type)
             self.__ScrolledWindow.append(c)
             self.__CaseView.append(c)
         self.__add_report_page()

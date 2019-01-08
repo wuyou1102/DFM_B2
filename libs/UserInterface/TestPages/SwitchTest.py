@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class SwitchTest(Base.Page):
-    def __init__(self, parent):
-        Base.Page.__init__(self, parent=parent, name=u"开关测试", flag="Switch")
+    def __init__(self, parent, type):
+        Base.Page.__init__(self, parent=parent, name=u"开关测试", type=type)
 
 
     def init_test_sizer(self):
@@ -56,3 +56,7 @@ class SwitchTest(Base.Page):
     def append_log(self, msg):
         self.LogMessage(msg)
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
+    def get_flag(self):
+        if self.type == "PCBA":
+            return "PCBA_SWITCH"
+        return "MACH_SWITCH"

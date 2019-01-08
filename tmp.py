@@ -1,7 +1,6 @@
 # -*- encoding:UTF-8 -*-
 import requests
 
-print '\xbe\xdc\xbe\xf8\xb7\xc3\xce\xca\xa1\xa3'.decode("gbk")
 headers = {'Accept': '*/*',
            'Accept-Language': 'zh-CN,zh;q=0.9',
            'Cache-Control': 'max-age=0',
@@ -25,20 +24,37 @@ def GET(url):
     return resp
 
 
+import urllib
+import sys
+
+
+def report(count, blockSize, totalSize):
+    if totalSize < 4000:
+        return False
+    percent = int(count * blockSize * 100 / totalSize)
+    sys.stdout.write("\r%d%%" % percent + ' complete')
+    sys.stdout.flush()
+
+
 urls = [
-    "https://imtt.dd.qq.com/16891/80B6C15AD0AC33A4F3E2C8E2445CA703.apk?fsname=com.taobao.taobao_8.3.10_223.apk",
-    "https://imtt.dd.qq.com/16891/371C7C353C7B87011FB3DE8B12BCBCA5.apk?fsname=com.tencent.mm_7.0.0_1380.apk",
-    "https://imtt.dd.qq.com/16891/FEA3304FC9D84ADBF9F44BD542A9FD3E.apk?fsname=com.baidu.searchbox_11.2.0.10_46662912.apk",
-    "https://imtt.dd.qq.com/16891/B82FD7E2F759060B05E2D486364BE1D0.apk?fsname=com.tencent.mobileqq_7.9.5_980.apk",
+    "https://imtt.dd.qq.com/16891/8AC244815C2FA8D472AC19EFF184F17A.apk?fsname=com.gui.gui.chen.flash.light.one_2.3.4_234.apk",
+    "https://dc2d8d5b0b9641aa7fb44379ca67b370.dd.cdntips.com/imtt.dd.qq.com/16891/8AC244815C2FA8D472AC19EFF184F17A.apk?mkey=5c342f5ede468b66&f=0ce9&fsname=com.gui.gui.chen.flash.light.one_2.3.4_234.apk&cip=222.70.173.147&proto=https"
 ]
+resp = GET(url=urls[1])
+print resp.headers
+print resp.cookies
+
+
+
 # for x in range(1000):
 #     for url in urls:
 #         resp = GET(url=url)
 #         with open("a.apk", "wb") as application:
 #             application.write(resp.content)
-#         print x
+#          print x
+for x in range(10000):
+    print x
+    print '\n'
+    urllib.urlretrieve(urls[1], 'a,apk', report)
 
-resp = GET(url=urls[2])
-print resp.headers
-print resp.is_redirect
-# print [resp.content]
+# # print [resp.content]

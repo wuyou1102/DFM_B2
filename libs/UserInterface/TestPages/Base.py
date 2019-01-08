@@ -27,12 +27,12 @@ class Variable(object):
 
 
 class Page(wx.Panel):
-    def __init__(self, parent, name, flag):
+    def __init__(self, parent, name, type):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.__parent = parent
         self.lock = threading.Lock()
+        self.type = type
         self.name = name
-        self.flag = flag
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         title = wx.StaticText(self, wx.ID_ANY, self.name, wx.DefaultPosition, wx.DefaultSize,
                               wx.ALIGN_CENTER | wx.SIMPLE_BORDER)
@@ -66,7 +66,13 @@ class Page(wx.Panel):
 
     def get_result(self):
         uart = self.get_uart()
-        return uart.get_flag_result(self.flag)
+        return uart.get_flag_result(self.get_flag())
+
+    def get_type(self):
+        return self.type
+
+    def get_flag(self):
+        raise NotImplementedError
 
     def Show(self):
         super(Page, self).Show()
@@ -107,11 +113,9 @@ class Page(wx.Panel):
     def SetResult(self, result):
         self.FormatPrint(result, symbol="=")
         uart = self.get_uart()
-        if uart.set_flag_result(flag=self.flag, result=result):
+        if uart.set_flag_result(flag=self.get_flag(), result=result):
             return True
         return False
-
-
 
     def EnablePass(self, enable=True):
         self.PassButton.Enable(enable=enable)

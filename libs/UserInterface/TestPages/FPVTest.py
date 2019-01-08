@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 class FPVTest(Base.Page):
-    def __init__(self, parent):
-        Base.Page.__init__(self, parent=parent, name=u"图传测试", flag="FPV")
+    def __init__(self, parent, type):
+        Base.Page.__init__(self, parent=parent, name=u"图传测试", type=type)
         self.player = Player(self.on_result_button)
 
     def init_test_sizer(self):
@@ -35,6 +35,7 @@ class FPVTest(Base.Page):
             sizer.Add(title, 0, wx.EXPAND | wx.TOP, 4)
             sizer.Add(value, 1, wx.EXPAND | wx.ALL, 1)
             return sizer, value
+
         rtsp_sizer = wx.BoxSizer(wx.VERTICAL)
         config = self.__get_config(name=name)
         address_sizer, self.address = create_text_ctrl("地  址: ", config.get("address", "192.168.90.48"))
@@ -89,7 +90,10 @@ class FPVTest(Base.Page):
             port=self.port.GetValue(),
             address=self.address.GetValue(),
         )
-
+    def get_flag(self):
+        if self.type == "PCBA":
+            return "PCBA_FPV"
+        return "MACH_FPV"
 
 class Player(wx.Frame):
     def __init__(self, EVT_RESULT, position=wx.DefaultPosition):
