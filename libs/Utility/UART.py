@@ -68,9 +68,12 @@ class UART(Serial):
             return True
         return False
 
+    # 协议栈接口
     def set_radio_frequency_power(self, value):
         cmd = command.set_radio_frequency_power(value=value)
-        return self._set(cmd=cmd)
+        if self._get(cmd=cmd) == '0x0':
+            return True
+        return False
 
     def get_radio_frequency_power(self):
         cmd = command.get_radio_frequency_power()
@@ -78,7 +81,9 @@ class UART(Serial):
 
     def set_register(self, address, value):
         cmd = command.set_register(address=address, value=value)
-        return self._set(cmd=cmd)
+        if self._get(cmd=cmd) == '0x0':
+            return True
+        return False
 
     def get_register(self, address):
         cmd = command.get_register(address=address)
@@ -86,7 +91,9 @@ class UART(Serial):
 
     def set_frequency_point(self, value):
         cmd = command.set_frequency_point(value=value)
-        return self._set(cmd=cmd)
+        if self._get(cmd=cmd) == '0x0':
+            return True
+        return False
 
     def get_frequency_point(self):
         cmd = command.get_frequency_point()
@@ -118,11 +125,15 @@ class UART(Serial):
 
     def set_tx_mode_20m(self):
         cmd = command.set_tx_mode_20m()
-        return self._set(cmd=cmd)
+        if self._get(cmd=cmd) == '0x0':
+            return True
+        return False
 
     def set_rx_mode_20m(self):
         cmd = command.set_rx_mode_20m()
-        return self._get(cmd=cmd)
+        if self._get(cmd=cmd) == '0x0':
+            return True
+        return False
 
     def is_instrument_connected(self):
         cmd = command.is_instrument_connected()

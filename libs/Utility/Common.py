@@ -120,7 +120,21 @@ def generator():
         yield count
 
 
+def convert_freq_point(value):
+    def swap_to_d1d3(d3t1):
+        d3t1 = [d3t1[i:i + 2] for i in xrange(0, len(d3t1), 2)]
+        return ''.join(d3t1[::-1])
+
+    value = '{0:08x}'.format(int(value, 16))
+    d3d1 = value[0:6]
+    d0 = value[6:].upper()
+    rf_multi = 30 if d0 in ['4B', '4C', '4D', '4E', '4F', '50', '51', '52', '53'] else 60
+    d1d3 = swap_to_d1d3(d3d1)
+    d1d3 = int(d1d3, 16)
+    d0 = int(d0, 16)
+    f = round((d1d3 / 16777216.0 + d0) * rf_multi, 2)
+    return f
+
+
 if __name__ == '__main__':
-    res = execute_command(Command.adb.shell_command('ps |grep \"ddd\"'))
-    print res.outputs
-    print res.exit_code
+    print convert_freq_point("0x55555553")

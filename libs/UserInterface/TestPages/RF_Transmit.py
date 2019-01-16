@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class TransmitTest(Base.Page):
     def __init__(self, parent, type):
-        Base.Page.__init__(self, parent=parent, name="接收测试", type=type)
+        Base.Page.__init__(self, parent=parent, name="发送测试", type=type)
         self.stop_flag = True
 
     def init_test_sizer(self):
@@ -21,9 +21,7 @@ class TransmitTest(Base.Page):
         return sizer
 
     def before_test(self):
-        super(EthernetTest, self).before_test()
-        self.output.SetValue("")
-        self.stop_flag = True
+        pass
 
     def start_test(self):
         Utility.append_thread(target=self.ping)
@@ -50,4 +48,4 @@ class TransmitTest(Base.Page):
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     def get_flag(self):
-        return String.PCBA_ETHERNET
+        return String.RF_TRANSMIT

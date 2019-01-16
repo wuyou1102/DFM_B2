@@ -16,8 +16,8 @@ sys.setdefaultencoding('utf-8')
 
 
 class Frame(wx.Frame):
-    def __init__(self, title, type):
-        wx.Frame.__init__(self, None, id=wx.ID_ANY, title=title, size=(800, 600))
+    def __init__(self, title, type, size=(800, 600)):
+        wx.Frame.__init__(self, None, id=wx.ID_ANY, title=title, size=size)
         self.panel = Panel(self, type=type)
         self.SetBackgroundColour(Color.Azure2)
         self.Center()

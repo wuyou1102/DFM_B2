@@ -5,7 +5,6 @@ import Base
 from libs.Config import Font
 from libs.Config import Color
 from libs.Config import String
-from Base import Variable
 from libs import Utility
 
 logger = logging.getLogger(__name__)
@@ -40,7 +39,7 @@ class USBTest(Base.Page):
         self.FormatPrint(info="Stop")
 
     def is_clicked(self):
-        uart = Variable.get_uart()
+        uart = self.get_uart()
         while self.stop_flag:
             result = uart.is_usb_connected()
             state = u"已插入" if result else u"未插入"

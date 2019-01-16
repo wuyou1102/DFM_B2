@@ -4,6 +4,7 @@ import logging
 import Base
 from libs import Utility
 from libs.Config import String
+from Base import Variable
 
 logger = logging.getLogger(__name__)
 
@@ -14,35 +15,40 @@ class ReceiveTest(Base.Page):
         self.stop_flag = True
 
     def init_test_sizer(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        return sizer
+
+    def __init_freq_point_sizer(self):
+
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.output = wx.TextCtrl(self, -1, '', style=wx.TE_MULTILINE | wx.TE_READONLY | wx.HSCROLL)
-        self.output.SetInsertionPointEnd()
-        sizer.Add(self.output, 1, wx.EXPAND | wx.ALL, 0)
+        title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.port_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, Utility.Serial.list_ports(),0)
+        sizer.Add(title, 0, wx.EXPAND | wx.TOP, 5)
+        title.Add(self.port_choice, 1, wx.EXPAND | wx.ALL, 1)
+
+
+        for p in ['2410', '2450', '2475','5750', '5800', '5825']:
+            print p
         return sizer
 
     def before_test(self):
-        super(EthernetTest, self).before_test()
-        self.output.SetValue("")
         self.stop_flag = True
+        uart = self.get_uart()
+        uart.set_rx_mode_20m()
 
     def start_test(self):
-        Utility.append_thread(target=self.ping)
+        Utility.append_thread(target=self.draw_line)
         self.FormatPrint(info="Started")
 
     def stop_test(self):
         self.stop_flag = False
         self.FormatPrint(info="Stop")
 
-    def ping(self):
+    def draw_line(self):
+        uart = self.get_uart()
         while self.stop_flag:
-            command = 'ping 192.168.90.1 -n 1'
-            result = Utility.execute_command(command, encoding='gb2312')
-            line = result.outputs[2]
-            self.append_log(line)
-            if "TTL=" in line:
-                self.append_log(u"测试通过，请点击PASS。")
-                self.EnablePass()
-                break
+            print uart.get_slot_bler()
             self.Sleep(1)
 
     def append_log(self, msg):
@@ -50,5 +56,4 @@ class ReceiveTest(Base.Page):
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     def get_flag(self):
-        return String.PCBA_ETHERNET
-
+        return String.RF_RECEIVE
