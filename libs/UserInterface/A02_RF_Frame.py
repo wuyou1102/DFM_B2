@@ -56,10 +56,30 @@ class Panel(wx.Panel):
         sizer.Add(self.panel_mpl, 1, wx.EXPAND | wx.ALL, 1)
         return sizer
 
-    def __init_write_sn_sizer(self):
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        return sizer
+    def __init_port_sizer(self):
+        size = (25, 25)
+        port_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        port_title = wx.StaticText(self, wx.ID_ANY, u"端口号: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.port_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, Utility.Serial.list_ports(),
+                                     0)
+        pic_refresh = wx.Image('resource/icon/Refresh.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
+        pic_connect = wx.Image('resource/icon/Connect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
+        pic_disconnect = wx.Image('resource/icon/Disconnect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
+        self.btn_refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0,
+                                           name='refresh')
+        self.btn_connect = wx.BitmapButton(self, wx.ID_ANY, pic_connect, wx.DefaultPosition, size, style=0,
+                                           name='connect')
+        self.btn_disconnect = wx.BitmapButton(self, wx.ID_ANY, pic_disconnect, wx.DefaultPosition, size, style=0,
+                                              name='disconnect')
+        self.btn_refresh.Bind(wx.EVT_BUTTON, self.on_button_click)
+        self.btn_connect.Bind(wx.EVT_BUTTON, self.on_button_click)
+        self.btn_disconnect.Bind(wx.EVT_BUTTON, self.on_button_click)
+        port_sizer.Add(port_title, 0, wx.EXPAND | wx.TOP, 5)
+        port_sizer.Add(self.port_choice, 1, wx.EXPAND | wx.ALL, 1)
+        port_sizer.Add(self.btn_refresh, 0, wx.EXPAND | wx.ALL, 1)
+        port_sizer.Add(self.btn_connect, 0, wx.EXPAND | wx.ALL, 1)
+        port_sizer.Add(self.btn_disconnect, 0, wx.EXPAND | wx.ALL, 1)
+        return port_sizer
 
 
 class FrequencySettingPanel(wx.Panel):
@@ -182,6 +202,8 @@ class MatplotPanel(wx.Panel):
         main_sizer.Add(self.__init_button_sizer(), 0, wx.EXPAND | wx.ALL, 0)
         self.SetSizer(main_sizer)
         self.Layout()
+
+
 
     def __init_button_sizer(self):
         def pass_fail_button(isPass):

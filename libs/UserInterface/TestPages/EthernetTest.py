@@ -3,6 +3,7 @@ import wx
 import logging
 import Base
 from libs import Utility
+from libs.Config import String
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,5 @@ class EthernetTest(Base.Page):
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     def get_flag(self):
-        if self.type == "PCBA":
-            return "PCBA_ETH"
-        return "MACH_ETH"
+        return String.PCBA_ETHERNET
+

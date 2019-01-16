@@ -50,7 +50,7 @@ class Panel(wx.Panel):
         elif name == "Machine":
             from A01_CIT_Machine import Frame
         elif name == "RF":
-            from A02_RF_Frame import Frame
+            from A01_CIT_RF import Frame
         f = Frame()
         f.Show()
         self.parent.Close()

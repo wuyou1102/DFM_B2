@@ -4,6 +4,7 @@ import logging
 import Base
 from libs.Config import Font
 from libs.Config import Color
+from libs.Config import String
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,4 @@ class LightTest(Base.Page):
         self.FormatPrint(info="Stop")
 
     def get_flag(self):
-        if self.type == "PCBA":
-            return "PCBA_LIGHT"
-        return "MACH_LIGHT"
+        return String.PCBA_LIGHT

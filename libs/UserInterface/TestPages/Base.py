@@ -8,9 +8,13 @@ from libs import Utility
 import os
 import time
 import threading
-import serial
 
 logger = logging.getLogger(__name__)
+result_mapping = {
+    "NotTest": "1",
+    "PASS": "2",
+    "FAIL": "3",
+}
 
 
 class Variable(object):
@@ -88,7 +92,7 @@ class Page(wx.Panel):
     def create_result_button(self, isPass):
         color = Color.SpringGreen3 if isPass else Color.Firebrick2
         label = u"PASS" if isPass else u"FAIL"
-        button = wx.Button(self, wx.ID_ANY, label, wx.DefaultPosition, (-1, 40), 0)
+        button = wx.Button(self, wx.ID_ANY, label, wx.DefaultPosition, (-1, 40), 0, name=label)
         button.SetBackgroundColour(color)
         button.SetFont(Font.COMMON_1_LARGE_BOLD)
         button.Bind(wx.EVT_BUTTON, self.on_result_button)
@@ -96,9 +100,8 @@ class Page(wx.Panel):
 
     def on_result_button(self, event):
         obj = event.GetEventObject()
-        result = "Pass" if obj.Name == "Pass" else "Fail"
-        logger.debug("\"%s\" Result is : <%s>" % (self.name, result))
-        if self.SetResult(result):
+        logger.debug("\"%s\" Result is : <%s>" % (self.name, obj.Name))
+        if self.SetResult(result_mapping[obj.Name]):
             self.__parent.next_page()
 
     def before_test(self):
@@ -125,9 +128,8 @@ class Page(wx.Panel):
         uart = self.get_uart()
         if uart is None:
             return
-        serial = uart.get_serial_number()
-        with open(os.path.join(Path.LOG_SAVE, "%s.log" % serial), 'a') as wfile:
-            wfile.write(u"{time}:{message}\n".format(time=Utility.get_timestamp(), message=msg))
+        with open(os.path.join(Path.LOG_SAVE, "%s.log" % uart.SerialNumber), 'a') as log:
+            log.write(u"{time}:{message}\n".format(time=Utility.get_timestamp(), message=msg))
 
     @staticmethod
     def Sleep(secs):

@@ -7,6 +7,7 @@ from libs.Config import Color
 from libs.Config import Path
 from libs import Utility
 import vlc
+from libs.Config import String
 
 logger = logging.getLogger(__name__)
 
@@ -14,15 +15,12 @@ logger = logging.getLogger(__name__)
 class FPVTest(Base.Page):
     def __init__(self, parent, type):
         Base.Page.__init__(self, parent=parent, name=u"图传测试", type=type)
-        self.player = Player(self.on_result_button)
+        self.player = None
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
-
         address_sizer = self.__init_rtsp_sizer()
-
         sizer.Add(address_sizer, 0, wx.EXPAND | wx.ALL, 0)
-
         return sizer
 
     def __init_rtsp_sizer(self, name="rtsp"):
@@ -59,21 +57,22 @@ class FPVTest(Base.Page):
 
     def before_test(self):
         super(FPVTest, self).before_test()
-        self.player.Stop()
 
     def start_test(self):
         self.FormatPrint(info="Started")
 
     def stop_test(self):
         self.FormatPrint(info="Stop")
-        self.player.Stop()
-        self.player.Hide()
+        if self.player is not None:
+            self.player.Destroy()
+            self.player = None
 
     def OnPlay(self, event):
-        if not self.player.IsShown():
-            self.player.Show()
-        self.player.Open(self.GetUrl())
-        self.player.Play()
+        if self.player is None:
+            self.player = Player(self.on_result_button)
+            self.player.Show(url=self.GetUrl())
+        else:
+            self.player.Reload(url=self.GetUrl())
 
     def OnSave(self, event):
         data = dict()
@@ -90,10 +89,10 @@ class FPVTest(Base.Page):
             port=self.port.GetValue(),
             address=self.address.GetValue(),
         )
+
     def get_flag(self):
-        if self.type == "PCBA":
-            return "PCBA_FPV"
-        return "MACH_FPV"
+        return String.MACHINE_FPV
+
 
 class Player(wx.Frame):
     def __init__(self, EVT_RESULT, position=wx.DefaultPosition):
@@ -109,24 +108,34 @@ class Player(wx.Frame):
         self.Center()
         self.instance = vlc.Instance()
         self.player = self.instance.media_player_new()
+        self.url = ""
 
-    def Open(self, url):
-        self.Stop()
+    def Show(self, url, show=True):
+        self.url = url
+        self.Init(url=url)
+        super(Player, self).Show(show=show)
+        self.Play()
+
+    def Reload(self, url):
+        if self.url != url:
+            self.Stop()
+            self.Init(url=url)
+            self.Play()
+
+    def Destroy(self):
+        Utility.append_thread(target=self.Stop, allow_dupl=False, thread_name=str(self))
+        super(Player, self).Destroy()
+
+    def Init(self, url):
         media = self.instance.media_new(url)
         self.player.set_media(media)
         self.player.set_hwnd(self.preview.GetHandle())
-        if self.player.play() == -1:
-            Utility.Alert.Error("无法播放")
 
     def Play(self):
         self.player.play()
 
     def Stop(self):
         self.player.stop()
-
-    def Destroy(self):
-        self.player.stop()
-        return self.Hide()
 
     def init_result_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -139,7 +148,7 @@ class Player(wx.Frame):
     def create_result_button(self, isPass):
         color = Color.SpringGreen3 if isPass else Color.Firebrick2
         label = u"PASS" if isPass else u"FAIL"
-        button = wx.Button(self, wx.ID_ANY, label, wx.DefaultPosition, (-1, 40), 0)
+        button = wx.Button(self, wx.ID_ANY, label, wx.DefaultPosition, (-1, 40), 0, name=label)
         button.SetBackgroundColour(color)
         button.SetFont(Font.COMMON_1_LARGE_BOLD)
         button.Bind(wx.EVT_BUTTON, self.EVT_RESULT)

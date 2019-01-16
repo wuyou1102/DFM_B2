@@ -3,7 +3,6 @@ import subprocess
 import logging
 from libs import Command
 import time
-from Serial import Serial
 
 __logger = logging.getLogger(__name__)
 

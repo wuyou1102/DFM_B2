@@ -28,3 +28,5 @@ class BaseErrorCode(six.with_metaclass(ErrorCodeMetaClass)):
 class ErrorCode(BaseErrorCode):
     TARGET_ALREADY_EXIST = ErrorCodeField(10001, "Same target is already running.")
     TARGET_NOT_FUNCTION = ErrorCodeField(10002, "The target cannot be called.It's not a function.")
+    SERIAL_EXCEPTION = ErrorCodeField(10003, "Serial communication error.")
+    WRONG_TERMINATOR = ErrorCodeField(10004, "Can not find terminal symbol.")

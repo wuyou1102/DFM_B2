@@ -4,8 +4,7 @@ import sys
 import wx
 from libs import Utility
 from libs.Config import Color
-from TestPages import MACHINE_CASES
-from TestPages import PCBA_CASES
+
 from libs.Utility.UART import UART
 from TestPages import Variable
 from TestPages.Base import Report
@@ -85,10 +84,22 @@ class Panel(wx.Panel):
 
     def __init_horizontal_sizer_1(self):
         sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"测试"), wx.VERTICAL)
-        cases = PCBA_CASES if self.type == "PCBA" else MACHINE_CASES
-        self.test_view = ListBook(self, cases)
+        self.test_view = ListBook(self, self.switch_cases())
         sizer.Add(self.test_view, 1, wx.EXPAND | wx.ALL, 0)
         return sizer
+
+    def switch_cases(self):
+        if self.type == "PCBA":
+            from TestPages import PCBA_CASES
+            return PCBA_CASES
+        elif self.type == "MACHINE":
+            from TestPages import MACHINE_CASES
+            return MACHINE_CASES
+        elif self.type == "RF":
+            from TestPages import RF_CASES
+            return RF_CASES
+        else:
+            raise KeyError("Unknown type :\"%s\"" % self.type)
 
     def on_button_click(self, event):
         obj = event.GetEventObject()
@@ -112,7 +123,7 @@ class Panel(wx.Panel):
         except serial.serialutil.SerialException as e:
             Utility.Alert.Error(e.message)
             return False
-        if uart.is_connect():
+        if uart.is_uart_connected():
             self.set_variable(uart=uart)
             self.update_serial_number()
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
@@ -139,9 +150,7 @@ class Panel(wx.Panel):
 
     def update_serial_number(self):
         uart = Variable.get_uart()
-        serial = uart.get_serial_number()
-        if serial is not None:
-            self.serial_number.SetValue(value=serial)
+        self.serial_number.SetValue(value=uart.SerialNumber)
 
     def Enable(self, enable=True):
         lst1 = [self.btn_disconnect, self.button_sn, self.test_view]
@@ -291,8 +300,8 @@ class ScrollButton(wx.Button):
         self.index = index
         self.__result = "NotTest"
         self.__color = {
-            "Pass": Color.SpringGreen3,
-            "Fail": Color.Red1,
+            "True": Color.SpringGreen3,
+            "False": Color.Red1,
             "NotTest": Color.gray81,
             "Report": Color.Yellow
         }

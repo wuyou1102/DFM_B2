@@ -4,6 +4,7 @@ import logging
 import Base
 from libs.Config import Font
 from libs.Config import Color
+from libs.Config import String
 from Base import Variable
 from libs import Utility
 
@@ -13,7 +14,6 @@ logger = logging.getLogger(__name__)
 class SwitchTest(Base.Page):
     def __init__(self, parent, type):
         Base.Page.__init__(self, parent=parent, name=u"开关测试", type=type)
-
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -44,7 +44,7 @@ class SwitchTest(Base.Page):
     def is_clicked(self):
         uart = Variable.get_uart()
         while self.stop_flag:
-            result = uart.get_button_click()
+            result = uart.is_button_clicked()
             state = u"已触发" if result else u"未触发"
             self.append_log(u"查询开关状态 \"%s\"" % state)
             if result:
@@ -56,7 +56,6 @@ class SwitchTest(Base.Page):
     def append_log(self, msg):
         self.LogMessage(msg)
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
+
     def get_flag(self):
-        if self.type == "PCBA":
-            return "PCBA_SWITCH"
-        return "MACH_SWITCH"
+        return String.PCBA_SWITCH
