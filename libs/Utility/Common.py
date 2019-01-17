@@ -133,7 +133,7 @@ def convert_freq_point(value):
     d1d3 = int(d1d3, 16)
     d0 = int(d0, 16)
     f = round((d1d3 / 16777216.0 + d0) * rf_multi, 2)
-    return f
+    return str(f)
 
 
 if __name__ == '__main__':

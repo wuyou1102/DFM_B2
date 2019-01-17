@@ -71,73 +71,77 @@ class UART(Serial):
     # 协议栈接口
     def set_radio_frequency_power(self, value):
         cmd = command.set_radio_frequency_power(value=value)
-        if self._get(cmd=cmd) == '0x0':
-            return True
-        return False
+        return self._protocol_set(cmd=cmd)
 
     def get_radio_frequency_power(self):
         cmd = command.get_radio_frequency_power()
-        return self._get(cmd=cmd)
+        return self._protocol_get(cmd=cmd)
 
     def set_register(self, address, value):
         cmd = command.set_register(address=address, value=value)
-        if self._get(cmd=cmd) == '0x0':
-            return True
-        return False
+        return self._protocol_set(cmd=cmd)
 
     def get_register(self, address):
         cmd = command.get_register(address=address)
-        return self._get(cmd=cmd)
+        return self._protocol_get(cmd=cmd)
 
     def set_frequency_point(self, value):
         cmd = command.set_frequency_point(value=value)
-        if self._get(cmd=cmd) == '0x0':
-            return True
-        return False
+        return self._protocol_set(cmd=cmd)
 
     def get_frequency_point(self):
         cmd = command.get_frequency_point()
-        return self._get(cmd=cmd)
+        return self._protocol_get(cmd=cmd)
 
     def hold_baseband(self):
         cmd = command.hold_baseband()
-        return self._set(cmd=cmd)
+        return self._protocol_set(cmd=cmd)
 
     def release_baseband(self):
         cmd = command.release_baseband()
-        return self._set(cmd=cmd)
+        return self._protocol_set(cmd=cmd)
 
     def set_qam(self, value):
         cmd = command.set_qam(value=value)
-        return self._set(cmd=cmd)
+        return self._protocol_set(cmd=cmd)
 
     def get_qam(self):
         cmd = command.get_qam()
-        return self._get(cmd=cmd)
+        return self._protocol_get(cmd=cmd)
 
     def get_br_bler(self):
         cmd = command.get_br_bler()
-        return self._get(cmd=cmd)
+        return self._protocol_get(cmd=cmd)
 
     def get_slot_bler(self):
         cmd = command.get_slot_bler()
-        return self._get(cmd=cmd)
+        return self._protocol_get(cmd=cmd)
 
     def set_tx_mode_20m(self):
         cmd = command.set_tx_mode_20m()
-        if self._get(cmd=cmd) == '0x0':
-            return True
-        return False
+        return self._protocol_set(cmd=cmd)
 
     def set_rx_mode_20m(self):
         cmd = command.set_rx_mode_20m()
-        if self._get(cmd=cmd) == '0x0':
-            return True
-        return False
+        return self._protocol_set(cmd=cmd)
 
     def is_instrument_connected(self):
         cmd = command.is_instrument_connected()
-        if self._get(cmd=cmd) == "True":
+        return self._protocol_set(cmd=cmd)
+
+    def _protocol_get(self, cmd):
+        output = self._get(cmd=cmd)
+        if output is None:
+            Alert.Error("串口通信失败，请重试")
+            raise RuntimeError
+        return output
+
+    def _protocol_set(self, cmd):
+        output = self._get(cmd=cmd)
+        if output is None:
+            Alert.Error("串口通信失败，请重试")
+            raise RuntimeError
+        if output == "0x0":
             return True
         return False
 

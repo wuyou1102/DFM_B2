@@ -2,12 +2,12 @@
 import logging
 import sys
 import wx
-import matplotlib
 
-matplotlib.use('WXAgg')
 from libs import Utility
 from libs.Config import Color
 from libs.Config import Font
+import matplotlib
+matplotlib.use('WXAgg')
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 import numpy

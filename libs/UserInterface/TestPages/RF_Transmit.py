@@ -14,38 +14,39 @@ class TransmitTest(Base.Page):
         self.stop_flag = True
 
     def init_test_sizer(self):
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.output = wx.TextCtrl(self, -1, '', style=wx.TE_MULTILINE | wx.TE_READONLY | wx.HSCROLL)
-        self.output.SetInsertionPointEnd()
-        sizer.Add(self.output, 1, wx.EXPAND | wx.ALL, 0)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.__init_freq_point_sizer(), 0, wx.EXPAND | wx.ALL, 0)
         return sizer
 
     def before_test(self):
         pass
 
+    def __init_freq_point_sizer(self):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
+        sizer.Add(title, 0, wx.EXPAND | wx.TOP, 5)
+        sizer.Add(self.current_point, 0, wx.EXPAND | wx.ALL, 1)
+        for p in ['2410', '2450', '2475', '5750', '5800', '5825']:
+            button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (40, -1), 0, name=p)
+            button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
+            sizer.Add(button, 0, wx.ALL, 1)
+        return sizer
+
+    def on_freq_point_selected(self, event):
+        obj = event.GetEventObject()
+        uart = self.get_uart()
+        uart.set_frequency_point(obj.Name + "000")
+        self.update_current_freq_point()
+
+    def __init_freq_power_sizer(self):
+        pass
+
     def start_test(self):
-        Utility.append_thread(target=self.ping)
         self.FormatPrint(info="Started")
 
     def stop_test(self):
-        self.stop_flag = False
         self.FormatPrint(info="Stop")
-
-    def ping(self):
-        while self.stop_flag:
-            command = 'ping 192.168.90.1 -n 1'
-            result = Utility.execute_command(command, encoding='gb2312')
-            line = result.outputs[2]
-            self.append_log(line)
-            if "TTL=" in line:
-                self.append_log(u"测试通过，请点击PASS。")
-                self.EnablePass()
-                break
-            self.Sleep(1)
-
-    def append_log(self, msg):
-        self.LogMessage(msg)
-        wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     def get_flag(self):
         return String.RF_TRANSMIT
