@@ -32,8 +32,8 @@ class Panel(wx.Panel):
         horizontal_0 = self.__init_horizontal_sizer_0()
         horizontal_1 = self.__init_horizontal_sizer_1()
 
-        main_sizer.Add(horizontal_0, 1, wx.EXPAND | wx.ALL, 2)
-        main_sizer.Add(horizontal_1, 3, wx.EXPAND | wx.ALL, 2)
+        main_sizer.Add(horizontal_0, 0, wx.EXPAND | wx.ALL, 2)
+        main_sizer.Add(horizontal_1, 1, wx.EXPAND | wx.ALL, 2)
 
         self.SetSizer(main_sizer)
         self.Layout()
@@ -196,8 +196,8 @@ class ListBook(wx.Panel):
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         left_sizer.Add(self.__ScrolledWindow, 1, wx.EXPAND | wx.ALL, 0)
         right_sizer.Add(self.__CaseView, 1, wx.EXPAND | wx.ALL, 0)
-        main_sizer.Add(left_sizer, 2, wx.EXPAND | wx.ALL, 0)
-        main_sizer.Add(right_sizer, 7, wx.EXPAND | wx.ALL, 0)
+        main_sizer.Add(left_sizer, 0, wx.EXPAND | wx.ALL, 0)
+        main_sizer.Add(right_sizer, 1, wx.EXPAND | wx.ALL, 0)
         self.__init_cases(cases=cases)
         self.SetSizer(main_sizer)
         self.Layout()
@@ -233,7 +233,7 @@ class ScrolledWindow(wx.Panel):
         self.__count = 0
         self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.__container = wx.BoxSizer(wx.VERTICAL)
-        self.__ScrolledWindow = wx.ScrolledWindow(self, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize,
+        self.__ScrolledWindow = wx.ScrolledWindow(self, id=wx.ID_ANY, pos=wx.DefaultPosition, size=(100, -1),
                                                   style=wx.VSCROLL)
         self.__ScrolledWindow.SetSizer(self.__container)
         self.__ScrolledWindow.SetScrollRate(5, 5)

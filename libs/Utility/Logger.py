@@ -26,7 +26,7 @@ logging.config.dictConfig({
             'filename': __LOG,
             'formatter': 'verbose',
             'encoding': 'utf8',
-            'maxBytes': 1024 * 1024 * 5,
+            'maxBytes': 1024 * 1024 * 1,
         }
     },
     'loggers': {
