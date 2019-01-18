@@ -26,6 +26,7 @@ class TransmitTest(Base.Page):
         hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT, 0)
 
         sizer.Add(hori_sizer, 0, wx.EXPAND | wx.ALL, 0)
+        sizer.Add(self.__init_scroll_bar(), 0, wx.EXPAND | wx.ALL, 0)
 
         return sizer
 
@@ -89,12 +90,22 @@ class TransmitTest(Base.Page):
 
         Utility.append_thread(target=update_mcs)
 
+    def update_current_power(self):
+        def update_power():
+            uart = self.get_uart()
+            value = uart.get_radio_frequency_power()
+            self.slider.SetValue(int(value, 16))
+            self.static_text.SetLabel(value.upper())
+
+        Utility.append_thread(update_power)
+
     def before_test(self):
         self.init_variable()
         uart = self.get_uart()
         uart.set_tx_mode_20m()
         self.update_current_freq_point()
         self.update_current_mcs()
+        self.update_current_power()
 
     def init_variable(self):
         self.stop_flag = True
@@ -142,14 +153,23 @@ class TransmitTest(Base.Page):
 
     def on_scroll_changed(self, event):
         x = self.slider.GetValue()
-        self.static_text.SetLabel("%s dB" % str(-15.5 + 0.25 * (x - 1)))
-        byte = reg.GetByte(address=self.address)
-        b = '{0:08b}'.format(ord(byte))[0:2]
-        x = '{0:06b}'.format(x)
-        value = int(b + x, 2)
-        reg.SetByte(address=self.address, byte=value)
-        self.refresh()
+        uart = self.get_uart()
+        uart.set_radio_frequency_power(value=x)
+        self.update_current_power()
 
     def on_scroll(self, event):
         x = self.slider.GetValue()
-        self.static_text.SetLabel("%s dB" % str(-15.5 + 0.25 * (x - 1)))
+        self.static_text.SetLabel(hex(x).upper())
+
+    def __init_scroll_bar(self):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        title_name = wx.StaticText(self, wx.ID_ANY, u"射频功率:", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.slider = wx.Slider(self, wx.ID_ANY, 0, 0, 31, wx.DefaultPosition, wx.DefaultSize,
+                                wx.SL_HORIZONTAL | wx.SL_SELRANGE | wx.SL_TICKS)
+        self.slider.Bind(wx.EVT_SCROLL_CHANGED, self.on_scroll_changed)
+        self.slider.Bind(wx.EVT_SLIDER, self.on_scroll)
+        self.static_text = wx.StaticText(self, wx.ID_ANY, u"", wx.DefaultPosition, (50, -1), 0)
+        sizer.Add(title_name, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
+        sizer.Add(self.slider, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
+        sizer.Add(self.static_text, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
+        return sizer
