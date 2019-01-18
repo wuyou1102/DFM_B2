@@ -127,7 +127,10 @@ class UART(Serial):
 
     def is_instrument_connected(self):
         cmd = command.is_instrument_connected()
-        return self._protocol_set(cmd=cmd)
+        output = self._protocol_get(cmd=cmd)
+        if output == "0x1":
+            return True
+        return False
 
     def _protocol_get(self, cmd):
         output = self._get(cmd=cmd)

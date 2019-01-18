@@ -37,7 +37,7 @@ def get_frequency_point():
 
 
 def hold_baseband():
-    cmd = "hold"
+    cmd = "stop"
     return __HEAD + cmd
 
 

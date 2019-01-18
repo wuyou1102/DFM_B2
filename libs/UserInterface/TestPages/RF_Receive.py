@@ -138,26 +138,29 @@ class ReceiveTest(Base.Page):
             self.Sleep(1)
 
     def on_restart(self, event):
-        uart = self.get_uart()
-        uart.hold_baseband()
-        self.Sleep(1)
-        uart.release_baseband()
-        Utility.Alert.Info(u"基带重启完成")
+        obj = event.GetEventObject()
+        try:
+            obj.Disable()
+            uart = self.get_uart()
+            uart.hold_baseband()
+            self.Sleep(1)
+            uart.release_baseband()
+            Utility.Alert.Info(u"基带重启完成")
+        finally:
+            obj.Enable()
 
     def refresh_status(self):
-        sleep_time = 1
+        def set_bitmap(bitmap):
+            self.status.SetBitmap(bitmap)
+            self.Sleep(0.55)
 
         def set_as_disconnect():
-            self.status.SetBitmap(self.pic_status_disconnect)
-            self.Sleep(sleep_time)
-            self.status.SetBitmap(wx.NullBitmap)
-            self.Sleep(sleep_time)
+            set_bitmap(self.pic_status_disconnect)
+            set_bitmap(wx.NullBitmap)
 
         def set_as_connect():
-            self.status.SetBitmap(self.pic_status_connect1)
-            self.Sleep(sleep_time)
-            self.status.SetBitmap(self.pic_status_connect2)
-            self.Sleep(sleep_time)
+            set_bitmap(self.pic_status_connect1)
+            set_bitmap(self.pic_status_connect2)
 
         uart = self.get_uart()
         while self.stop_flag:
