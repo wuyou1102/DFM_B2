@@ -29,6 +29,6 @@ class Receive5800(ReceiveBase):
         ReceiveBase.__init__(self, parent=parent, type=type, freq=5800, flag=String.RF_RECEIVE_5800)
 
 
-class Receive5825(ReceiveBase):
+class Receive5850(ReceiveBase):
     def __init__(self, parent, type):
-        ReceiveBase.__init__(self, parent=parent, type=type, freq=5825, flag=String.RF_RECEIVE_5825)
+        ReceiveBase.__init__(self, parent=parent, type=type, freq=5850, flag=String.RF_RECEIVE_5850)

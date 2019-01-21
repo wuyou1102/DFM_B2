@@ -17,7 +17,7 @@ def query_thread():
             __log.debug(msg="%-10s|%50s" % ("RUNNING", k))
         else:
             __log.debug(msg="%-10s|%50s" % ("DONE", k))
-            __thread_pool.pop(k=k)
+            del __thread_pool[k]
 
 
 def append_thread(target, allow_dupl=False, **kwargs):

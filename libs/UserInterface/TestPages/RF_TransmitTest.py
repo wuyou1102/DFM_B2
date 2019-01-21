@@ -29,6 +29,6 @@ class Transmit5800(TransmitBase):
         TransmitBase.__init__(self, parent=parent, type=type, freq=5800, flag=String.RF_TRANSMIT_5800)
 
 
-class Transmit5825(TransmitBase):
+class Transmit5850(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=5825, flag=String.RF_TRANSMIT_5825)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=5850, flag=String.RF_TRANSMIT_5850)
