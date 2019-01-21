@@ -4,7 +4,7 @@ import matplotlib
 import wx
 import Base
 from libs import Utility
-from libs.Config import String
+
 from libs.Config import Picture
 
 matplotlib.use('WXAgg')
@@ -16,9 +16,10 @@ logger = logging.getLogger(__name__)
 
 
 class ReceiveBase(Base.Page):
-    def __init__(self, parent, type, freq=5100):
+    def __init__(self, parent, type, freq, flag):
         self.freq = freq
-        Base.Page.__init__(self, parent=parent, name="接收测试", type=type)
+        self.flag = flag
+        Base.Page.__init__(self, parent=parent, name="接收测试[%s]" % freq, type=type)
         self.init_variable()
 
     def init_test_sizer(self):
@@ -83,11 +84,15 @@ class ReceiveBase(Base.Page):
 
     def update_current_freq_point(self):
         def update_freq():
+            self.Sleep(0.05)
             uart = self.get_uart()
             value = uart.get_frequency_point()
-            self.current_point.SetValue(Utility.convert_freq_point(value=value))
+            value = Utility.convert_freq_point(value=value)
+            self.current_point.SetValue(value)
+            if float(value) != self.freq:
+                Utility.Alert.Error(u"当前频点不是预期的频点，请手动确认频点。")
 
-        Utility.append_thread(target=update_freq)
+        Utility.append_thread(target=update_freq, allow_dupl=True)
 
     def update_current_mcs(self):
         def update_mcs():
@@ -95,15 +100,15 @@ class ReceiveBase(Base.Page):
             value = uart.get_qam()
             self.current_mcs.SetSelection(int(value, 16))
 
-        Utility.append_thread(target=update_mcs)
+        Utility.append_thread(target=update_mcs, allow_dupl=True)
 
     def before_test(self):
         self.init_variable()
         self.panel_mpl.init_axes()
         uart = self.get_uart()
         uart.set_rx_mode_20m()
+        uart.set_frequency_point(self.freq * 1000)
         self.update_current_freq_point()
-        self.update_current_mcs()
 
     def init_variable(self):
         self.stop_flag = True
@@ -112,8 +117,8 @@ class ReceiveBase(Base.Page):
 
     def start_test(self):
         self.FormatPrint(info="Started")
-        Utility.append_thread(target=self.draw_line)
-        Utility.append_thread(target=self.refresh_status)
+        Utility.append_thread(target=self.draw_line, thread_name="DRAW_LINE_%s" % self.freq)
+        Utility.append_thread(target=self.refresh_status, thread_name="STATUS_%s" % self.freq)
 
     def stop_test(self):
         self.stop_flag = False
@@ -123,13 +128,13 @@ class ReceiveBase(Base.Page):
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     def get_flag(self):
-        return String.RF_RECEIVE
+        return self.flag
 
     def draw_line(self):
         while self.stop_flag:
             self.update_bler()
-            self.panel_mpl.refresh(self.slot, self.br)
-            self.Sleep(1)
+            self.panel_mpl.refresh(self.slot)
+            self.Sleep(0.8)
 
     def on_restart(self, event):
         obj = event.GetEventObject()

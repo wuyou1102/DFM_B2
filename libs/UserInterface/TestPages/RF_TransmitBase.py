@@ -149,7 +149,7 @@ class TransmitTest(Base.Page):
                 set_as_disconnect()
 
     def get_flag(self):
-        return String.RF_TRANSMIT
+        return String.RF_TRANSMIT_2410
 
     def on_scroll_changed(self, event):
         x = self.slider.GetValue()

@@ -233,7 +233,7 @@ class ScrolledWindow(wx.Panel):
         self.__count = 0
         self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.__container = wx.BoxSizer(wx.VERTICAL)
-        self.__ScrolledWindow = wx.ScrolledWindow(self, id=wx.ID_ANY, pos=wx.DefaultPosition, size=(100, -1),
+        self.__ScrolledWindow = wx.ScrolledWindow(self, id=wx.ID_ANY, pos=wx.DefaultPosition, size=(135, -1),
                                                   style=wx.VSCROLL)
         self.__ScrolledWindow.SetSizer(self.__container)
         self.__ScrolledWindow.SetScrollRate(5, 5)
