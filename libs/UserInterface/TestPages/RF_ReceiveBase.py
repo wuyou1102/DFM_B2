@@ -15,8 +15,9 @@ import numpy
 logger = logging.getLogger(__name__)
 
 
-class ReceiveTest(Base.Page):
-    def __init__(self, parent, type):
+class ReceiveBase(Base.Page):
+    def __init__(self, parent, type, freq=5100):
+        self.freq = freq
         Base.Page.__init__(self, parent=parent, name="接收测试", type=type)
         self.init_variable()
 
@@ -24,9 +25,8 @@ class ReceiveTest(Base.Page):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hori_sizer = wx.BoxSizer(wx.HORIZONTAL)
         hori_sizer.Add(self.__init_freq_point_sizer(), 1, wx.EXPAND, 0)
-        hori_sizer.Add(self.__init_mcs_sizer(), 1, wx.EXPAND, 0)
+        # hori_sizer.Add(self.__init_mcs_sizer(), 1, wx.EXPAND, 0)
         hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT, 0)
-
         sizer.Add(hori_sizer, 0, wx.EXPAND | wx.ALL, 0)
         sizer.Add(self.__init_mpl_sizer(), 1, wx.EXPAND | wx.ALL, 0)
         return sizer
@@ -43,10 +43,10 @@ class ReceiveTest(Base.Page):
         self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
-        for p in ['2410', '2450', '2475', '5750', '5800', '5825']:
-            button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (40, -1), 0, name=p)
-            button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
-            sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        p = str(self.freq)
+        button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (40, -1), 0, name=p)
+        button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
+        sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         return sizer
 
     def on_freq_point_selected(self, event):
@@ -64,7 +64,7 @@ class ReceiveTest(Base.Page):
 
     def __init_status_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.status = wx.StaticBitmap(self, wx.ID_ANY,Picture.status_disconnect, wx.DefaultPosition, (33, 33), 0)
+        self.status = wx.StaticBitmap(self, wx.ID_ANY, Picture.status_disconnect, wx.DefaultPosition, (33, 33), 0)
         restart = wx.BitmapButton(self, wx.ID_ANY, Picture.restart, wx.DefaultPosition, (33, 33), 0)
         restart.Bind(wx.EVT_BUTTON, self.on_restart)
         sizer.Add(restart, 0, wx.ALL, 1)
@@ -108,7 +108,7 @@ class ReceiveTest(Base.Page):
     def init_variable(self):
         self.stop_flag = True
         self.slot = []
-        self.br = []
+        # self.br = []
 
     def start_test(self):
         self.FormatPrint(info="Started")
@@ -146,15 +146,15 @@ class ReceiveTest(Base.Page):
     def refresh_status(self):
         def set_bitmap(bitmap):
             self.status.SetBitmap(bitmap)
-            self.Sleep(0.55)
+            self.Sleep(0.577)
 
         def set_as_disconnect():
-            set_bitmap(self.pic_status_disconnect)
+            set_bitmap(Picture.status_disconnect)
             set_bitmap(wx.NullBitmap)
 
         def set_as_connect():
-            set_bitmap(self.pic_status_connect1)
-            set_bitmap(self.pic_status_connect2)
+            set_bitmap(Picture.status_connect1)
+            set_bitmap(Picture.status_connect2)
 
         uart = self.get_uart()
         while self.stop_flag:
@@ -166,7 +166,7 @@ class ReceiveTest(Base.Page):
     def update_bler(self):
         uart = self.get_uart()
         self.slot.append(self.get_bler(uart.get_slot_bler))
-        self.br.append(self.get_bler(uart.get_br_bler))
+        # self.br.append(self.get_bler(uart.get_br_bler))
 
     def get_bler(self, func):
         value = func()
@@ -308,14 +308,18 @@ class BlerMpl(BaseMplPanel):
         self.__init_plot()
         self.init_axes()
 
-    def refresh(self, slot, br):
+    # def refresh(self, slot, br):
+    #     self.refresh_line(self.slot, slot)
+    #     self.refresh_line(self.br, br)
+    #     self.update()
+
+    def refresh(self, slot):
         self.refresh_line(self.slot, slot)
-        self.refresh_line(self.br, br)
         self.update()
 
     def __init_plot(self):
         self.slot, = self.Axes.plot(numpy.array([]), numpy.array([]), color="blue", linewidth=1.5, label=u'SLOT',
                                     linestyle='-')
-        self.br, = self.Axes.plot(numpy.array([]), numpy.array([]), color="red", linewidth=1.5, label=u'BR',
-                                  linestyle='-')
+        # self.br, = self.Axes.plot(numpy.array([]), numpy.array([]), color="red", linewidth=1.5, label=u'BR',
+        #                           linestyle='-')
         self.Axes.legend()

@@ -35,7 +35,7 @@ class EthernetTest(Base.Page):
 
     def ping(self):
         while self.stop_flag:
-            command = 'ping 192.168.90.1 -n 1'
+            command = 'ping 192.168.1.1 -n 1'
             result = Utility.execute_command(command, encoding='gb2312')
             line = result.outputs[2]
             self.append_log(line)
