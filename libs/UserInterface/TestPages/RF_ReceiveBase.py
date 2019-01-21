@@ -1,12 +1,11 @@
 # -*- encoding:UTF-8 -*-
 import logging
-
 import matplotlib
 import wx
-
 import Base
 from libs import Utility
 from libs.Config import String
+from libs.Config import Picture
 
 matplotlib.use('WXAgg')
 from matplotlib.figure import Figure
@@ -18,11 +17,6 @@ logger = logging.getLogger(__name__)
 
 class ReceiveTest(Base.Page):
     def __init__(self, parent, type):
-        self.pic_status_connect1 = wx.Image('resource/icon/status_connect1.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-        self.pic_status_connect2 = wx.Image('resource/icon/status_connect2.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-        self.pic_status_disconnect = wx.Image('resource/icon/status_disconnect.png',
-                                              wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-        self.pic_restart = wx.Image('resource/icon/restart.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
         Base.Page.__init__(self, parent=parent, name="接收测试", type=type)
         self.init_variable()
 
@@ -70,8 +64,8 @@ class ReceiveTest(Base.Page):
 
     def __init_status_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.status = wx.StaticBitmap(self, wx.ID_ANY, self.pic_status_disconnect, wx.DefaultPosition, (33, 33), 0)
-        restart = wx.BitmapButton(self, wx.ID_ANY, self.pic_restart, wx.DefaultPosition, (33, 33), 0)
+        self.status = wx.StaticBitmap(self, wx.ID_ANY,Picture.status_disconnect, wx.DefaultPosition, (33, 33), 0)
+        restart = wx.BitmapButton(self, wx.ID_ANY, Picture.restart, wx.DefaultPosition, (33, 33), 0)
         restart.Bind(wx.EVT_BUTTON, self.on_restart)
         sizer.Add(restart, 0, wx.ALL, 1)
         sizer.Add(self.status, 0, wx.ALL, 1)
