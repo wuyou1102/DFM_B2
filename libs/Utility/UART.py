@@ -4,6 +4,7 @@ import logging
 from libs.Config.ErrorCode import ErrorCode
 import Alert
 from libs.Command import AT as command
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ class UART(Serial):
     def get_flag_result(self, flag):
         cmd = command.get_flag_result(flag=flag)
         result = self._get(cmd=cmd)
+        time.sleep(0.025)
         return result
 
     def set_flag_result(self, flag, result):
@@ -95,11 +97,15 @@ class UART(Serial):
 
     def hold_baseband(self):
         cmd = command.hold_baseband()
-        return self._protocol_set(cmd=cmd)
+        result = self._protocol_set(cmd=cmd)
+        time.sleep(0.5)
+        return result
 
     def release_baseband(self):
         cmd = command.release_baseband()
-        return self._protocol_set(cmd=cmd)
+        result = self._protocol_set(cmd=cmd)
+        time.sleep(0.5)
+        return result
 
     def set_qam(self, value):
         cmd = command.set_qam(value=value)
@@ -161,6 +167,13 @@ class UART(Serial):
                 if result.exit_code == 0:
                     return result.outputs
             return None
+        elif result.exit_code == ErrorCode.TIMING_ERROR:
+            self.send(command="", sleep=0.008)
+            # Alert.Error("111")
+            for x in range(2, 5):
+                result = self.execute_command(command=cmd, sleep=sleep + 0.01 * x)
+                if result.exit_code == 0:
+                    return result.outputs
         else:
             raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))
 
@@ -168,17 +181,17 @@ class UART(Serial):
         for x in range(3):
             if self.__set(cmd=cmd, sleep=sleep):
                 return True
-        Alert.Error("设置失败")
+        Alert.Error(u"设置失败")
         return False
 
-    def __set(self, cmd, sleep=0.02):
+    def __set(self, cmd, sleep=0.01):
         result = self.execute_command(command=cmd, sleep=sleep)
         if result.exit_code == 0:
             if result.outputs == "True":
                 return True
             return False
         elif result.exit_code == ErrorCode.SERIAL_EXCEPTION:
-            Alert.Error("sssssss")
+            Alert.Error(u"串口通信失败，请重启串口后重试。")
             return False
         elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
             for x in range(2, 5):

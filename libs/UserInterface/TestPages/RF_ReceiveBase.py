@@ -13,13 +13,14 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 import numpy
 
 logger = logging.getLogger(__name__)
+import time
 
 
 class ReceiveBase(Base.Page):
     def __init__(self, parent, type, freq, flag):
         self.freq = freq
         self.flag = flag
-        Base.Page.__init__(self, parent=parent, name="接收测试[%s]" % freq, type=type)
+        Base.Page.__init__(self, parent=parent, name="接收灵敏度 [%s]" % freq, type=type)
         self.init_variable()
 
     def init_test_sizer(self):
@@ -90,7 +91,7 @@ class ReceiveBase(Base.Page):
             value = Utility.convert_freq_point(value=value)
             self.current_point.SetValue(value)
             if float(value) != self.freq:
-                Utility.Alert.Error(u"当前频点不是预期的频点，请手动确认频点。")
+                Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")
 
         Utility.append_thread(target=update_freq, allow_dupl=True)
 
@@ -103,6 +104,7 @@ class ReceiveBase(Base.Page):
         Utility.append_thread(target=update_mcs, allow_dupl=True)
 
     def before_test(self):
+        self.PassButton.Disable()
         self.init_variable()
         self.panel_mpl.init_axes()
         uart = self.get_uart()
@@ -113,28 +115,43 @@ class ReceiveBase(Base.Page):
     def init_variable(self):
         self.stop_flag = True
         self.slot = []
-        # self.br = []
 
     def start_test(self):
         self.FormatPrint(info="Started")
         Utility.append_thread(target=self.draw_line, thread_name="DRAW_LINE_%s" % self.freq)
-        Utility.append_thread(target=self.refresh_status, thread_name="STATUS_%s" % self.freq)
 
     def stop_test(self):
         self.stop_flag = False
-
-    def append_log(self, msg):
-        self.LogMessage(msg)
-        wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     def get_flag(self):
         return self.flag
 
     def draw_line(self):
+        uart = self.get_uart()
+        while self.stop_flag:
+            if uart.is_instrument_connected():
+                self.status.SetBitmap(Picture.status_connect1)
+                break
+            else:
+                self.status.SetBitmap(Picture.status_disconnect)
+                uart.hold_baseband()
+                self.status.SetBitmap(wx.NullBitmap)
+                uart.release_baseband()
+
         while self.stop_flag:
             self.update_bler()
             self.panel_mpl.refresh(self.slot)
             self.Sleep(0.8)
+            if self.check_result():
+                self.PassButton.Enable()
+                break
+
+    def check_result(self):
+        if len(self.slot) < 11:
+            return False
+        if sum(self.slot[-10:]) > 0:
+            return False
+        return True
 
     def on_restart(self, event):
         obj = event.GetEventObject()
@@ -142,31 +159,14 @@ class ReceiveBase(Base.Page):
             obj.Disable()
             uart = self.get_uart()
             uart.hold_baseband()
-            self.Sleep(1)
             uart.release_baseband()
             Utility.Alert.Info(u"基带重启完成")
+            if uart.is_instrument_connected():
+                self.status.SetBitmap(Picture.status_connect1)
+            else:
+                self.status.SetBitmap(Picture.status_disconnect)
         finally:
             obj.Enable()
-
-    def refresh_status(self):
-        def set_bitmap(bitmap):
-            self.status.SetBitmap(bitmap)
-            self.Sleep(0.577)
-
-        def set_as_disconnect():
-            set_bitmap(Picture.status_disconnect)
-            set_bitmap(wx.NullBitmap)
-
-        def set_as_connect():
-            set_bitmap(Picture.status_connect1)
-            set_bitmap(Picture.status_connect2)
-
-        uart = self.get_uart()
-        while self.stop_flag:
-            if uart.is_instrument_connected():
-                set_as_connect()
-            else:
-                set_as_disconnect()
 
     def update_bler(self):
         uart = self.get_uart()
@@ -195,8 +195,8 @@ class BaseMplPanel(wx.Panel):
         # 配置项『
         self.dpi = 100
         self.facecolor = '#FEF9E7'
-        self.data_limit_length = 120
-        self.y_max = 100
+        self.data_limit_length = 30
+        self.y_max = 128
         # 配置项』
         self.x_limit_range = numpy.arange(self.data_limit_length)
         self.blank_array = numpy.array([])
@@ -257,19 +257,6 @@ class BaseMplPanel(wx.Panel):
         except ValueError:
             Utility.AlertError(u"输入异常: \"%s\" or \"%s\"" % (self.min_tc.GetValue(), self.max_tc.GetValue()))
 
-    # def on_save(self, event):
-    #     dlg = wx.FileDialog(
-    #         self,
-    #         message="Save plot as...",
-    #         defaultDir=os.getcwd(),
-    #         defaultFile="%s-%s.png" % (self.get_title(), Utility.get_timestamp()),
-    #         wildcard="PNG (*.png)|*.png",
-    #         style=wx.FD_SAVE)
-    #
-    #     if dlg.ShowModal() == wx.ID_OK:
-    #         path = dlg.GetPath()
-    #         self.FigureCanvas.print_figure(path, dpi=self.dpi)
-
     def get_title(self):
         return self.title
 
@@ -288,7 +275,9 @@ class BaseMplPanel(wx.Panel):
     def set_ybound(self, lower, upper):
         self.Axes.set_ybound(lower=lower, upper=upper)
 
-    def init_axes(self, x_lower=0, x_upper=120):
+    def init_axes(self, x_lower=0, x_upper=None):
+        if x_upper is None:
+            x_upper = self.data_limit_length
         self.Axes.set_facecolor(self.facecolor)
         self.Axes.set_xbound(lower=x_lower, upper=x_upper)
         self.Axes.set_ybound(-1, self.y_max)

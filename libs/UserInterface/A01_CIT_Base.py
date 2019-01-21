@@ -1,14 +1,15 @@
 # -*- encoding:UTF-8 -*-
 import logging
 import sys
-import wx
-from libs import Utility
-from libs.Config import Color
 
-from libs.Utility.UART import UART
+import serial
+import wx
+
 from TestPages import Variable
 from TestPages.Base import Report
-import serial
+from libs import Utility
+from libs.Config import Color
+from libs.Utility.UART import UART
 
 logger = logging.getLogger(__name__)
 reload(sys)
@@ -118,6 +119,9 @@ class Panel(wx.Panel):
     def connect(self):
         port = self.get_selected_port()
         if port is False: return False
+        uart = self.get_variable("uart")
+        if uart is not None:
+            uart.close()
         try:
             uart = UART(port=port)
         except serial.serialutil.SerialException as e:
@@ -167,6 +171,11 @@ class Panel(wx.Panel):
     @staticmethod
     def set_variable(**kwargs):
         Variable.set_uart(uart=kwargs['uart'])
+
+    @staticmethod
+    def get_variable(key):
+        if key == "uart":
+            return Variable.get_uart()
 
     @staticmethod
     def clear_variable():
@@ -275,8 +284,8 @@ class ScrolledWindow(wx.Panel):
     def on_click(self, event):
         if self.__previous_select is not None: self.__previous_select.deselect()
         button = event.GetEventObject()
-        button.select()
         self.__previous_select = button
+        button.select()
 
     def hide_last_select(self):
         if self.__previous_select is not None:
@@ -303,7 +312,8 @@ class ScrollButton(wx.Button):
             "True": Color.SpringGreen3,
             "False": Color.Red1,
             "NotTest": Color.gray81,
-            "Report": Color.Yellow
+            "Report": Color.Yellow,
+            "None": Color.White
         }
 
     def __refresh_result(self):
@@ -334,7 +344,10 @@ class ScrollButton(wx.Button):
 
     @property
     def color(self):
-        return self.__color[self.__result]
+        try:
+            return self.__color[self.__result]
+        except KeyError:
+            return "None"
 
 
 class CaseView(wx.Panel):

@@ -13,17 +13,24 @@ __thread_pool = dict()
 def query_thread():
     __log.debug(msg="%-10s|%50s" % ("STATE", "NAME"))
     for k, v in __thread_pool.items():
-        __log.debug(msg="%-10s|%50s" % ("RUNNING" if v.isAlive() else "DONE", k))
+        if v.isAlive():
+            __log.debug(msg="%-10s|%50s" % ("RUNNING", k))
+        else:
+            __log.debug(msg="%-10s|%50s" % ("DONE", k))
+            __thread_pool.pop(k=k)
 
 
 def append_thread(target, allow_dupl=False, **kwargs):
-    if not isinstance(target, types.FunctionType) and not isinstance(target, types.MethodType):
-        __log.error(ErrorCode.TARGET_NOT_FUNCTION.MSG)
-        return False
-    if allow_dupl:
-        return __append_thread_duplicate(target=target, **kwargs)
-    else:
-        return __append_thread(target=target, **kwargs)
+    try:
+        if not isinstance(target, types.FunctionType) and not isinstance(target, types.MethodType):
+            __log.error(ErrorCode.TARGET_NOT_FUNCTION.MSG)
+            return False
+        if allow_dupl:
+            return __append_thread_duplicate(target=target, **kwargs)
+        else:
+            return __append_thread(target=target, **kwargs)
+    finally:
+        query_thread()
 
 
 def is_alive(name):
@@ -61,7 +68,7 @@ def __start_thread(target, thread_name, **kwargs):
     t.setDaemon(True)
     __thread_pool[thread_name] = t
     t.start()
-    __log.debug(msg="%-10s|%50s" % ("STARTED", thread_name))
+    # __log.debug(msg="%-10s|%50s" % ("STARTED", thread_name))
     return t
 
 
