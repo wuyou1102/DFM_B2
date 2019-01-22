@@ -107,7 +107,7 @@ class TestPage(wx.Panel):
 
     def on_result_button(self, event):
         obj = event.GetEventObject()
-        logger.debug("\"%s\" Result is : <%s>" % (self.name, obj.Name))
+        logger.debug("\"%s\" Result is : <%s>" % (self.get_name(), obj.Name))
         if self.SetResult(result_mapping[obj.Name]):
             self.__parent.next_page()
 
