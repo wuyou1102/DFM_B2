@@ -121,6 +121,7 @@ class ReceiveBase(Base.Page):
 
     def stop_test(self):
         self.stop_flag = False
+        self.FormatPrint(info="Stop")
 
     def get_flag(self):
         return self.flag

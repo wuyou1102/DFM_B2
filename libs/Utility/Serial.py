@@ -30,8 +30,6 @@ class Serial(object):
                 Logger.debug("* STDOUT: {result}".format(result=repr(result)))
                 if result.endswith('\n'):
                     return ExecuteResult(exit_code=0, outputs=result.strip('\n'))
-                elif result in command:
-                    return ExecuteResult(exit_code=ErrorCode.TIMING_ERROR, outputs=ErrorCode.TIMING_ERROR.MSG)
                 else:
                     return ExecuteResult(exit_code=ErrorCode.WRONG_TERMINATOR, outputs=ErrorCode.WRONG_TERMINATOR.MSG)
             except serial.SerialException:
@@ -43,10 +41,16 @@ class Serial(object):
     def send(self, command, sleep):
         command = command.strip('\r\n') + '\n'
         self.__session.write(command.encode())
+
         time.sleep(sleep)
 
     def read(self):
         return self.__session.read_all()
+
+    def flush(self):
+        self.send("", sleep=0.005)
+        self.__session.flushInput()
+        self.__session.flushOutput()
 
     @Timeout.timeout(5)
     def read_line(self):

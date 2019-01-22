@@ -10,6 +10,7 @@ from TestPages.Base import Report
 from libs import Utility
 from libs.Config import Color
 from libs.Utility.UART import UART
+import time
 
 logger = logging.getLogger(__name__)
 reload(sys)
@@ -44,6 +45,10 @@ class Panel(wx.Panel):
         sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"设备信息"), wx.VERTICAL)
         sizer.Add(self.__init_port_sizer(), 0, wx.EXPAND | wx.ALL, 1)
         sizer.Add(self.__init_serial_number_sizer(), 0, wx.EXPAND | wx.ALL, 1)
+        self.btn_get_info = wx.Button(self, wx.ID_ANY, u"刷新设备信息", wx.DefaultPosition, wx.DefaultSize, 0,
+                                      name="get_info")
+        self.btn_get_info.Bind(wx.EVT_BUTTON, self.on_button_click)
+        sizer.Add(self.btn_get_info, 0, wx.EXPAND | wx.ALL, 1)
         return sizer
 
     def __init_port_sizer(self):
@@ -115,6 +120,8 @@ class Panel(wx.Panel):
             self.set_serial_number_via_uart()
         elif name == "get_sn":
             self.update_serial_number()
+        elif name == "get_info":
+            self.get_device_info()
 
     def connect(self):
         port = self.get_selected_port()
@@ -134,6 +141,18 @@ class Panel(wx.Panel):
         else:
             Utility.Alert.Error(u"无法打开设备")
 
+    def get_device_info(self):
+        uart = self.get_variable("uart")
+        if uart.is_uart_connected():
+            try:
+                self.btn_get_info.Disable()
+                self.update_serial_number()
+                Utility.append_thread(target=self.update_case_result, allow_dupl=False)
+            finally:
+                self.btn_get_info.Enable()
+        else:
+            Utility.Alert.Error(u"无法打开设备")
+
     def disconnect(self):
         self.test_view.clear_case_result()
         uart = Variable.get_uart()
@@ -142,6 +161,7 @@ class Panel(wx.Panel):
         self.clear_variable()
         self.Layout()
         self.Enable(False)
+        self.serial_number.SetValue("")
 
     def set_serial_number_via_uart(self):
         serial = self.serial_number.GetValue()
@@ -165,6 +185,7 @@ class Panel(wx.Panel):
             ctrl.Enable(not enable)
 
     def update_case_result(self):
+        self.test_view.clear_case_result()
         self.test_view.update_case_result()
         self.Enable()
 
@@ -291,6 +312,7 @@ class ScrolledWindow(wx.Panel):
         if self.__previous_select is not None:
             self.__previous_select.deselect()
 
+
     def next_page(self):
         self.__previous_select.deselect()
         self.__previous_select.update_result()
@@ -313,7 +335,6 @@ class ScrollButton(wx.Button):
             "False": Color.Red1,
             "NotTest": Color.gray81,
             "Report": Color.Yellow,
-            "None": Color.White
         }
 
     def __refresh_result(self):
@@ -347,7 +368,7 @@ class ScrollButton(wx.Button):
         try:
             return self.__color[self.__result]
         except KeyError:
-            return "None"
+            return Color.White
 
 
 class CaseView(wx.Panel):
