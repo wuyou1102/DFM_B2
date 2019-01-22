@@ -177,7 +177,7 @@ class Panel(wx.Panel):
         self.serial_number.SetValue(value=uart.SerialNumber)
 
     def Enable(self, enable=True):
-        lst1 = [self.btn_disconnect, self.button_sn, self.test_view]
+        lst1 = [self.btn_disconnect, self.button_sn, self.test_view, self.btn_get_info]
         lst2 = [self.btn_connect, self.port_choice, self.btn_refresh]
         for ctrl in lst1:
             ctrl.Enable(enable)
@@ -312,7 +312,6 @@ class ScrolledWindow(wx.Panel):
         if self.__previous_select is not None:
             self.__previous_select.deselect()
 
-
     def next_page(self):
         self.__previous_select.deselect()
         self.__previous_select.update_result()
@@ -334,7 +333,7 @@ class ScrollButton(wx.Button):
             "True": Color.SpringGreen3,
             "False": Color.Red1,
             "NotTest": Color.gray81,
-            "Report": Color.Yellow,
+            "Report": Color.PaleTurquoise,
         }
 
     def __refresh_result(self):

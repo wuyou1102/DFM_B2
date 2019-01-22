@@ -3,7 +3,7 @@ import wx
 import logging
 import Base
 from libs import Utility
-from libs.Config import String
+from libs.Config import Font
 from libs.Config import Picture
 
 logger = logging.getLogger(__name__)
@@ -30,11 +30,13 @@ class TransmitBase(Base.Page):
     def __init_freq_point_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        title.SetFont(Font.COMMON_1_LARGE)
         self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
+        self.current_point.SetFont(Font.COMMON_1_LARGE)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         p = str(self.freq)
-        button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (40, -1), 0, name=p)
+        button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (45, 33), 0, name=p)
         button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
         sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         return sizer

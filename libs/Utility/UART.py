@@ -69,7 +69,7 @@ class UART(Serial):
 
     def is_button_clicked(self):
         cmd = command.is_button_clicked()
-        if self._get(cmd=cmd) == "True":
+        if self._get(cmd=cmd, sleep=0.01) == "True":
             return True
         return False
 
@@ -167,7 +167,7 @@ class UART(Serial):
             return True
         return False
 
-    def _get(self, cmd, sleep=0.005):
+    def _get(self, cmd, sleep=0.01):
         result = self.execute_command(command=cmd, sleep=sleep)
         if result.exit_code == 0:
             return result.outputs
@@ -177,13 +177,13 @@ class UART(Serial):
         elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
             logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
             self.flush()
-            return self._get(cmd=cmd, sleep=sleep)
+            return self._get(cmd=cmd, sleep=sleep + 0.005)
         else:
             raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))
 
-    def _set(self, cmd, sleep=0.005):
+    def _set(self, cmd, sleep=0.01):
         for x in range(3):
-            if self.__set(cmd=cmd, sleep=sleep):
+            if self.__set(cmd=cmd, sleep=sleep + 0.005):
                 return True
         Alert.Error(u"设置失败")
         return False

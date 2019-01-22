@@ -106,7 +106,7 @@ def is_button_clicked():
 
 
 def is_uart_connected():
-    return "is_usb_connect"
+    return "is_uart_connect"
 
 
 def is_usb_connected():

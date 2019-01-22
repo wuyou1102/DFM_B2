@@ -4,8 +4,9 @@ import matplotlib
 import wx
 import Base
 from libs import Utility
-
+from libs.Config import Font
 from libs.Config import Picture
+
 
 matplotlib.use('WXAgg')
 from matplotlib.figure import Figure
@@ -13,7 +14,7 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 import numpy
 
 logger = logging.getLogger(__name__)
-import time
+
 
 
 class ReceiveBase(Base.Page):
@@ -26,11 +27,19 @@ class ReceiveBase(Base.Page):
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hori_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        hori_sizer.Add(self.__init_freq_point_sizer(), 1, wx.EXPAND, 0)
+        hori_sizer.Add(self.__init_freq_point_sizer(), 0, wx.EXPAND, 0)
+        hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND, 0)
         # hori_sizer.Add(self.__init_mcs_sizer(), 1, wx.EXPAND, 0)
-        hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT, 0)
+        hori_sizer.Add(self.__init_message_sizer(), 1, wx.EXPAND, 0)
         sizer.Add(hori_sizer, 0, wx.EXPAND | wx.ALL, 0)
         sizer.Add(self.__init_mpl_sizer(), 1, wx.EXPAND | wx.ALL, 0)
+        return sizer
+
+    def __init_message_sizer(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.message = wx.StaticText(self, wx.ID_ANY, u"正在连接信号发生器", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.message.SetFont(Font.DESC)
+        sizer.Add(self.message, 1, wx.EXPAND | wx.TOP, 3)
         return sizer
 
     def __init_mpl_sizer(self):
@@ -42,11 +51,13 @@ class ReceiveBase(Base.Page):
     def __init_freq_point_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        title.SetFont(Font.COMMON_1_LARGE)
         self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
+        self.current_point.SetFont(Font.COMMON_1_LARGE)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         p = str(self.freq)
-        button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (40, -1), 0, name=p)
+        button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (45, 33), 0, name=p)
         button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
         sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         return sizer
@@ -131,8 +142,10 @@ class ReceiveBase(Base.Page):
         while self.stop_flag:
             if uart.is_instrument_connected():
                 self.status.SetBitmap(Picture.status_connect1)
+                self.message.SetLabel(u"信号发生器已连接，测试中")
                 break
             else:
+                self.message.SetLabel(u"正在连接信号发生器")
                 self.status.SetBitmap(Picture.status_disconnect)
                 uart.hold_baseband()
                 self.status.SetBitmap(wx.NullBitmap)
@@ -143,6 +156,7 @@ class ReceiveBase(Base.Page):
             self.panel_mpl.refresh(self.slot)
             self.Sleep(0.8)
             if self.check_result():
+                self.message.SetLabel(u"测试通过，请点击PASS")
                 self.PassButton.Enable()
                 break
 
