@@ -6,7 +6,7 @@ from libs.Config import String
 #         for p in ['2410', '2450', '2475', '5750', '5800', '5825']:
 class Transmit2410(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=2410, flag=String.RF_TRANSMIT_2410)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=2410)
 
     @staticmethod
     def GetFlag(t):
@@ -16,7 +16,7 @@ class Transmit2410(TransmitBase):
 
 class Transmit2450(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=2450, flag=String.RF_TRANSMIT_2450)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=2450)
 
     @staticmethod
     def GetFlag(t):
@@ -26,7 +26,7 @@ class Transmit2450(TransmitBase):
 
 class Transmit2475(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=2475, flag=String.RF_TRANSMIT_2475)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=2475)
 
     @staticmethod
     def GetFlag(t):
@@ -36,7 +36,7 @@ class Transmit2475(TransmitBase):
 
 class Transmit5750(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=5750, flag=String.RF_TRANSMIT_5750)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=5750)
 
     @staticmethod
     def GetFlag(t):
@@ -46,7 +46,7 @@ class Transmit5750(TransmitBase):
 
 class Transmit5800(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=5800, flag=String.RF_TRANSMIT_5800)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=5800)
 
     @staticmethod
     def GetFlag(t):
@@ -56,7 +56,7 @@ class Transmit5800(TransmitBase):
 
 class Transmit5850(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=5850, flag=String.RF_TRANSMIT_5850)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=5850)
 
     @staticmethod
     def GetFlag(t):

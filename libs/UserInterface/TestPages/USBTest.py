@@ -55,7 +55,7 @@ class USBTest(Base.Page):
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     def get_flag(self):
-        return String.PCBA_USB
+        return self.GetFlag(t=self.type)
 
     @staticmethod
     def GetFlag(t):

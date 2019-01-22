@@ -91,7 +91,7 @@ class FPVTest(Base.Page):
         )
 
     def get_flag(self):
-        return String.MACHINE_FPV
+        return self.GetFlag(t=self.type)
 
     @staticmethod
     def GetFlag(t):

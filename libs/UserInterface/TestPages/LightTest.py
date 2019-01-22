@@ -38,7 +38,7 @@ class LightTest(Base.Page):
         self.FormatPrint(info="Stop")
 
     def get_flag(self):
-        return String.PCBA_LIGHT
+        return self.GetFlag(t=self.type)
 
     @staticmethod
     def GetFlag(t):

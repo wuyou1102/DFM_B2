@@ -18,9 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class ReceiveBase(Base.Page):
-    def __init__(self, parent, type, freq, flag):
+    def __init__(self, parent, type, freq):
         self.freq = freq
-        self.flag = flag
         Base.Page.__init__(self, parent=parent, name="接收灵敏度 [%s]" % freq, type=type)
         self.init_variable()
 
@@ -135,7 +134,7 @@ class ReceiveBase(Base.Page):
         self.FormatPrint(info="Stop")
 
     def get_flag(self):
-        return self.flag
+        return self.GetFlag(t=self.type)
 
     def draw_line(self):
         uart = self.get_uart()

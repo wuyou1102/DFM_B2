@@ -96,13 +96,13 @@ class Panel(wx.Panel):
 
     def switch_cases(self):
         if self.type == "PCBA":
-            from TestPages import PCBA_CASES
+            from libs.Config.Cases import PCBA_CASES
             return PCBA_CASES
         elif self.type == "MACHINE":
-            from TestPages import MACHINE_CASES
+            from libs.Config.Cases import MACHINE_CASES
             return MACHINE_CASES
         elif self.type == "RF":
-            from TestPages import RF_CASES
+            from libs.Config.Cases import RF_CASES
             return RF_CASES
         else:
             raise KeyError("Unknown type :\"%s\"" % self.type)

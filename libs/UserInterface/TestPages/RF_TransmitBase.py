@@ -10,9 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class TransmitBase(Base.Page):
-    def __init__(self, parent, type, freq, flag):
+    def __init__(self, parent, type, freq):
         self.freq = freq
-        self.flag = flag
         Base.Page.__init__(self, parent=parent, name=" 发射功率 [%s] " % self.freq, type=type)
 
     def init_test_sizer(self):
@@ -129,7 +128,7 @@ class TransmitBase(Base.Page):
             obj.Enable()
 
     def get_flag(self):
-        return self.flag
+        return self.GetFlag(t=self.type)
 
     def on_scroll_changed(self, event):
         x = self.slider.GetValue()
