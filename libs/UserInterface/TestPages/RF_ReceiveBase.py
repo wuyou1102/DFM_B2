@@ -88,7 +88,6 @@ class ReceiveBase(Base.Page):
             self.Sleep(0.05)
             uart = self.get_uart()
             value = uart.get_frequency_point()
-            value = Utility.convert_freq_point(value=value)
             self.current_point.SetValue(value)
             if float(value) != self.freq:
                 Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")

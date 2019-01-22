@@ -5,6 +5,7 @@ from libs.Config.ErrorCode import ErrorCode
 import Alert
 from libs.Command import AT as command
 import time
+from libs.Utility import convert_freq_point
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,12 @@ class UART(Serial):
 
     def get_radio_frequency_power(self):
         cmd = command.get_radio_frequency_power()
-        return self._protocol_get(cmd=cmd)
+        try:
+            result = self._protocol_get(cmd=cmd)
+            result = int(result, 16)
+            return result
+        except ValueError:
+            return self.get_radio_frequency_power()
 
     def set_register(self, address, value):
         cmd = command.set_register(address=address, value=value)
@@ -93,7 +99,12 @@ class UART(Serial):
 
     def get_frequency_point(self):
         cmd = command.get_frequency_point()
-        return self._protocol_get(cmd=cmd)
+        try:
+            result = self._protocol_get(cmd=cmd)
+            result = convert_freq_point(result)
+            return result
+        except ValueError:
+            return self.get_frequency_point()
 
     def hold_baseband(self):
         cmd = command.hold_baseband()

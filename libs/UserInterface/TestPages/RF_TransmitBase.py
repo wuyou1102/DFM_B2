@@ -13,7 +13,7 @@ class TransmitBase(Base.Page):
     def __init__(self, parent, type, freq, flag):
         self.freq = freq
         self.flag = flag
-        Base.Page.__init__(self, parent=parent, name="发射功率  [%s]" % self.freq, type=type)
+        Base.Page.__init__(self, parent=parent, name=" 发射功率 [%s] " % self.freq, type=type)
         self.stop_flag = True
 
     def init_test_sizer(self):
@@ -75,11 +75,9 @@ class TransmitBase(Base.Page):
             self.Sleep(0.05)
             uart = self.get_uart()
             value = uart.get_frequency_point()
-            value = Utility.convert_freq_point(value=value)
             self.current_point.SetValue(value)
             if float(value) != self.freq:
                 Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")
-
         Utility.append_thread(target=update_freq, allow_dupl=True)
 
     def update_current_mcs(self):
@@ -94,9 +92,8 @@ class TransmitBase(Base.Page):
         def update_power():
             uart = self.get_uart()
             value = uart.get_radio_frequency_power()
-            self.slider.SetValue(int(value, 16))
-            self.static_text.SetLabel(value.upper())
-
+            self.slider.SetValue(value)
+            self.static_text.SetLabel(hex(value).upper())
         Utility.append_thread(target=update_power, allow_dupl=True)
 
     def before_test(self):
