@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 
-class ReceiveBase(Base.Page):
+class ReceiveBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
-        Base.Page.__init__(self, parent=parent, name="接收灵敏度 [%s]" % freq, type=type)
+        Base.TestPage.__init__(self, parent=parent, type=type)
         self.init_variable()
 
     def init_test_sizer(self):

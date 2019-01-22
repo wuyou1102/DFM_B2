@@ -8,9 +8,9 @@ from libs.Config import String
 logger = logging.getLogger(__name__)
 
 
-class EthernetTest(Base.Page):
+class Ethernet(Base.TestPage):
     def __init__(self, parent, type):
-        Base.Page.__init__(self, parent=parent, name="网口测试", type=type)
+        Base.TestPage.__init__(self, parent=parent, type=type)
         self.stop_flag = True
 
     def init_test_sizer(self):
@@ -21,7 +21,7 @@ class EthernetTest(Base.Page):
         return sizer
 
     def before_test(self):
-        super(EthernetTest, self).before_test()
+        super(Ethernet, self).before_test()
         self.output.SetValue("")
         self.stop_flag = True
 
@@ -49,8 +49,9 @@ class EthernetTest(Base.Page):
         self.LogMessage(msg)
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
-    def get_flag(self):
-        return self.GetFlag(t=self.type)
+    @staticmethod
+    def GetName():
+        return u"网口测试"
 
     @staticmethod
     def GetFlag(t):

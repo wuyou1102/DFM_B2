@@ -10,9 +10,9 @@ from libs import Utility
 logger = logging.getLogger(__name__)
 
 
-class USBTest(Base.Page):
+class USB(Base.TestPage):
     def __init__(self, parent, type):
-        Base.Page.__init__(self, parent=parent, name=u"USB测试", type=type)
+        Base.TestPage.__init__(self, parent=parent, type=type)
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -26,7 +26,7 @@ class USBTest(Base.Page):
         return sizer
 
     def before_test(self):
-        super(USBTest, self).before_test()
+        super(USB, self).before_test()
         self.stop_flag = True
         self.output.SetValue("")
 
@@ -54,8 +54,9 @@ class USBTest(Base.Page):
         self.LogMessage(msg)
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
-    def get_flag(self):
-        return self.GetFlag(t=self.type)
+    @staticmethod
+    def GetName():
+        return u"USB测试"
 
     @staticmethod
     def GetFlag(t):

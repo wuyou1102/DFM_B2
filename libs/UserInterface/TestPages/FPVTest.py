@@ -12,9 +12,9 @@ from libs.Config import String
 logger = logging.getLogger(__name__)
 
 
-class FPVTest(Base.Page):
+class FPV(Base.TestPage):
     def __init__(self, parent, type):
-        Base.Page.__init__(self, parent=parent, name=u"图传测试", type=type)
+        Base.TestPage.__init__(self, parent=parent, type=type)
         self.player = None
 
     def init_test_sizer(self):
@@ -56,7 +56,7 @@ class FPVTest(Base.Page):
         return Utility.ParseConfig.get(path=Path.CONFIG, section=name)
 
     def before_test(self):
-        super(FPVTest, self).before_test()
+        super(FPV, self).before_test()
 
     def start_test(self):
         self.FormatPrint(info="Started")
@@ -90,8 +90,9 @@ class FPVTest(Base.Page):
             address=self.address.GetValue(),
         )
 
-    def get_flag(self):
-        return self.GetFlag(t=self.type)
+    @staticmethod
+    def GetName():
+        return u"图传测试"
 
     @staticmethod
     def GetFlag(t):

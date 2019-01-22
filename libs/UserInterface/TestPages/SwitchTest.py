@@ -10,9 +10,9 @@ from libs import Utility
 logger = logging.getLogger(__name__)
 
 
-class SwitchTest(Base.Page):
+class Switch(Base.TestPage):
     def __init__(self, parent, type):
-        Base.Page.__init__(self, parent=parent, name=u"开关测试", type=type)
+        Base.TestPage.__init__(self, parent=parent, type=type)
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -26,7 +26,7 @@ class SwitchTest(Base.Page):
         return sizer
 
     def before_test(self):
-        super(SwitchTest, self).before_test()
+        super(Switch, self).before_test()
         uart = self.get_uart()
         uart.reset_button_click()
         self.stop_flag = True
@@ -56,8 +56,9 @@ class SwitchTest(Base.Page):
         self.LogMessage(msg)
         wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
-    def get_flag(self):
-        return self.GetFlag(t=self.type)
+    @staticmethod
+    def GetName():
+        return u"开关测试"
 
     @staticmethod
     def GetFlag(t):

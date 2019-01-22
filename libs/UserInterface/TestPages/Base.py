@@ -30,15 +30,14 @@ class Variable(object):
         return True
 
 
-class Page(wx.Panel):
-    def __init__(self, parent, name, type):
+class TestPage(wx.Panel):
+    def __init__(self, parent, type):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.__parent = parent
         self.lock = threading.Lock()
         self.type = type
-        self.name = name
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
-        title = wx.StaticText(self, wx.ID_ANY, self.name, wx.DefaultPosition, wx.DefaultSize,
+        title = wx.StaticText(self, wx.ID_ANY, self.get_name(), wx.DefaultPosition, wx.DefaultSize,
                               wx.ALIGN_CENTER | wx.SIMPLE_BORDER)
         title.SetFont(Font.TEST_TITLE)
         title.SetBackgroundColour(Color.LightYellow1)
@@ -65,9 +64,6 @@ class Page(wx.Panel):
     def get_uart():
         return Variable.get_uart()
 
-    def get_name(self):
-        return self.name
-
     def get_result(self):
         uart = self.get_uart()
         return uart.get_flag_result(self.get_flag())
@@ -75,17 +71,28 @@ class Page(wx.Panel):
     def get_type(self):
         return self.type
 
+    def get_name(self):
+        return self.GetName()
+
+    @staticmethod
+    def GetName():
+        raise NotImplementedError
+
     def get_flag(self):
+        return self.GetFlag(t=self.type)
+
+    @staticmethod
+    def GetFlag(t):
         raise NotImplementedError
 
     def Show(self):
-        super(Page, self).Show()
+        super(TestPage, self).Show()
         self.__parent.refresh()
         self.before_test()
         self.start_test()
 
     def Hide(self):
-        super(Page, self).Hide()
+        super(TestPage, self).Hide()
         self.__parent.refresh()
         self.stop_test()
 
@@ -138,7 +145,7 @@ class Page(wx.Panel):
     def FormatPrint(self, info, symbol="*", length=50):
         if self.lock.acquire():
             try:
-                body = " %s: %s" % (self.name, info)
+                body = " %s: %s" % (self.get_name(), info)
                 self.LogMessage(symbol * length)
                 self.LogMessage(symbol + body)
                 self.LogMessage(symbol * length)
@@ -146,7 +153,7 @@ class Page(wx.Panel):
                 self.lock.release()
 
 
-class Report(wx.Panel):
+class ReportPage(wx.Panel):
     def __init__(self, parent, name=u"测试总结"):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.__parent = parent
@@ -164,12 +171,18 @@ class Report(wx.Panel):
         return self.name
 
     def Show(self):
-        super(Report, self).Show()
+        super(ReportPage, self).Show()
         self.__parent.refresh()
 
     def Hide(self):
-        super(Report, self).Hide()
+        super(ReportPage, self).Hide()
         self.__parent.refresh()
 
     def get_result(self):
         return "Report"
+
+    def __init_PCBA_sizer(self):
+        pass
+
+    def __init_panel(self):
+        pass

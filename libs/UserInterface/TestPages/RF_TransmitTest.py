@@ -13,6 +13,10 @@ class Transmit2410(TransmitBase):
         if t == "RF":
             return String.RF_TRANSMIT_2410
 
+    @staticmethod
+    def GetName():
+        return u" 发射功率 [2410] "
+
 
 class Transmit2450(TransmitBase):
     def __init__(self, parent, type):
@@ -22,6 +26,10 @@ class Transmit2450(TransmitBase):
     def GetFlag(t):
         if t == "RF":
             return String.RF_TRANSMIT_2450
+
+    @staticmethod
+    def GetName():
+        return u" 发射功率 [2450] "
 
 
 class Transmit2475(TransmitBase):
@@ -33,6 +41,10 @@ class Transmit2475(TransmitBase):
         if t == "RF":
             return String.RF_TRANSMIT_2475
 
+    @staticmethod
+    def GetName():
+        return u" 发射功率 [2475] "
+
 
 class Transmit5750(TransmitBase):
     def __init__(self, parent, type):
@@ -42,6 +54,10 @@ class Transmit5750(TransmitBase):
     def GetFlag(t):
         if t == "RF":
             return String.RF_TRANSMIT_5750
+
+    @staticmethod
+    def GetName():
+        return u" 发射功率 [5750] "
 
 
 class Transmit5800(TransmitBase):
@@ -53,6 +69,10 @@ class Transmit5800(TransmitBase):
         if t == "RF":
             return String.RF_TRANSMIT_5800
 
+    @staticmethod
+    def GetName():
+        return u" 发射功率 [5800] "
+
 
 class Transmit5850(TransmitBase):
     def __init__(self, parent, type):
@@ -62,3 +82,7 @@ class Transmit5850(TransmitBase):
     def GetFlag(t):
         if t == "RF":
             return String.RF_TRANSMIT_5850
+
+    @staticmethod
+    def GetName():
+        return u" 发射功率 [5850] "

@@ -9,9 +9,9 @@ from libs.Config import String
 logger = logging.getLogger(__name__)
 
 
-class LightTest(Base.Page):
+class Light(Base.TestPage):
     def __init__(self, parent, type):
-        Base.Page.__init__(self, parent=parent, name=u"灯座测试", type=type)
+        Base.TestPage.__init__(self, parent=parent, type=type)
         self.count = 0
 
     def init_test_sizer(self):
@@ -37,8 +37,9 @@ class LightTest(Base.Page):
     def stop_test(self):
         self.FormatPrint(info="Stop")
 
-    def get_flag(self):
-        return self.GetFlag(t=self.type)
+    @staticmethod
+    def GetName():
+        return u"灯座测试"
 
     @staticmethod
     def GetFlag(t):

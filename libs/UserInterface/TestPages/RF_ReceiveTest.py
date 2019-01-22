@@ -13,6 +13,10 @@ class Receive2410(ReceiveBase):
         if t == "RF":
             return String.RF_RECEIVE_2410
 
+    @staticmethod
+    def GetName():
+        return u"接收灵敏度 [2410]"
+
 
 class Receive2450(ReceiveBase):
     def __init__(self, parent, type):
@@ -22,6 +26,10 @@ class Receive2450(ReceiveBase):
     def GetFlag(t):
         if t == "RF":
             return String.RF_RECEIVE_2450
+
+    @staticmethod
+    def GetName():
+        return u"接收灵敏度 [2450]"
 
 
 class Receive2475(ReceiveBase):
@@ -33,6 +41,10 @@ class Receive2475(ReceiveBase):
         if t == "RF":
             return String.RF_RECEIVE_2475
 
+    @staticmethod
+    def GetName():
+        return u"接收灵敏度 [2475]"
+
 
 class Receive5750(ReceiveBase):
     def __init__(self, parent, type):
@@ -42,6 +54,10 @@ class Receive5750(ReceiveBase):
     def GetFlag(t):
         if t == "RF":
             return String.RF_RECEIVE_5750
+
+    @staticmethod
+    def GetName():
+        return u"接收灵敏度 [5750]"
 
 
 class Receive5800(ReceiveBase):
@@ -53,6 +69,10 @@ class Receive5800(ReceiveBase):
         if t == "RF":
             return String.RF_RECEIVE_5800
 
+    @staticmethod
+    def GetName():
+        return u"接收灵敏度 [5800]"
+
 
 class Receive5850(ReceiveBase):
     def __init__(self, parent, type):
@@ -62,3 +82,7 @@ class Receive5850(ReceiveBase):
     def GetFlag(t):
         if t == "RF":
             return String.RF_RECEIVE_5850
+
+    @staticmethod
+    def GetName():
+        return u"接收灵敏度 [5850]"

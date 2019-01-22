@@ -9,10 +9,10 @@ from libs.Config import Picture
 logger = logging.getLogger(__name__)
 
 
-class TransmitBase(Base.Page):
+class TransmitBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
-        Base.Page.__init__(self, parent=parent, name=" 发射功率 [%s] " % self.freq, type=type)
+        Base.TestPage.__init__(self, parent=parent, type=type)
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)

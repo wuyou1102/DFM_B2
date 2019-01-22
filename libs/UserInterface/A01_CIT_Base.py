@@ -6,7 +6,7 @@ import serial
 import wx
 
 from TestPages import Variable
-from TestPages.Base import Report
+from TestPages.Base import ReportPage
 from libs import Utility
 from libs.Config import Color
 from libs.Utility.UART import UART
@@ -241,7 +241,7 @@ class ListBook(wx.Panel):
         self.__ScrolledWindow.refresh_scroll_window()
 
     def __add_report_page(self):
-        report = Report(self.__CaseView)
+        report = ReportPage(self.__CaseView)
         self.__ScrolledWindow.append(report)
         self.__CaseView.append(report)
 
