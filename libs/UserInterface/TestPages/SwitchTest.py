@@ -58,3 +58,8 @@ class SwitchTest(Base.Page):
 
     def get_flag(self):
         return String.PCBA_SWITCH
+
+    @staticmethod
+    def GetFlag(t):
+        if t == "PCBA":
+            return String.PCBA_SWITCH

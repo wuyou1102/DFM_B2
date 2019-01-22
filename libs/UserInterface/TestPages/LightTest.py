@@ -39,3 +39,8 @@ class LightTest(Base.Page):
 
     def get_flag(self):
         return String.PCBA_LIGHT
+
+    @staticmethod
+    def GetFlag(t):
+        if t == "PCBA":
+            return String.PCBA_LIGHT

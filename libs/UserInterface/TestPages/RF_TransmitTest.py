@@ -8,27 +8,57 @@ class Transmit2410(TransmitBase):
     def __init__(self, parent, type):
         TransmitBase.__init__(self, parent=parent, type=type, freq=2410, flag=String.RF_TRANSMIT_2410)
 
+    @staticmethod
+    def GetFlag(t):
+        if t == "RF":
+            return String.RF_TRANSMIT_2410
+
 
 class Transmit2450(TransmitBase):
     def __init__(self, parent, type):
         TransmitBase.__init__(self, parent=parent, type=type, freq=2450, flag=String.RF_TRANSMIT_2450)
+
+    @staticmethod
+    def GetFlag(t):
+        if t == "RF":
+            return String.RF_TRANSMIT_2450
 
 
 class Transmit2475(TransmitBase):
     def __init__(self, parent, type):
         TransmitBase.__init__(self, parent=parent, type=type, freq=2475, flag=String.RF_TRANSMIT_2475)
 
+    @staticmethod
+    def GetFlag(t):
+        if t == "RF":
+            return String.RF_TRANSMIT_2475
+
 
 class Transmit5750(TransmitBase):
     def __init__(self, parent, type):
         TransmitBase.__init__(self, parent=parent, type=type, freq=5750, flag=String.RF_TRANSMIT_5750)
+
+    @staticmethod
+    def GetFlag(t):
+        if t == "RF":
+            return String.RF_TRANSMIT_5750
 
 
 class Transmit5800(TransmitBase):
     def __init__(self, parent, type):
         TransmitBase.__init__(self, parent=parent, type=type, freq=5800, flag=String.RF_TRANSMIT_5800)
 
+    @staticmethod
+    def GetFlag(t):
+        if t == "RF":
+            return String.RF_TRANSMIT_5800
+
 
 class Transmit5850(TransmitBase):
     def __init__(self, parent, type):
         TransmitBase.__init__(self, parent=parent, type=type, freq=5850, flag=String.RF_TRANSMIT_5850)
+
+    @staticmethod
+    def GetFlag(t):
+        if t == "RF":
+            return String.RF_TRANSMIT_5850

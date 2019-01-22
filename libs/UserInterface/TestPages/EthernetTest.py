@@ -52,3 +52,7 @@ class EthernetTest(Base.Page):
     def get_flag(self):
         return String.PCBA_ETHERNET
 
+    @staticmethod
+    def GetFlag(t):
+        if t == "PCBA":
+            return String.PCBA_ETHERNET

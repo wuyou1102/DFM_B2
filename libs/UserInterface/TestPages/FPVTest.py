@@ -93,6 +93,11 @@ class FPVTest(Base.Page):
     def get_flag(self):
         return String.MACHINE_FPV
 
+    @staticmethod
+    def GetFlag(t):
+        if t == "MACHINE":
+            return String.MACHINE_FPV
+
 
 class Player(wx.Frame):
     def __init__(self, EVT_RESULT, position=wx.DefaultPosition):
