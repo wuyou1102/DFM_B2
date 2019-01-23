@@ -48,7 +48,7 @@ class Serial(object):
         return self.__session.read_all()
 
     def flush(self):
-        self.send("", sleep=0.005)
+        self.send("", sleep=0.016)
         self.__session.flushInput()
         self.__session.flushOutput()
 

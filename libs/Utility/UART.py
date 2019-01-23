@@ -10,6 +10,8 @@ from libs.Utility import convert_freq_point
 logger = logging.getLogger(__name__)
 
 timeout = 5
+base_sleep_time = 0.016
+each_increase_time = 0.004
 
 
 class UART(Serial):
@@ -48,12 +50,7 @@ class UART(Serial):
         return self._set(cmd=cmd)
 
     def is_uart_connected(self):
-        serial = self._get(cmd=command.get_serial_number())
-        if serial:
-            self.__serial_number = serial
-            return True
-        if self._get(cmd=command.is_button_clicked()) in ["True", "False"]:
-            self.__serial_number = ""
+        if self._get(cmd=command.is_button_clicked(), retry=False) in ["True", "False"]:
             return True
         return False
 
@@ -69,7 +66,7 @@ class UART(Serial):
 
     def is_button_clicked(self):
         cmd = command.is_button_clicked()
-        if self._get(cmd=cmd, sleep=0.01) == "True":
+        if self._get(cmd=cmd) == "True":
             return True
         return False
 
@@ -167,7 +164,7 @@ class UART(Serial):
             return True
         return False
 
-    def _get(self, cmd, sleep=0.01):
+    def _get(self, cmd, sleep=base_sleep_time, retry=True):
         result = self.execute_command(command=cmd, sleep=sleep)
         if result.exit_code == 0:
             return result.outputs
@@ -175,20 +172,22 @@ class UART(Serial):
             Alert.Error(ErrorCode.SERIAL_EXCEPTION.MSG)
             return None
         elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
-            logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
-            self.flush()
-            return self._get(cmd=cmd, sleep=sleep + 0.005)
+            if retry:
+                logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
+                self.flush()
+                return self._get(cmd=cmd, sleep=sleep + each_increase_time)
+            return None
         else:
             raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))
 
-    def _set(self, cmd, sleep=0.01):
+    def _set(self, cmd, sleep=base_sleep_time):
         for x in range(3):
-            if self.__set(cmd=cmd, sleep=sleep + 0.005):
+            if self.__set(cmd=cmd, sleep=sleep):
                 return True
         Alert.Error(u"设置失败")
         return False
 
-    def __set(self, cmd, sleep=0.01):
+    def __set(self, cmd, sleep=base_sleep_time):
         result = self.execute_command(command=cmd, sleep=sleep)
         if result.exit_code == 0:
             if result.outputs == "True":
@@ -200,6 +199,6 @@ class UART(Serial):
         elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
             logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
             self.flush()
-            return self.__set(cmd=cmd, sleep=sleep)
+            return self.__set(cmd=cmd, sleep=sleep + each_increase_time)
         else:
             raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))
