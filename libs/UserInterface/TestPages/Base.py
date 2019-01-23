@@ -176,12 +176,24 @@ class ReportPage(wx.Panel):
 
     def __init_result_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.__init_device_info(), 0, wx.EXPAND | wx.ALL, 0)
         sizer.Add(self.__init_case_result_sizer(), 1, wx.EXPAND | wx.ALL, 0)
         sizer.Add(self.__init_operation_sizer(), 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_BOTTOM | wx.ALL, 0)
         return sizer
 
-    def __init_serial_number_sizer(self):
-        pass
+    def __init_device_info(self):
+        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "设备信息"), wx.VERTICAL)
+        row0 = wx.BoxSizer(wx.HORIZONTAL)
+        title = wx.StaticText(self, wx.ID_ANY, u"序列号: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.serial_number = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
+                                         wx.TE_READONLY | wx.NO_BORDER)
+        self.serial_number.SetBackgroundColour(Color.gray81)
+        title.SetFont(Font.COMMON_1)
+        self.serial_number.SetFont(Font.COMMON_1_LARGE)
+        row0.Add(title, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
+        row0.Add(self.serial_number, 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
+        sizer.Add(row0, 0, wx.EXPAND | wx.LEFT, 10)
+        return sizer
 
     def __init_case_result_sizer(self):
         from libs.Config.Cases import RF_CASES
@@ -210,7 +222,6 @@ class ReportPage(wx.Panel):
         obj = event.GetEventObject()
         name = obj.GetName()
         if name == "refresh_result":
-            self.__set_result_color_as_default()
             Utility.append_thread(target=self.__update_color_based_on_result)
         elif name == "upload_result":
             Utility.Alert.Info("Hello World!")
@@ -223,8 +234,10 @@ class ReportPage(wx.Panel):
         return self.name
 
     def capture_screen(self):
-        dlg = wx.FileDialog(self, "保存结果截图", "", style=wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
-                            wildcard="Screenshots(*.png)|*.png|All files(*.*)|*.*")
+        default_name = "%s.png" % self.serial_number.GetValue()
+        dlg = wx.FileDialog(self, "保存截图", "", style=wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
+                            wildcard="Screenshots(*.png)|*.png|All files(*.*)|*.*",
+                            defaultFile=default_name)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
             if not os.path.splitext(filename)[1]:  # 如果没有文件名后缀
@@ -246,7 +259,6 @@ class ReportPage(wx.Panel):
     def Show(self):
         super(ReportPage, self).Show()
         self.__parent.refresh()
-        self.__set_result_color_as_default()
         Utility.append_thread(target=self.__update_color_based_on_result)
 
     def Hide(self):
@@ -286,13 +298,16 @@ class ReportPage(wx.Panel):
         return title
 
     def __update_color_based_on_result(self):
+        self.__set_result_color_as_default()
         uart = Variable.get_uart()
+        self.serial_number.SetValue(uart.get_serial_number())
         for ctrl in self.__result_controls:
             result = uart.get_flag_result(flag=ctrl.GetName())
             ctrl.SetBackgroundColour(self.__color[result])
             ctrl.Refresh()
 
     def __set_result_color_as_default(self):
+        self.serial_number.SetValue("")
         for ctrl in self.__result_controls:
             ctrl.SetBackgroundColour(self.__color["NotTest"])
             ctrl.Refresh()
