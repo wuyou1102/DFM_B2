@@ -156,7 +156,13 @@ class TestPage(wx.Panel):
 class ReportPage(wx.Panel):
     def __init__(self, parent, name=u"测试总结"):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
+        self.__color = {
+            "True": Color.GoogleGreen,
+            "False": Color.GoogleRed,
+            "NotTest": Color.gray81,
+        }
         self.__parent = parent
+        self.__result_controls = list()
         self.name = name
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         title = wx.StaticText(self, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize,
@@ -164,8 +170,49 @@ class ReportPage(wx.Panel):
         title.SetFont(Font.TEST_TITLE)
         title.SetBackgroundColour(Color.LightYellow1)
         self.main_sizer.Add(title, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
+        self.main_sizer.Add(self.__init_result_sizer(), 1, wx.EXPAND | wx.ALL, 1)
         self.SetSizer(self.main_sizer)
         self.Layout()
+
+    def __init_result_sizer(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.__init_case_result_sizer(), 1, wx.EXPAND | wx.ALL, 0)
+        sizer.Add(self.__init_operation_sizer(), 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_BOTTOM | wx.ALL, 0)
+        return sizer
+
+    def __init_serial_number_sizer(self):
+        pass
+
+    def __init_case_result_sizer(self):
+        from libs.Config.Cases import RF_CASES
+        from libs.Config.Cases import PCBA_CASES
+        from libs.Config.Cases import MACHINE_CASES
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.__init_result_ctrl_sizer(cases=RF_CASES, t="RF", gap=3), 0, wx.EXPAND | wx.ALL, 1)
+        sizer.Add(self.__init_result_ctrl_sizer(cases=PCBA_CASES, t="PCBA", gap=5), 0, wx.EXPAND | wx.ALL, 1)
+        sizer.Add(self.__init_result_ctrl_sizer(cases=MACHINE_CASES, t="整机", gap=5), 0, wx.EXPAND | wx.ALL, 1)
+        return sizer
+
+    def __init_operation_sizer(self):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        upload = wx.Button(self, wx.ID_ANY, u"TODO:上传测试结果", wx.DefaultPosition, (-1, 40), 0, name="upload_result")
+        refresh = wx.Button(self, wx.ID_ANY, u"刷新结果", wx.DefaultPosition, (-1, 40), 0, name="refresh_result")
+        upload.Bind(wx.EVT_BUTTON, self.__on_button_click)
+        refresh.Bind(wx.EVT_BUTTON, self.__on_button_click)
+        sizer.Add(upload, 0, wx.ALL, 5)
+        sizer.Add(refresh, 0, wx.ALL, 5)
+        return sizer
+
+    def __on_button_click(self, event):
+        obj = event.GetEventObject()
+        name = obj.GetName()
+        if name == "refresh_result":
+            self.__set_result_color_as_default()
+            Utility.append_thread(target=self.__update_color_based_on_result)
+        elif name == "upload_result":
+            Utility.Alert.Info("Hello World!")
+        else:
+            Utility.Alert.Error("Hello WUYOU!")
 
     def get_name(self):
         return self.name
@@ -173,6 +220,8 @@ class ReportPage(wx.Panel):
     def Show(self):
         super(ReportPage, self).Show()
         self.__parent.refresh()
+        self.__set_result_color_as_default()
+        Utility.append_thread(target=self.__update_color_based_on_result)
 
     def Hide(self):
         super(ReportPage, self).Hide()
@@ -181,8 +230,43 @@ class ReportPage(wx.Panel):
     def get_result(self):
         return "Report"
 
-    def __init_PCBA_sizer(self):
-        pass
+    def __init_result_ctrl_sizer(self, cases, t, gap=3):
+        def split_cases():
+            lst = list()
+            for case in cases:
+                flag = case.GetFlag(t=t)
+                name = case.GetName()
+                wx_control = self.__init_result_ctrl(flag=flag, name=name)
+                lst.append(wx_control)
+            split_lst = [lst[i:i + gap] for i in range(0, len(lst), gap)]
+            return split_lst
 
-    def __init_panel(self):
-        pass
+        rows = split_cases()
+        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, t), wx.VERTICAL)
+        for row in rows:
+            row_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            for ctrl in row:
+                row_sizer.Add(ctrl, 0, wx.ALL, 3)
+            sizer.Add(row_sizer, 0, wx.EXPAND | wx.ALL, 5)
+        return sizer
+
+    def __init_result_ctrl(self, flag, name):
+        name = " %s " % name.strip(" ")
+        title = wx.StaticText(self, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize,
+                              wx.TEXT_ALIGNMENT_CENTRE | wx.SIMPLE_BORDER, name=str(flag))
+        title.SetFont(Font.REPORT_LARGE)
+        title.SetBackgroundColour(self.__color["NotTest"])
+        self.__result_controls.append(title)
+        return title
+
+    def __update_color_based_on_result(self):
+        uart = Variable.get_uart()
+        for ctrl in self.__result_controls:
+            result = uart.get_flag_result(flag=ctrl.GetName())
+            ctrl.SetBackgroundColour(self.__color[result])
+            ctrl.Refresh()
+
+    def __set_result_color_as_default(self):
+        for ctrl in self.__result_controls:
+            ctrl.SetBackgroundColour(self.__color["NotTest"])
+            ctrl.Refresh()

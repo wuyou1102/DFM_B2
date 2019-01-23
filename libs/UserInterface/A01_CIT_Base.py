@@ -330,10 +330,10 @@ class ScrollButton(wx.Button):
         self.index = index
         self.__result = "NotTest"
         self.__color = {
-            "True": Color.SpringGreen3,
-            "False": Color.Red1,
+            "True": Color.GoogleGreen,
+            "False": Color.GoogleRed,
             "NotTest": Color.gray81,
-            "Report": Color.PaleTurquoise,
+            "Report": Color.GoogleYellow,
         }
 
     def __refresh_result(self):
@@ -352,7 +352,7 @@ class ScrollButton(wx.Button):
 
     def select(self, select=True):
         if select:
-            self.SetBackgroundColour(Color.DodgerBlue3)
+            self.SetBackgroundColour(Color.GoogleBlue)
             self.__case.Show()
         else:
             self.SetBackgroundColour(self.color)

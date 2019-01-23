@@ -96,7 +96,7 @@ class FPV(Base.TestPage):
 
     @staticmethod
     def GetFlag(t):
-        if t == "MACHINE":
+        if t in ["MACHINE", u"整机"]:
             return String.MACHINE_FPV
 
 
