@@ -49,13 +49,23 @@ def build():
     return False
 
 
+def copy_vlc(path):
+    vlc_folder = os.path.join(root_path, 'packages/vlc')
+    for f in os.listdir(vlc_folder):
+        f_path = os.path.join(vlc_folder, f)
+        if os.path.isdir(f_path):
+            shutil.copy(src=f_path, dst=os.path.join(path, f))
+        else:
+            shutil.copytree(src=f_path, dst=os.path.join(path, f))
+
+
 def deploy():
-    shutil.move(os.path.join(abs_path, 'out', python_name),
-                os.path.join(abs_path, "DFM_%s" % Utility.get_timestamp()))
+    deploy_path = os.path.join(abs_path, "DFM_%s" % Utility.get_timestamp())
+    shutil.move(os.path.join(abs_path, 'out', python_name), deploy_path)
+    copy_vlc(path=deploy_path)
     # shutil.rmtree(os.path.join(abs_path, 'tmp'))
     # shutil.rmtree(os.path.join(abs_path, 'out'))
     # os.remove(os.path.join(abs_path, '%s.spec' % python_name))
-
 
 if __name__ == '__main__':
     if build():
