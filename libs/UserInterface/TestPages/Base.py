@@ -197,10 +197,13 @@ class ReportPage(wx.Panel):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         upload = wx.Button(self, wx.ID_ANY, u"TODO:上传测试结果", wx.DefaultPosition, (-1, 40), 0, name="upload_result")
         refresh = wx.Button(self, wx.ID_ANY, u"刷新结果", wx.DefaultPosition, (-1, 40), 0, name="refresh_result")
+        screenshot = wx.Button(self, wx.ID_ANY, u"保存截图", wx.DefaultPosition, (-1, 40), 0, name="screenshot")
         upload.Bind(wx.EVT_BUTTON, self.__on_button_click)
         refresh.Bind(wx.EVT_BUTTON, self.__on_button_click)
+        screenshot.Bind(wx.EVT_BUTTON, self.__on_button_click)
         sizer.Add(upload, 0, wx.ALL, 5)
         sizer.Add(refresh, 0, wx.ALL, 5)
+        sizer.Add(screenshot, 0, wx.ALL, 5)
         return sizer
 
     def __on_button_click(self, event):
@@ -211,11 +214,34 @@ class ReportPage(wx.Panel):
             Utility.append_thread(target=self.__update_color_based_on_result)
         elif name == "upload_result":
             Utility.Alert.Info("Hello World!")
+        elif name == "screenshot":
+            self.capture_screen()
         else:
             Utility.Alert.Error("Hello WUYOU!")
 
     def get_name(self):
         return self.name
+
+    def capture_screen(self):
+        dlg = wx.FileDialog(self, "保存结果截图", "", style=wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
+                            wildcard="Screenshots(*.png)|*.png|All files(*.*)|*.*")
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            if not os.path.splitext(filename)[1]:  # 如果没有文件名后缀
+                filename = filename + '.png'
+        else:
+            filename = None
+        dlg.Destroy()
+        time.sleep(1)
+        if filename is not None:
+            screen = wx.ScreenDC()
+            size, pos = self.GetSize(), self.GetScreenPosition()
+            width, height = size[0], size[1]
+            x, y = pos[0], pos[1]
+            bmp = wx.Bitmap(width, height)
+            memory = wx.MemoryDC(bmp)
+            memory.Blit(0, 0, width, height, screen, x, y)
+            bmp.SaveFile(filename, wx.BITMAP_TYPE_PNG)
 
     def Show(self):
         super(ReportPage, self).Show()
