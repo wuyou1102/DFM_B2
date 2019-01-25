@@ -174,7 +174,7 @@ class Panel(wx.Panel):
 
     def update_serial_number(self):
         uart = Variable.get_uart()
-        self.serial_number.SetValue(value=uart.SerialNumber)
+        self.serial_number.SetValue(value=uart.get_serial_number())
 
     def Enable(self, enable=True):
         lst1 = [self.btn_disconnect, self.button_sn, self.test_view, self.btn_get_info]

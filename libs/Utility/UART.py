@@ -175,15 +175,17 @@ class UART(Serial):
             if retry:
                 logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
                 self.flush()
-                return self._get(cmd=cmd, sleep=sleep + each_increase_time)
+                if sleep > 0.05:
+                    return None
+                else:
+                    return self._get(cmd=cmd, sleep=sleep + each_increase_time)
             return None
         else:
             raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))
 
     def _set(self, cmd, sleep=base_sleep_time):
-        for x in range(3):
-            if self.__set(cmd=cmd, sleep=sleep):
-                return True
+        if self.__set(cmd=cmd, sleep=sleep):
+            return True
         Alert.Error(u"设置失败")
         return False
 
@@ -199,6 +201,9 @@ class UART(Serial):
         elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
             logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
             self.flush()
-            return self.__set(cmd=cmd, sleep=sleep + each_increase_time)
+            if sleep > 0.05:
+                return False
+            else:
+                return self.__set(cmd=cmd, sleep=sleep + each_increase_time)
         else:
             raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))

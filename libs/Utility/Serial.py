@@ -41,7 +41,6 @@ class Serial(object):
     def send(self, command, sleep):
         command = command.strip('\r\n') + '\n'
         self.__session.write(command.encode())
-
         time.sleep(sleep)
 
     def read(self):
