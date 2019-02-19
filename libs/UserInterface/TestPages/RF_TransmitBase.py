@@ -103,9 +103,10 @@ class TransmitBase(Base.TestPage):
         uart = self.get_uart()
         uart.set_tx_mode_20m()
         uart.set_frequency_point(self.freq * 1000)
+        uart.set_radio_frequency_power(15)
         self.update_current_power()
         self.update_current_freq_point()
-        # self.update_current_mcs()
+
 
     def init_variable(self):
         self.stop_flag = True

@@ -138,6 +138,7 @@ class ReceiveBase(Base.TestPage):
 
     def draw_line(self):
         uart = self.get_uart()
+        self.Sleep(0.3)
         while self.stop_flag:
             if uart.is_instrument_connected():
                 self.status.SetBitmap(Picture.status_connect1)
