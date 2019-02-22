@@ -7,14 +7,12 @@ from libs import Utility
 from libs.Config import Font
 from libs.Config import Picture
 
-
 matplotlib.use('WXAgg')
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 import numpy
 
 logger = logging.getLogger(__name__)
-
 
 
 class ReceiveBase(Base.TestPage):
@@ -151,21 +149,28 @@ class ReceiveBase(Base.TestPage):
                 self.status.SetBitmap(wx.NullBitmap)
                 uart.release_baseband()
 
-        while self.stop_flag:
+        for x in range(40):
+            if not self.stop_flag:
+                return
             self.update_bler()
             self.panel_mpl.refresh(self.slot)
             self.Sleep(0.8)
             if self.check_result():
-                self.message.SetLabel(u"测试通过，请点击PASS")
+                self.set_message_result(isPass=True)
                 self.PassButton.Enable()
-                break
+                return
+        self.set_message_result(isPass=False)
 
     def check_result(self):
-        if len(self.slot) < 11:
-            return False
-        if sum(self.slot[-10:]) > 0:
-            return False
-        return True
+        if self.slot.count(0) >= 10:
+            return True
+        return False
+
+    def set_message_result(self, isPass=True):
+        if isPass:
+            self.message.SetLabel(u"测试通过，请点击PASS")
+        else:
+            self.message.SetLabel(u"测试失败，请点击FAIL")
 
     def on_restart(self, event):
         obj = event.GetEventObject()
