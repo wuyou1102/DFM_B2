@@ -39,7 +39,9 @@ class Serial(object):
                 self.lock.release()
 
     def send(self, command, sleep):
-        command = command.strip('\r\n') + '\n'
+        if len(command) > 50:
+            Logger.error("Command length is large than 50:%s" % repr(command))
+        command = " " * 50 + command.strip('\r\n') + '\n'
         self.__session.write(command.encode())
         time.sleep(sleep)
 
@@ -47,7 +49,6 @@ class Serial(object):
         return self.__session.read_all()
 
     def flush(self):
-        self.send("", sleep=0.016)
         self.__session.flushInput()
         self.__session.flushOutput()
 
