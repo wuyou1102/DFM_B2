@@ -64,3 +64,5 @@ class Switch(Base.TestPage):
     def GetFlag(t):
         if t == "PCBA":
             return String.PCBA_SWITCH
+        elif t in ["MACHINE", u"整机"]:
+            return String.MACHINE_SWITCH
