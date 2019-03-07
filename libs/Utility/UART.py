@@ -10,8 +10,9 @@ from libs.Utility import convert_freq_point
 logger = logging.getLogger(__name__)
 
 timeout = 5
-base_sleep_time = 0.016
-each_increase_time = 0.004
+
+INTERVAL_TIME = 0.016
+MAX_RETRY_COUNT = 3
 
 
 class UART(Serial):
@@ -30,33 +31,31 @@ class UART(Serial):
 
     def set_serial_number(self, serial):
         cmd = command.set_serial_number(value=serial)
-        if self.__set(cmd=cmd):
-            output = self.get_serial_number()
-            if output == serial:
-                self.__serial_number = output
-                return True
-            return False
-        return False
+        return self._set(cmd=cmd)
 
     def get_flag_result(self, flag):
         cmd = command.get_flag_result(flag=flag)
         result = self._get(cmd=cmd)
-        if result in ["False", "True", "NotTest"]:
-            return result
-        return self.get_flag_result(flag=flag)
+        for x in ["False", "True", "NotTest"]:
+            if result.endswith(x):
+                return x
+        return "NotTest"
 
     def set_flag_result(self, flag, result):
         cmd = command.set_flag_result(flag=flag, result=result)
         return self._set(cmd=cmd)
 
     def is_uart_connected(self):
-        if self._get(cmd=command.is_button_clicked(), retry=False) in ["True", "False"]:
-            return True
+        cmd = command.is_button_clicked()
+        result = self._get(cmd=cmd)
+        for x in ["True", "False"]:
+            if result.endswith(x):
+                return True
         return False
 
     def is_usb_connected(self):
         cmd = command.is_usb_connected()
-        if self._get(cmd=cmd) == "True":
+        if self._get(cmd=cmd).endswith("True"):
             return True
         return False
 
@@ -66,7 +65,7 @@ class UART(Serial):
 
     def is_button_clicked(self):
         cmd = command.is_button_clicked()
-        if self._get(cmd=cmd) == "True":
+        if self._get(cmd=cmd).endswith("True"):
             return True
         return False
 
@@ -144,66 +143,61 @@ class UART(Serial):
     def is_instrument_connected(self):
         cmd = command.is_instrument_connected()
         output = self._protocol_get(cmd=cmd)
-        if output == "0x1":
+        if output.endswith("0x1"):
             return True
         return False
 
-    def _protocol_get(self, cmd):
-        output = self._get(cmd=cmd)
-        if output is None:
-            Alert.Error("串口通信失败，请重试")
-            raise RuntimeError
-        return output
+    def _protocol_get(self, cmd, retry=True):
+        return self._get(cmd=cmd, retry=retry)
 
-    def _protocol_set(self, cmd):
-        output = self._get(cmd=cmd)
-        if output is None:
-            Alert.Error("串口通信失败，请重试")
-            raise RuntimeError
-        if output == "0x0":
-            return True
-        return False
+    def _protocol_set(self, cmd, retry=True):
+        result = self.__execute_command(cmd=cmd, retry=retry)
+        if result.exit_code == 0:
+            if result.outputs.endswith("0x0"):
+                return True
+            else:
+                Alert.Error(u"设置失败")
+                return False
+        else:
+            Alert.Error(result.outputs)
+            return False
 
-    def _get(self, cmd, sleep=base_sleep_time, retry=True):
-        result = self.execute_command(command=cmd, sleep=sleep)
+    def _get(self, cmd, retry=True):
+        result = self.__execute_command(cmd=cmd, retry=retry)
         if result.exit_code == 0:
             return result.outputs
-        elif result.exit_code == ErrorCode.SERIAL_EXCEPTION:
-            Alert.Error(ErrorCode.SERIAL_EXCEPTION.MSG)
-            return None
-        elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
-            if retry:
-                logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
-                self.flush()
-                if sleep > 0.05:
-                    return None
-                else:
-                    return self._get(cmd=cmd, sleep=sleep + each_increase_time)
-            return None
         else:
-            raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))
+            Alert.Error(result.outputs)
+            return None
 
-    def _set(self, cmd, sleep=base_sleep_time):
-        if self.__set(cmd=cmd, sleep=sleep):
-            return True
-        Alert.Error(u"设置失败")
-        return False
-
-    def __set(self, cmd, sleep=base_sleep_time):
-        result = self.execute_command(command=cmd, sleep=sleep)
+    def _set(self, cmd, retry=True):
+        result = self.__execute_command(cmd=cmd, retry=retry)
         if result.exit_code == 0:
-            if result.outputs == "True":
+            if result.outputs.endswith("True"):
                 return True
-            return False
-        elif result.exit_code == ErrorCode.SERIAL_EXCEPTION:
-            Alert.Error(ErrorCode.SERIAL_EXCEPTION.MSG)
-            return False
-        elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
-            logger.error(ErrorCode.WRONG_TERMINATOR.MSG)
-            self.flush()
-            if sleep > 0.05:
-                return False
             else:
-                return self.__set(cmd=cmd, sleep=sleep + each_increase_time)
+                Alert.Error(u"设置失败")
+                return False
         else:
-            raise KeyError("Unknow exit code: \"%s\"" % repr(result.exit_code))
+            Alert.Error(result.outputs)
+            return False
+
+    def __execute_command(self, cmd, count=0, retry=True):
+        result = self.execute_command(command=cmd, sleep=INTERVAL_TIME)
+        if result.exit_code == 0:
+            return result
+        elif result.exit_code == ErrorCode.SERIAL_EXCEPTION:
+            return result
+        elif result.exit_code == ErrorCode.WRONG_TERMINATOR:
+            if count < MAX_RETRY_COUNT and retry:
+                self.flush()
+                return self.__execute_command(cmd=cmd, count=count + 1)
+            return result
+        elif result.exit_code == ErrorCode.EMPTY_OUTPUT_EXCEPTION:
+            cmd = " " * 50 + cmd
+            if count < MAX_RETRY_COUNT and retry:
+                self.flush()
+                return self.__execute_command(cmd=cmd, retry=False)
+            return result
+        else:
+            raise KeyError("Unknown exit code: \"%s\"" % repr(result.exit_code))

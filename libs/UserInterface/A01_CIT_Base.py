@@ -10,7 +10,6 @@ from TestPages.Base import ReportPage
 from libs import Utility
 from libs.Config import Color
 from libs.Utility.UART import UART
-import time
 
 logger = logging.getLogger(__name__)
 reload(sys)
@@ -166,15 +165,23 @@ class Panel(wx.Panel):
     def set_serial_number_via_uart(self):
         serial = self.serial_number.GetValue()
         if not serial:
-            Utility.Alert.Error(u"请输入正确的序列号")
+            Utility.Alert.Error(u"请输入序列号")
+            return False
+        elif len(serial) > 18:
+            Utility.Alert.Error(u"输入的序列号太长，\n当前：%s，最大：18" % len(serial))
             return False
         else:
             uart = Variable.get_uart()
-            return uart.set_serial_number(serial)
+            uart.set_serial_number(serial)
+            self.update_serial_number()
 
     def update_serial_number(self):
         uart = Variable.get_uart()
-        self.serial_number.SetValue(value=uart.get_serial_number())
+        value = uart.get_serial_number()
+        if value is None:
+            self.serial_number.SetValue(value="")
+        else:
+            self.serial_number.SetValue(value=value)
 
     def Enable(self, enable=True):
         lst1 = [self.btn_disconnect, self.button_sn, self.test_view, self.btn_get_info]

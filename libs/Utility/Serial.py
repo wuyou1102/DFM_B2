@@ -31,17 +31,23 @@ class Serial(object):
                 if result.endswith('\n'):
                     return ExecuteResult(exit_code=0, outputs=result.strip('\n'))
                 else:
-                    return ExecuteResult(exit_code=ErrorCode.WRONG_TERMINATOR, outputs=ErrorCode.WRONG_TERMINATOR.MSG)
+                    if result == "":
+                        return ExecuteResult(exit_code=ErrorCode.EMPTY_OUTPUT_EXCEPTION,
+                                             outputs=u"执行命令:%s\n" % command + ErrorCode.EMPTY_OUTPUT_EXCEPTION.MSG)
+                    else:
+                        return ExecuteResult(exit_code=ErrorCode.WRONG_TERMINATOR,
+                                             outputs=u"执行命令:%s\n" % command + ErrorCode.WRONG_TERMINATOR.MSG)
             except serial.SerialException:
-                return ExecuteResult(exit_code=ErrorCode.SERIAL_EXCEPTION, outputs=ErrorCode.SERIAL_EXCEPTION.MSG)
+                return ExecuteResult(exit_code=ErrorCode.SERIAL_EXCEPTION,
+                                     outputs=u"执行命令:%s\n" % command + ErrorCode.SERIAL_EXCEPTION.MSG)
             finally:
                 Logger.debug('********************************************************')
+                time.sleep(0.01)
                 self.lock.release()
 
     def send(self, command, sleep):
-        if len(command) > 50:
-            Logger.error("Command length is large than 50:%s" % repr(command))
-        command = " " * 50 + command.strip('\r\n') + '\n'
+        # command = " " * 50 + command.strip('\r\n') + '\n'
+        command = command.strip('\r\n') + '\n'
         self.__session.write(command.encode())
         time.sleep(sleep)
 
@@ -49,6 +55,7 @@ class Serial(object):
         return self.__session.read_all()
 
     def flush(self):
+        time.sleep(0.01)
         self.__session.flushInput()
         self.__session.flushOutput()
 

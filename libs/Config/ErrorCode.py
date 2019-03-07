@@ -28,6 +28,7 @@ class BaseErrorCode(six.with_metaclass(ErrorCodeMetaClass)):
 class ErrorCode(BaseErrorCode):
     TARGET_ALREADY_EXIST = ErrorCodeField(10001, "Same target is already running.")
     TARGET_NOT_FUNCTION = ErrorCodeField(10002, "The target cannot be called.It's not a function.")
-    SERIAL_EXCEPTION = ErrorCodeField(10003, u"串口通信异常，请检查后重试。")
-    WRONG_TERMINATOR = ErrorCodeField(10004, "Can not find terminal symbol.")
-    TIMING_ERROR = ErrorCodeField(10005, "Sequence Error Interrupt.")
+    SERIAL_EXCEPTION = ErrorCodeField(10003, u"串口通信异常，请检查串口是否正常，然后重试。")
+    WRONG_TERMINATOR = ErrorCodeField(10004, u"错误的结束符，请重试。")
+    EMPTY_OUTPUT_EXCEPTION = ErrorCodeField(10005, u"空白输出，请重试。")
+    TIMING_ERROR = ErrorCodeField(10006, "Sequence Error Interrupt.")
