@@ -101,6 +101,10 @@ def get_flag_result(flag):
     return "get_flag_result({flag})".format(flag=flag)
 
 
+def get_all_flag_result():
+    return "get_all_flag_result"
+
+
 def is_button_clicked():
     return "is_button_clicked"
 

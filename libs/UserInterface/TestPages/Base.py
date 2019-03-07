@@ -156,11 +156,7 @@ class TestPage(wx.Panel):
 class ReportPage(wx.Panel):
     def __init__(self, parent, name=u"测试总结"):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
-        self.__color = {
-            "True": Color.GoogleGreen,
-            "False": Color.GoogleRed,
-            "NotTest": Color.gray81,
-        }
+
         self.__parent = parent
         self.__result_controls = list()
         self.name = name
@@ -289,11 +285,7 @@ class ReportPage(wx.Panel):
         return sizer
 
     def __init_result_ctrl(self, flag, name):
-        name = " %s " % name.strip(" ")
-        title = wx.StaticText(self, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize,
-                              wx.TEXT_ALIGNMENT_CENTRE | wx.SIMPLE_BORDER, name=str(flag))
-        title.SetFont(Font.REPORT_LARGE)
-        title.SetBackgroundColour(self.__color["NotTest"])
+        title = StaticText(parent=self, flag=flag, name=name)
         self.__result_controls.append(title)
         return title
 
@@ -301,13 +293,56 @@ class ReportPage(wx.Panel):
         self.__set_result_color_as_default()
         uart = Variable.get_uart()
         self.serial_number.SetValue(uart.get_serial_number())
-        for ctrl in self.__result_controls:
-            result = uart.get_flag_result(flag=ctrl.GetName())
-            ctrl.SetBackgroundColour(self.__color[result])
-            ctrl.Refresh()
+        results = uart.get_all_flag_results()
+        if results is not None:
+            for ctrl in self.__result_controls:
+                result = results[ctrl.GetFlag() - 1]
+                ctrl.SetResult(result)
+        else:
+            for ctrl in self.__result_controls:
+                result = uart.get_flag_result(ctrl.GetFlag())
+                ctrl.SetResult(result)
 
     def __set_result_color_as_default(self):
         self.serial_number.SetValue("")
         for ctrl in self.__result_controls:
-            ctrl.SetBackgroundColour(self.__color["NotTest"])
-            ctrl.Refresh()
+            ctrl.SetResult("NotTest")
+
+
+class StaticText(wx.StaticText):
+    def __init__(self, parent, name, flag):
+        wx.StaticText.__init__(self, parent, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize,
+                               wx.TEXT_ALIGNMENT_CENTRE | wx.SIMPLE_BORDER)
+        self.SetFont(Font.REPORT_LARGE)
+        # print "%s  %s" % (name, flag)
+        self.__name = name
+        self.__flag = flag
+        self.__result = ""
+        self.__color = {
+            "True": Color.GoogleGreen,
+            "False": Color.GoogleRed,
+            "NotTest": Color.gray81,
+        }
+        self.SetResult("NotTest")
+
+    def GetName(self):
+        return self.__name
+
+    def GetResult(self):
+        return self.__result
+
+    def GetFlag(self):
+        return self.__flag
+
+    def SetResult(self, result):
+        if result in ["NotTest", "1"]:
+            self.__result = "NotTest"
+        elif result in ["True", "2"]:
+            self.__result = "True"
+        elif result in ["False", "3"]:
+            self.__result = "False"
+        else:
+            self.__result = "NotTest"
+            logger.error("Wrong Result Type: %s" % result)
+        self.SetBackgroundColour(self.__color[self.__result])
+        self.Refresh()

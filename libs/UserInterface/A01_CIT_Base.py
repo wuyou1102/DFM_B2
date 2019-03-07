@@ -302,8 +302,19 @@ class ScrolledWindow(wx.Panel):
         self.main_sizer.Layout()
 
     def update_case_result(self):
-        for button in self.__buttons:
-            button.update_result()
+        uart = Variable.get_uart()
+        results = uart.get_all_flag_results()
+        if results is not None:
+            for button in self.__buttons:
+                try:
+                    flag = button.get_flag()
+                    result = results[flag - 1]
+                    button.update_result(result=result)
+                except AttributeError:
+                    button.update_result()
+        else:
+            for button in self.__buttons:
+                button.update_result()
 
     def clear_case_result(self):
         for button in self.__buttons:
@@ -349,8 +360,19 @@ class ScrollButton(wx.Button):
     def __refresh_button(self):
         self.SetBackgroundColour(self.color)
 
-    def update_result(self):
-        self.__refresh_result()
+    def update_result(self, result=None):
+        if result is None:
+            self.__refresh_result()
+        else:
+            if result in ["NotTest", "1"]:
+                self.__result = "NotTest"
+            elif result in ["True", "2"]:
+                self.__result = "True"
+            elif result in ["False", "3"]:
+                self.__result = "False"
+            else:
+                self.__result = "NotTest"
+                logger.error("Wrong Result Type: %s" % result)
         self.__refresh_button()
 
     def clear_result(self):
@@ -375,6 +397,9 @@ class ScrollButton(wx.Button):
             return self.__color[self.__result]
         except KeyError:
             return Color.White
+
+    def get_flag(self):
+        return self.__case.get_flag()
 
 
 class CaseView(wx.Panel):

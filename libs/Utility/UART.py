@@ -33,6 +33,13 @@ class UART(Serial):
         cmd = command.set_serial_number(value=serial)
         return self._set(cmd=cmd)
 
+    def get_all_flag_results(self):
+        cmd = command.get_all_flag_result()
+        result = self._get(cmd)
+        if len(result) == 32:
+            return result
+        return None
+
     def get_flag_result(self, flag):
         cmd = command.get_flag_result(flag=flag)
         result = self._get(cmd=cmd)
@@ -48,9 +55,10 @@ class UART(Serial):
     def is_uart_connected(self):
         cmd = command.is_button_clicked()
         result = self._get(cmd=cmd)
-        for x in ["True", "False"]:
-            if result.endswith(x):
-                return True
+        if result is not None:
+            for x in ["True", "False"]:
+                if result.endswith(x):
+                    return True
         return False
 
     def is_usb_connected(self):
