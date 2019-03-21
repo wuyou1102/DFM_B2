@@ -25,17 +25,19 @@ class ReceiveBase(Base.TestPage):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hori_sizer = wx.BoxSizer(wx.HORIZONTAL)
         hori_sizer.Add(self.__init_freq_point_sizer(), 0, wx.EXPAND, 0)
-        hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND, 0)
-        # hori_sizer.Add(self.__init_mcs_sizer(), 1, wx.EXPAND, 0)
-        hori_sizer.Add(self.__init_message_sizer(), 1, wx.EXPAND, 0)
-        sizer.Add(hori_sizer, 0, wx.EXPAND | wx.ALL, 0)
+        hori_sizer.Add(self.__init_rssi_sizer(), 1, wx.EXPAND | wx.LEFT, 50)
+        hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT | wx.RIGHT, 5)
+        sizer.Add(hori_sizer, 0, wx.EXPAND | wx.LEFT, 15)
+        sizer.Add(self.__init_message_sizer(), 0, wx.EXPAND | wx.ALIGN_CENTER | wx.LEFT, 15)
         sizer.Add(self.__init_mpl_sizer(), 1, wx.EXPAND | wx.ALL, 0)
         return sizer
 
     def __init_message_sizer(self):
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.status = wx.StaticBitmap(self, wx.ID_ANY, Picture.status_disconnect, wx.DefaultPosition, (33, 33), 0)
         self.message = wx.StaticText(self, wx.ID_ANY, u"正在连接信号发生器", wx.DefaultPosition, wx.DefaultSize, 0)
         self.message.SetFont(Font.DESC)
+        sizer.Add(self.status, 0, wx.ALL, 1)
         sizer.Add(self.message, 1, wx.EXPAND | wx.TOP, 3)
         return sizer
 
@@ -45,16 +47,27 @@ class ReceiveBase(Base.TestPage):
         sizer.Add(self.panel_mpl, 1, wx.EXPAND | wx.ALL, 1)
         return sizer
 
+    def __init_rssi_sizer(self):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        rssi_0_title = wx.StaticText(self, wx.ID_ANY, u"天线0: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        rssi_1_title = wx.StaticText(self, wx.ID_ANY, u"天线1: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.rssi_0 = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (50, -1),
+                                  wx.TE_READONLY | wx.TE_CENTRE)
+        self.rssi_1 = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (50, -1),
+                                  wx.TE_READONLY | wx.TE_CENTRE)
+        sizer.Add(rssi_0_title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        sizer.Add(self.rssi_0, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        sizer.Add(rssi_1_title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        sizer.Add(self.rssi_1, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        return sizer
+
     def __init_freq_point_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
-        title.SetFont(Font.COMMON_1_LARGE)
-        self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.current_point.SetFont(Font.COMMON_1_LARGE)
+        self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1), wx.TE_READONLY)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
-        p = str(self.freq)
-        button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (45, 33), 0, name=p)
+        button = wx.Button(self, wx.ID_ANY, u"重设频点", wx.DefaultPosition, (65, 27), 0, name=str(self.freq))
         button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
         sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         return sizer
@@ -74,11 +87,10 @@ class ReceiveBase(Base.TestPage):
 
     def __init_status_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.status = wx.StaticBitmap(self, wx.ID_ANY, Picture.status_disconnect, wx.DefaultPosition, (33, 33), 0)
+
         restart = wx.BitmapButton(self, wx.ID_ANY, Picture.restart, wx.DefaultPosition, (33, 33), 0)
         restart.Bind(wx.EVT_BUTTON, self.on_restart)
         sizer.Add(restart, 0, wx.ALL, 1)
-        sizer.Add(self.status, 0, wx.ALL, 1)
         return sizer
 
     def __init_mcs_sizer(self):
@@ -136,7 +148,7 @@ class ReceiveBase(Base.TestPage):
 
     def draw_line(self):
         uart = self.get_uart()
-        self.Sleep(0.3)
+        self.Sleep(1)
         while self.stop_flag:
             if uart.is_instrument_connected():
                 self.status.SetBitmap(Picture.status_connect1)
@@ -148,13 +160,12 @@ class ReceiveBase(Base.TestPage):
                 uart.hold_baseband()
                 self.status.SetBitmap(wx.NullBitmap)
                 uart.release_baseband()
-
         for x in range(40):
             if not self.stop_flag:
                 return
             self.update_bler()
             self.panel_mpl.refresh(self.slot)
-            self.Sleep(0.8)
+            self.Sleep(1)
             if self.check_result():
                 self.set_message_result(isPass=True)
                 self.PassButton.Enable()
@@ -189,8 +200,16 @@ class ReceiveBase(Base.TestPage):
 
     def update_bler(self):
         uart = self.get_uart()
-        self.slot.append(self.get_bler(uart.get_slot_bler))
-        # self.br.append(self.get_bler(uart.get_br_bler))
+        result = uart.get_rssi_and_bler()
+        if result is not None and int(result, 16) > 0:
+            bler = int(result[8:], 16)
+            rssi0 = int(result[0:4], 16) - 65536
+            rssi1 = int(result[4:8], 16) - 65536
+            self.slot.append(bler)
+            self.rssi_0.SetValue(str(rssi0))
+            self.rssi_1.SetValue(str(rssi1))
+        else:
+            self.update_bler()
 
     def get_bler(self, func):
         value = func()

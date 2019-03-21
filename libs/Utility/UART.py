@@ -1,17 +1,18 @@
 # -*- encoding:UTF-8 -*-
-from Serial import Serial
 import logging
-from libs.Config.ErrorCode import ErrorCode
-import Alert
-from libs.Command import AT as command
 import time
+
+import Alert
+from Serial import Serial
+from libs.Command import AT as command
+from libs.Config.ErrorCode import ErrorCode
 from libs.Utility import convert_freq_point
 
 logger = logging.getLogger(__name__)
 
 timeout = 5
 
-INTERVAL_TIME = 0.016
+INTERVAL_TIME = 0.05
 MAX_RETRY_COUNT = 3
 
 
@@ -36,6 +37,8 @@ class UART(Serial):
     def get_all_flag_results(self):
         cmd = command.get_all_flag_result()
         result = self._get(cmd)
+        if result is None:
+            return None
         if len(result) == 32:
             return result
         return None
@@ -140,6 +143,14 @@ class UART(Serial):
         cmd = command.get_slot_bler()
         return self._protocol_get(cmd=cmd)
 
+    def get_rssi(self, idx):
+        cmd = command.get_rssi(idx=idx)
+        return self._protocol_get(cmd=cmd)
+
+    def get_rssi_and_bler(self):
+        cmd = command.get_rssi_bler()
+        return self._protocol_get(cmd)
+
     def set_tx_mode_20m(self):
         cmd = command.set_tx_mode_20m()
         return self._protocol_set(cmd=cmd)
@@ -151,24 +162,32 @@ class UART(Serial):
     def is_instrument_connected(self):
         cmd = command.is_instrument_connected()
         output = self._protocol_get(cmd=cmd)
-        if output.endswith("0x1"):
-            return True
+        if output is not None:
+            try:
+                is_connected = int(output)
+                if is_connected == 1:
+                    return True
+            except ValueError:
+                logger.error("Get an abnormal value: \"%s\"" % repr(output))
         return False
 
     def _protocol_get(self, cmd, retry=True):
-        return self._get(cmd=cmd, retry=retry)
+        for x in range(3):
+            result = self._get(cmd=cmd, retry=retry)
+            if len(result) == 16:
+                return result
+        return None
 
     def _protocol_set(self, cmd, retry=True):
-        result = self.__execute_command(cmd=cmd, retry=retry)
-        if result.exit_code == 0:
-            if result.outputs.endswith("0x0"):
-                return True
-            else:
-                Alert.Error(u"设置失败")
-                return False
-        else:
-            Alert.Error(result.outputs)
-            return False
+        for x in range(3):
+            result = self._get(cmd=cmd, retry=retry)
+            try:
+                if len(result) == 16 and int(result) == 0:
+                    return True
+            except ValueError and TypeError:
+                logger.error("Get an abnormal value: \"%s\"" % repr(result))
+        Alert.Error(u"设置失败")
+        return False
 
     def _get(self, cmd, retry=True):
         result = self.__execute_command(cmd=cmd, retry=retry)

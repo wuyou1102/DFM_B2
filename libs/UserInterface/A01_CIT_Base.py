@@ -178,7 +178,7 @@ class Panel(wx.Panel):
     def update_serial_number(self):
         uart = Variable.get_uart()
         value = uart.get_serial_number()
-        if value is None:
+        if value is None or value == "123456789012345678":
             self.serial_number.SetValue(value="")
         else:
             self.serial_number.SetValue(value=value)

@@ -12,8 +12,8 @@ from libs.UserInterface.TestPages.RF_TransmitTest import \
     Transmit2410, Transmit2450, Transmit2475, \
     Transmit5750, Transmit5800, Transmit5850
 
-PCBA_CASES = [Ethernet, Switch, Light, LED, USB]
-MACHINE_CASES = [Ethernet, Switch, LED]
+PCBA_CASES = [Light, LED, Ethernet, Switch, USB]
+MACHINE_CASES = [LED, Ethernet, Switch]
 RF_CASES = [
     Receive2410, Receive2450, Receive2475, Receive5750, Receive5800, Receive5850,
     Transmit2410, Transmit2450, Transmit2475, Transmit5750, Transmit5800, Transmit5850,

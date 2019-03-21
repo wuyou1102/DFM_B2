@@ -2,6 +2,16 @@
 __HEAD = "AT+DFM="
 
 
+def get_rssi(idx):
+    cmd = "read_0{idx}_rssi".format(idx=idx)
+    return __HEAD + cmd
+
+
+def get_rssi_bler():
+    cmd = "read_rssi_bler"
+    return __HEAD + cmd
+
+
 def set_radio_frequency_power(value):
     if type(value) != int:
         raise TypeError("Frequency Power must <type 'int'>, but now is \"%s\"" % type(value))

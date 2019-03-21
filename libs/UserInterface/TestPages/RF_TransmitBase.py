@@ -18,24 +18,18 @@ class TransmitBase(Base.TestPage):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hori_sizer = wx.BoxSizer(wx.HORIZONTAL)
         hori_sizer.Add(self.__init_freq_point_sizer(), 1, wx.EXPAND, 0)
-        # hori_sizer.Add(self.__init_mcs_sizer(), 1, wx.EXPAND, 0)
-        hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT, 0)
-
-        sizer.Add(hori_sizer, 0, wx.EXPAND | wx.ALL, 0)
-        sizer.Add(self.__init_scroll_bar(), 0, wx.EXPAND | wx.ALL, 0)
-
+        hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT | wx.RIGHT, 5)
+        sizer.Add(hori_sizer, 0, wx.EXPAND | wx.LEFT, 15)
+        sizer.Add(self.__init_scroll_bar(), 0, wx.EXPAND | wx.LEFT, 15)
         return sizer
 
     def __init_freq_point_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
-        title.SetFont(Font.COMMON_1_LARGE)
-        self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.current_point.SetFont(Font.COMMON_1_LARGE)
+        self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1), wx.TE_READONLY)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
-        p = str(self.freq)
-        button = wx.Button(self, wx.ID_ANY, p, wx.DefaultPosition, (45, 33), 0, name=p)
+        button = wx.Button(self, wx.ID_ANY, u"重设频点", wx.DefaultPosition, (65, 27), 0, name=str(self.freq))
         button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
         sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         return sizer
@@ -107,7 +101,6 @@ class TransmitBase(Base.TestPage):
         self.update_current_power()
         self.update_current_freq_point()
 
-
     def init_variable(self):
         self.stop_flag = True
 
@@ -148,8 +141,8 @@ class TransmitBase(Base.TestPage):
                                 wx.SL_HORIZONTAL | wx.SL_SELRANGE | wx.SL_TICKS)
         self.slider.Bind(wx.EVT_SCROLL_CHANGED, self.on_scroll_changed)
         self.slider.Bind(wx.EVT_SLIDER, self.on_scroll)
-        self.static_text = wx.StaticText(self, wx.ID_ANY, u"", wx.DefaultPosition, (50, -1), 0)
+        self.static_text = wx.StaticText(self, wx.ID_ANY, u"", wx.DefaultPosition, (30, -1), 0)
         sizer.Add(title_name, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
         sizer.Add(self.slider, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
-        sizer.Add(self.static_text, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
+        sizer.Add(self.static_text, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         return sizer
