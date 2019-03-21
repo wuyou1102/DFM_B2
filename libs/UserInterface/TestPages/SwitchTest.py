@@ -33,14 +33,14 @@ class Switch(Base.TestPage):
         self.output.SetValue("")
 
     def start_test(self):
-        Utility.append_thread(target=self.is_clicked)
+        Utility.append_thread(target=self.is_button_clicked)
         self.FormatPrint(info="Started")
 
     def stop_test(self):
         self.stop_flag = False
         self.FormatPrint(info="Stop")
 
-    def is_clicked(self):
+    def is_button_clicked(self):
         uart = self.get_uart()
         while self.stop_flag:
             result = uart.is_button_clicked()

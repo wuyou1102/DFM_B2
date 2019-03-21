@@ -31,14 +31,14 @@ class USB(Base.TestPage):
         self.output.SetValue("")
 
     def start_test(self):
-        Utility.append_thread(target=self.is_clicked)
+        Utility.append_thread(target=self.is_usb_connected)
         self.FormatPrint(info="Started")
 
     def stop_test(self):
         self.stop_flag = False
         self.FormatPrint(info="Stop")
 
-    def is_clicked(self):
+    def is_usb_connected(self):
         uart = self.get_uart()
         while self.stop_flag:
             result = uart.is_usb_connected()
