@@ -8,6 +8,8 @@ from libs.Config.ErrorCode import ErrorCode
 from libs.Command import AT as command
 import Alert
 from libs.Utility import convert_freq_point
+from socket import error
+import Timeout
 
 Logger = logging.getLogger(__name__)
 
@@ -16,6 +18,10 @@ class Client(object):
     def __init__(self, address="192.168.1.1", port=51341):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._lock = threading.Lock()
+        self._connect(address, port)
+
+    @Timeout.timeout(2)
+    def _connect(self, address, port):
         self._socket.connect((address, port))
 
     def get_serial_number(self):
@@ -237,23 +243,26 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.90.242')
-    # print s.get_rssi_and_bler()
-    print s.get_rssi(1)
-    print s.get_serial_number()
-    print s.set_serial_number("22222222222")
-    print s.get_serial_number()
-    print s.get_all_flag_results()
-    print s.is_button_clicked()
-    print s.reset_button_click()
-    print s.is_button_clicked()
-    for x in range(1, 33):
-        print s.set_flag_result(x, 0)
     while True:
-        for x in range(1, 33):
-            print s.get_flag_result(x)
-    for x in range(1, 33):
-        print s.set_flag_result(x, 1)
-    for x in range(1, 33):
-        print s.get_flag_result(x)
-
-    s.close()
+        print s.get_rssi(1)
+        time.sleep(1)
+    print s.get_rssi(1)
+    # print s.get_serial_number()
+    # # print s.set_serial_number("22222222")
+    # print s.get_serial_number()
+    # print s.get_all_flag_results()
+    # print s.is_button_clicked()
+    # print s.reset_button_click()
+    # print s.is_button_clicked()
+    # print s.get_all_flag_results()
+    # for x in range(1, 33):
+    #     print s.set_flag_result(x, 2)
+    # # while True:
+    # #     for x in range(1, 33):
+    # #         print s.get_flag_result(x)
+    # # for x in range(1, 33):
+    # #     print s.set_flag_result(x, 1)
+    # # for x in range(1, 33):
+    # #     print s.get_flag_result(x)
+    #
+    # s.close()

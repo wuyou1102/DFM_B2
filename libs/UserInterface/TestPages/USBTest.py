@@ -39,7 +39,7 @@ class USB(Base.TestPage):
         self.FormatPrint(info="Stop")
 
     def is_usb_connected(self):
-        uart = self.get_uart()
+        uart = self.get_communicat()
         while self.stop_flag:
             result = uart.is_usb_connected()
             state = u"已插入" if result else u"未插入"

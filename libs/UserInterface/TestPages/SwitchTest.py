@@ -27,7 +27,7 @@ class Switch(Base.TestPage):
 
     def before_test(self):
         super(Switch, self).before_test()
-        uart = self.get_uart()
+        uart = self.get_communicat()
         uart.reset_button_click()
         self.stop_flag = True
         self.output.SetValue("")
@@ -41,7 +41,7 @@ class Switch(Base.TestPage):
         self.FormatPrint(info="Stop")
 
     def is_button_clicked(self):
-        uart = self.get_uart()
+        uart = self.get_communicat()
         while self.stop_flag:
             result = uart.is_button_clicked()
             state = u"已触发" if result else u"未触发"

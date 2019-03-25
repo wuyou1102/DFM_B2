@@ -9,7 +9,9 @@ from TestPages import Variable
 from TestPages.Base import ReportPage
 from libs import Utility
 from libs.Config import Color
-from libs.Utility.UART import UART
+from libs.Utility.Timeout import Timeout
+
+from libs.Utility import Socket
 
 logger = logging.getLogger(__name__)
 reload(sys)
@@ -17,7 +19,7 @@ sys.setdefaultencoding('utf-8')
 
 
 class Frame(wx.Frame):
-    def __init__(self, title, type, size=(800, 600)):
+    def __init__(self, title, type, size=(800, 700)):
         wx.Frame.__init__(self, None, id=wx.ID_ANY, title=title, size=size)
         self.panel = Panel(self, type=type)
         self.SetBackgroundColour(Color.Azure2)
@@ -29,67 +31,97 @@ class Panel(wx.Panel):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.parent = parent
         self.type = type
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
         # horizontal_0 = self.__init_horizontal_sizer_0()
-        horizontal_1 = self.__init_horizontal_sizer_1()
+        device_sizer = self.__init_device_sizer()
+        test_sizer = self.__init_test_sizer()
 
-        # main_sizer.Add(horizontal_0, 0, wx.EXPAND | wx.ALL, 2)
-        main_sizer.Add(horizontal_1, 1, wx.EXPAND | wx.ALL, 2)
+        main_sizer.Add(device_sizer, 0, wx.EXPAND | wx.ALL, 2)
+        main_sizer.Add(test_sizer, 1, wx.EXPAND | wx.ALL, 2)
 
         self.SetSizer(main_sizer)
         self.Layout()
-        # self.Enable(False)
+        self.Enable(False)
 
-    def __init_horizontal_sizer_0(self):
-        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"设备信息"), wx.VERTICAL)
-        sizer.Add(self.__init_port_sizer(), 0, wx.EXPAND | wx.ALL, 1)
-        sizer.Add(self.__init_serial_number_sizer(), 0, wx.EXPAND | wx.ALL, 1)
-        self.btn_get_info = wx.Button(self, wx.ID_ANY, u"刷新设备信息", wx.DefaultPosition, wx.DefaultSize, 0,
-                                      name="get_info")
-        self.btn_get_info.Bind(wx.EVT_BUTTON, self.on_button_click)
-        sizer.Add(self.btn_get_info, 0, wx.EXPAND | wx.ALL, 1)
+    # def __init_horizontal_sizer_0(self):
+    #     sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"设备信息"), wx.VERTICAL)
+    #     sizer.Add(self.__init_port_sizer(), 0, wx.EXPAND | wx.ALL, 1)
+    #     sizer.Add(self.__init_serial_number_sizer(), 0, wx.EXPAND | wx.ALL, 1)
+    #     self.btn_get_info = wx.Button(self, wx.ID_ANY, u"刷新设备信息", wx.DefaultPosition, wx.DefaultSize, 0,
+    #                                   name="get_info")
+    #     self.btn_get_info.Bind(wx.EVT_BUTTON, self.on_button_click)
+    #     sizer.Add(self.btn_get_info, 0, wx.EXPAND | wx.ALL, 1)
+    #     return sizer
+
+    def __init_device_sizer(self):
+        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"设备信息"), wx.HORIZONTAL)
+        sizer.Add(self.__init_serial_number_sizer(), 1, wx.EXPAND | wx.ALL, 1)
+        sizer.Add(self.__init_button_sizer(), 0, wx.EXPAND | wx.ALL, 1)
         return sizer
 
-    def __init_port_sizer(self):
-        size = (25, 25)
-        port_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        port_title = wx.StaticText(self, wx.ID_ANY, u"端口号: ", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.port_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, Utility.Serial.list_ports(),
-                                     0)
-        pic_refresh = wx.Image('resource/icon/Refresh.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
+    def __init_button_sizer(self):
+        size = (40, -1)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
         pic_connect = wx.Image('resource/icon/Connect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
         pic_disconnect = wx.Image('resource/icon/Disconnect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
-        self.btn_refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0,
-                                           name='refresh')
+        pic_refresh = wx.Image('resource/icon/Refresh.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
         self.btn_connect = wx.BitmapButton(self, wx.ID_ANY, pic_connect, wx.DefaultPosition, size, style=0,
                                            name='connect')
         self.btn_disconnect = wx.BitmapButton(self, wx.ID_ANY, pic_disconnect, wx.DefaultPosition, size, style=0,
                                               name='disconnect')
+        self.btn_refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0,
+                                           name='get_info')
         self.btn_refresh.Bind(wx.EVT_BUTTON, self.on_button_click)
         self.btn_connect.Bind(wx.EVT_BUTTON, self.on_button_click)
         self.btn_disconnect.Bind(wx.EVT_BUTTON, self.on_button_click)
-        port_sizer.Add(port_title, 0, wx.EXPAND | wx.TOP, 5)
-        port_sizer.Add(self.port_choice, 1, wx.EXPAND | wx.ALL, 1)
-        port_sizer.Add(self.btn_refresh, 0, wx.EXPAND | wx.ALL, 1)
-        port_sizer.Add(self.btn_connect, 0, wx.EXPAND | wx.ALL, 1)
-        port_sizer.Add(self.btn_disconnect, 0, wx.EXPAND | wx.ALL, 1)
-        return port_sizer
+        sizer.Add(self.btn_connect, 0, wx.EXPAND | wx.ALL, 1)
+        sizer.Add(self.btn_disconnect, 0, wx.EXPAND | wx.ALL, 1)
+        sizer.Add(self.btn_refresh, 0, wx.EXPAND | wx.ALL, 1)
+        return sizer
+
+    # def __init_port_sizer(self):
+    #     size = (25, 25)
+    #     port_sizer = wx.BoxSizer(wx.HORIZONTAL)
+    #     port_title = wx.StaticText(self, wx.ID_ANY, u"端口号: ", wx.DefaultPosition, wx.DefaultSize, 0)
+    #     self.port_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, Utility.Serial.list_ports(),
+    #                                  0)
+    #     pic_refresh = wx.Image('resource/icon/Refresh.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
+    #     pic_connect = wx.Image('resource/icon/Connect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
+    #     pic_disconnect = wx.Image('resource/icon/Disconnect.ico', wx.BITMAP_TYPE_ICO).ConvertToBitmap()
+    #     self.btn_refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0,
+    #                                        name='refresh')
+    #     self.btn_connect = wx.BitmapButton(self, wx.ID_ANY, pic_connect, wx.DefaultPosition, size, style=0,
+    #                                        name='connect')
+    #     self.btn_disconnect = wx.BitmapButton(self, wx.ID_ANY, pic_disconnect, wx.DefaultPosition, size, style=0,
+    #                                           name='disconnect')
+    #     self.btn_refresh.Bind(wx.EVT_BUTTON, self.on_button_click)
+    #     self.btn_connect.Bind(wx.EVT_BUTTON, self.on_button_click)
+    #     self.btn_disconnect.Bind(wx.EVT_BUTTON, self.on_button_click)
+    #     port_sizer.Add(port_title, 0, wx.EXPAND | wx.TOP, 5)
+    #     port_sizer.Add(self.port_choice, 1, wx.EXPAND | wx.ALL, 1)
+    #     port_sizer.Add(self.btn_refresh, 0, wx.EXPAND | wx.ALL, 1)
+    #     port_sizer.Add(self.btn_connect, 0, wx.EXPAND | wx.ALL, 1)
+    #     port_sizer.Add(self.btn_disconnect, 0, wx.EXPAND | wx.ALL, 1)
+    #     return port_sizer
 
     def __init_serial_number_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"序列号: ", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.serial_number = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.button_sn = wx.Button(self, wx.ID_ANY, u"写", wx.DefaultPosition, (25, 25), 0, name="set_sn")
-        self.button_sn.Bind(wx.EVT_BUTTON, self.on_button_click)
-        sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.TOP, 5)
+        self.serial_number = wx.TextCtrl(self, wx.ID_ANY, "123456789012345678", wx.DefaultPosition, wx.DefaultSize,
+                                         wx.TE_READONLY | wx.TE_CENTER)
+        f = wx.Font(23, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+        title.SetFont(f)
+        self.serial_number.SetFont(f)
+        self.serial_number.SetBackgroundColour(Color.LightGray)
+        sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.TOP | wx.LEFT, 5)
         sizer.Add(self.serial_number, 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
-        sizer.Add(self.button_sn, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
-
+        # self.button_sn = wx.Button(self, wx.ID_ANY, u"写", wx.DefaultPosition, (25, 25), 0, name="set_sn")
+        # self.button_sn.Bind(wx.EVT_BUTTON, self.on_button_click)
+        # sizer.Add(self.button_sn, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
         return sizer
 
-    def __init_horizontal_sizer_1(self):
-        # sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"测试"), wx.VERTICAL)
-        sizer = wx.BoxSizer(wx.VERTICAL)
+    def __init_test_sizer(self):
+        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"测试"), wx.VERTICAL)
         self.test_view = ListBook(self, self.switch_cases())
         sizer.Add(self.test_view, 1, wx.EXPAND | wx.ALL, 0)
         return sizer
@@ -110,36 +142,34 @@ class Panel(wx.Panel):
     def on_button_click(self, event):
         obj = event.GetEventObject()
         name = obj.Name
-        if name == "refresh":
-            self.port_choice.SetItems(UART.list_ports())
-        elif name == "connect":
+        # if name == "refresh":
+        #     self.port_choice.SetItems(UART.list_ports())
+        if name == "connect":
             self.connect()
         elif name == "disconnect":
             self.disconnect()
-        elif name == "set_sn":
-            self.set_serial_number_via_uart()
+        # elif name == "set_sn":
+        #     self.set_serial_number_via_uart()
         elif name == "get_sn":
             self.update_serial_number()
         elif name == "get_info":
             self.get_device_info()
 
     def connect(self):
-        port = self.get_selected_port()
-        if port is False: return False
-        uart = self.get_variable("uart")
-        if uart is not None:
-            uart.close()
+        socket = self.get_variable("socket")
+        if socket is not None:
+            socket.close()
         try:
-            uart = UART(port=port)
-        except serial.serialutil.SerialException as e:
-            Utility.Alert.Error(e.message)
-            return False
-        if uart.is_uart_connected():
-            self.set_variable(uart=uart)
+            socket = Socket.Client(address="192.168.90.242")
+            self.set_variable(socket=socket)
             self.update_serial_number()
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
-        else:
-            Utility.Alert.Error(u"无法打开设备")
+        except Socket.error as e:
+            Utility.Alert.Error(u"连接失败：%s" % e.message)
+            return False
+        except Timeout:
+            Utility.Alert.Error(u"连接失败：超时。")
+            return False
 
     def get_device_info(self):
         uart = self.get_variable("uart")
@@ -177,16 +207,16 @@ class Panel(wx.Panel):
             self.update_serial_number()
 
     def update_serial_number(self):
-        uart = Variable.get_uart()
-        value = uart.get_serial_number()
+        socket = Variable.get_socket()
+        value = socket.get_serial_number()
         if value is None or value == "123456789012345678":
             self.serial_number.SetValue(value="")
         else:
             self.serial_number.SetValue(value=value)
 
     def Enable(self, enable=True):
-        lst1 = [self.btn_disconnect, self.button_sn, self.test_view, self.btn_get_info]
-        lst2 = [self.btn_connect, self.port_choice, self.btn_refresh]
+        lst1 = [self.btn_disconnect, self.test_view, self.btn_refresh]
+        lst2 = [self.btn_connect]
         for ctrl in lst1:
             ctrl.Enable(enable)
         for ctrl in lst2:
@@ -199,16 +229,22 @@ class Panel(wx.Panel):
 
     @staticmethod
     def set_variable(**kwargs):
-        Variable.set_uart(uart=kwargs['uart'])
+        if 'socket' in kwargs.keys():
+            Variable.set_socket(socket=kwargs['socket'])
+        elif 'uart' in kwargs.keys():
+            Variable.set_uart(uart=kwargs['uart'])
 
     @staticmethod
     def get_variable(key):
         if key == "uart":
             return Variable.get_uart()
+        elif key == "socket":
+            return Variable.get_socket()
 
     @staticmethod
     def clear_variable():
         Variable.set_uart()
+        Variable.set_socket()
 
     def get_selected_port(self):
         selected = self.port_choice.GetStringSelection()
@@ -303,8 +339,8 @@ class ScrolledWindow(wx.Panel):
         self.main_sizer.Layout()
 
     def update_case_result(self):
-        uart = Variable.get_uart()
-        results = uart.get_all_flag_results()
+        socket = Variable.get_socket()
+        results = socket.get_all_flag_results()
         if results is not None:
             for button in self.__buttons:
                 try:

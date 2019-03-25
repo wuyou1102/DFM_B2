@@ -36,14 +36,14 @@ class TransmitBase(Base.TestPage):
 
     def on_freq_point_selected(self, event):
         obj = event.GetEventObject()
-        uart = self.get_uart()
+        uart = self.get_communicat()
         uart.set_frequency_point(obj.Name + "000")
         self.update_current_freq_point()
 
     def on_mcs_selected(self, event):
         obj = event.GetEventObject()
         selected = obj.GetSelection()
-        uart = self.get_uart()
+        uart = self.get_communicat()
         uart.set_qam(value=selected)
         self.update_current_mcs()
 
@@ -67,7 +67,7 @@ class TransmitBase(Base.TestPage):
     def update_current_freq_point(self):
         def update_freq():
             self.Sleep(0.05)
-            uart = self.get_uart()
+            uart = self.get_communicat()
             value = uart.get_frequency_point()
             self.current_point.SetValue(value)
             if float(value) != self.freq:
@@ -77,7 +77,7 @@ class TransmitBase(Base.TestPage):
 
     def update_current_mcs(self):
         def update_mcs():
-            uart = self.get_uart()
+            uart = self.get_communicat()
             value = uart.get_qam()
             self.current_mcs.SetSelection(int(value, 16))
 
@@ -85,7 +85,7 @@ class TransmitBase(Base.TestPage):
 
     def update_current_power(self):
         def update_power():
-            uart = self.get_uart()
+            uart = self.get_communicat()
             value = uart.get_radio_frequency_power()
             self.slider.SetValue(value)
             self.static_text.SetLabel(hex(value).upper())
@@ -94,7 +94,7 @@ class TransmitBase(Base.TestPage):
 
     def before_test(self):
         self.init_variable()
-        uart = self.get_uart()
+        uart = self.get_communicat()
         uart.set_tx_mode_20m()
         uart.set_frequency_point(self.freq * 1000)
         uart.set_radio_frequency_power(15)
@@ -114,7 +114,7 @@ class TransmitBase(Base.TestPage):
         obj = event.GetEventObject()
         try:
             obj.Disable()
-            uart = self.get_uart()
+            uart = self.get_communicat()
             uart.hold_baseband()
             uart.release_baseband()
             Utility.Alert.Info(u"基带重启完成")
@@ -126,7 +126,7 @@ class TransmitBase(Base.TestPage):
 
     def on_scroll_changed(self, event):
         x = self.slider.GetValue()
-        uart = self.get_uart()
+        uart = self.get_communicat()
         uart.set_radio_frequency_power(value=x)
         self.update_current_power()
 

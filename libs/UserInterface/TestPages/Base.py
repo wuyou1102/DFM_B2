@@ -19,6 +19,7 @@ result_mapping = {
 
 class Variable(object):
     __uart = None
+    __socket = None
 
     @classmethod
     def get_uart(cls):
@@ -27,6 +28,15 @@ class Variable(object):
     @classmethod
     def set_uart(cls, uart=None):
         cls.__uart = uart
+        return True
+
+    @classmethod
+    def get_socket(cls):
+        return cls.__socket
+
+    @classmethod
+    def set_socket(cls, socket=None):
+        cls.__socket = socket
         return True
 
 
@@ -61,12 +71,12 @@ class TestPage(wx.Panel):
         return sizer
 
     @staticmethod
-    def get_uart():
-        return Variable.get_uart()
+    def get_communicat():
+        return Variable.get_socket()
 
     def get_result(self):
-        uart = self.get_uart()
-        return uart.get_flag_result(self.get_flag())
+        comm = self.get_communicat()
+        return comm.get_flag_result(self.get_flag())
 
     def get_type(self):
         return self.type
@@ -122,7 +132,7 @@ class TestPage(wx.Panel):
 
     def SetResult(self, result):
         self.FormatPrint(result, symbol="=")
-        uart = self.get_uart()
+        uart = self.get_communicat()
         if uart.set_flag_result(flag=self.get_flag(), result=result):
             return True
         return False
@@ -132,7 +142,7 @@ class TestPage(wx.Panel):
 
     def LogMessage(self, msg):
         msg = msg.strip('\r\n')
-        uart = self.get_uart()
+        uart = self.get_communicat()
         if uart is None:
             return
         with open(os.path.join(Path.LOG_SAVE, "%s.log" % uart.SerialNumber), 'a') as log:
@@ -291,16 +301,16 @@ class ReportPage(wx.Panel):
 
     def __update_color_based_on_result(self):
         self.__set_result_color_as_default()
-        uart = Variable.get_uart()
-        self.serial_number.SetValue(uart.get_serial_number())
-        results = uart.get_all_flag_results()
+        socket = Variable.get_uart()
+        self.serial_number.SetValue(socket.get_serial_number())
+        results = socket.get_all_flag_results()
         if results is not None:
             for ctrl in self.__result_controls:
                 result = results[ctrl.GetFlag() - 1]
                 ctrl.SetResult(result)
         else:
             for ctrl in self.__result_controls:
-                result = uart.get_flag_result(ctrl.GetFlag())
+                result = socket.get_flag_result(ctrl.GetFlag())
                 ctrl.SetResult(result)
 
     def __set_result_color_as_default(self):
