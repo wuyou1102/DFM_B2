@@ -30,15 +30,15 @@ class Panel(wx.Panel):
         self.parent = parent
         self.type = type
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        horizontal_0 = self.__init_horizontal_sizer_0()
+        # horizontal_0 = self.__init_horizontal_sizer_0()
         horizontal_1 = self.__init_horizontal_sizer_1()
 
-        main_sizer.Add(horizontal_0, 0, wx.EXPAND | wx.ALL, 2)
+        # main_sizer.Add(horizontal_0, 0, wx.EXPAND | wx.ALL, 2)
         main_sizer.Add(horizontal_1, 1, wx.EXPAND | wx.ALL, 2)
 
         self.SetSizer(main_sizer)
         self.Layout()
-        self.Enable(False)
+        # self.Enable(False)
 
     def __init_horizontal_sizer_0(self):
         sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"设备信息"), wx.VERTICAL)
@@ -88,7 +88,8 @@ class Panel(wx.Panel):
         return sizer
 
     def __init_horizontal_sizer_1(self):
-        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"测试"), wx.VERTICAL)
+        # sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"测试"), wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         self.test_view = ListBook(self, self.switch_cases())
         sizer.Add(self.test_view, 1, wx.EXPAND | wx.ALL, 0)
         return sizer
@@ -233,8 +234,8 @@ class ListBook(wx.Panel):
         right_sizer = wx.BoxSizer(wx.VERTICAL)
         left_sizer.Add(self.__ScrolledWindow, 1, wx.EXPAND | wx.ALL, 0)
         right_sizer.Add(self.__CaseView, 1, wx.EXPAND | wx.ALL, 0)
-        main_sizer.Add(left_sizer, 0, wx.EXPAND | wx.ALL, 0)
-        main_sizer.Add(right_sizer, 1, wx.EXPAND | wx.ALL, 0)
+        main_sizer.Add(left_sizer, 1, wx.EXPAND | wx.ALL, 0)
+        main_sizer.Add(right_sizer, 5, wx.EXPAND | wx.ALL, 0)
         self.__init_cases(cases=cases)
         self.SetSizer(main_sizer)
         self.Layout()

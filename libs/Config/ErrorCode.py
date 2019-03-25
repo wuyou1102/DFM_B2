@@ -32,3 +32,4 @@ class ErrorCode(BaseErrorCode):
     WRONG_TERMINATOR = ErrorCodeField(10004, u"错误的结束符，请重试。")
     EMPTY_OUTPUT_EXCEPTION = ErrorCodeField(10005, u"空白输出，请重试。")
     TIMING_ERROR = ErrorCodeField(10006, "Sequence Error Interrupt.")
+    SOCKET_EXCEPTION = ErrorCodeField(10007, u"Socket通信异常，请检查网络后重试。")
