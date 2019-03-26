@@ -44,4 +44,4 @@ class Light(Base.TestPage):
     @staticmethod
     def GetFlag(t):
         if t == "PCBA":
-            return String.PCBA_LIGHT
+            return String.LAMP_HOLDER_PCBA

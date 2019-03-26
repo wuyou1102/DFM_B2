@@ -44,6 +44,6 @@ class LED(Base.TestPage):
     @staticmethod
     def GetFlag(t):
         if t == "PCBA":
-            return String.PCBA_LED
+            return String.LED_PCBA
         elif t in ["MACHINE", u"整机"]:
-            return String.MACHINE_LED
+            return String.LED_MACH

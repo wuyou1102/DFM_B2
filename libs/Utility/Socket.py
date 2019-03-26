@@ -17,6 +17,7 @@ Logger = logging.getLogger(__name__)
 class Client(object):
     def __init__(self, address="192.168.1.1", port=51341):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__serial_number = ""
         self._lock = threading.Lock()
         self._connect(address, port)
 
@@ -24,9 +25,14 @@ class Client(object):
     def _connect(self, address, port):
         self._socket.connect((address, port))
 
+    @property
+    def SerialNumber(self):
+        return self.__serial_number
+
     def get_serial_number(self):
         cmd = command.get_serial_number()
-        return self._get(cmd=cmd)
+        self.__serial_number = self._get(cmd=cmd)
+        return self.__serial_number
 
     def set_serial_number(self, serial):
         cmd = command.set_serial_number(value=serial)
@@ -232,6 +238,7 @@ class Client(object):
                 self._lock.release()
 
     def send(self, command):
+        command = command.strip('\r\n') + '\n'
         self._socket.sendall(command)
 
     def read(self, buffersize=1024):
@@ -244,9 +251,10 @@ class Client(object):
 if __name__ == '__main__':
     s = Client(address='192.168.90.242')
     while True:
-        print s.get_rssi(1)
-        time.sleep(1)
-    print s.get_rssi(1)
+        (s.get_rssi_and_bler())
+        (s.get_rssi(0))
+        (s.get_rssi(1))
+
     # print s.get_serial_number()
     # # print s.set_serial_number("22222222")
     # print s.get_serial_number()

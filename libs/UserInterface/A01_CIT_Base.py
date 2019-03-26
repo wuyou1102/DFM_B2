@@ -69,14 +69,14 @@ class Panel(wx.Panel):
                                            name='connect')
         self.btn_disconnect = wx.BitmapButton(self, wx.ID_ANY, pic_disconnect, wx.DefaultPosition, size, style=0,
                                               name='disconnect')
-        self.btn_refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0,
-                                           name='get_info')
-        self.btn_refresh.Bind(wx.EVT_BUTTON, self.on_button_click)
+
         self.btn_connect.Bind(wx.EVT_BUTTON, self.on_button_click)
         self.btn_disconnect.Bind(wx.EVT_BUTTON, self.on_button_click)
         sizer.Add(self.btn_connect, 0, wx.EXPAND | wx.ALL, 1)
         sizer.Add(self.btn_disconnect, 0, wx.EXPAND | wx.ALL, 1)
-        sizer.Add(self.btn_refresh, 0, wx.EXPAND | wx.ALL, 1)
+        # self.btn_refresh = wx.BitmapButton(self, wx.ID_ANY, pic_refresh, wx.DefaultPosition, size, style=0,name='get_info')
+        # self.btn_refresh.Bind(wx.EVT_BUTTON, self.on_button_click)
+        # sizer.Add(self.btn_refresh, 0, wx.EXPAND | wx.ALL, 1)
         return sizer
 
     # def __init_port_sizer(self):
@@ -107,7 +107,7 @@ class Panel(wx.Panel):
     def __init_serial_number_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"序列号: ", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.serial_number = wx.TextCtrl(self, wx.ID_ANY, "123456789012345678", wx.DefaultPosition, wx.DefaultSize,
+        self.serial_number = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
                                          wx.TE_READONLY | wx.TE_CENTER)
         f = wx.Font(23, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         title.SetFont(f)
@@ -164,12 +164,15 @@ class Panel(wx.Panel):
             self.set_variable(socket=socket)
             self.update_serial_number()
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
-        except Socket.error as e:
-            Utility.Alert.Error(u"连接失败：%s" % e.message)
-            return False
         except Timeout:
             Utility.Alert.Error(u"连接失败：超时。")
             return False
+        except IndexError:
+            Utility.Alert.Error(u"连接失败：目标拒绝。")
+        except KeyError:
+            Utility.Alert.Error(u"设备没有有效的序列号，无法测试。请返回上一步完成写号后继续")
+            self.clear_variable()
+            socket.close()
 
     def get_device_info(self):
         uart = self.get_variable("uart")
@@ -185,9 +188,9 @@ class Panel(wx.Panel):
 
     def disconnect(self):
         self.test_view.clear_case_result()
-        uart = Variable.get_uart()
-        if uart is not None:
-            uart.close()
+        socket = Variable.get_socket()
+        if socket is not None:
+            socket.close()
         self.clear_variable()
         self.Layout()
         self.Enable(False)
@@ -210,12 +213,12 @@ class Panel(wx.Panel):
         socket = Variable.get_socket()
         value = socket.get_serial_number()
         if value is None or value == "123456789012345678":
-            self.serial_number.SetValue(value="")
+            raise KeyError
         else:
             self.serial_number.SetValue(value=value)
 
     def Enable(self, enable=True):
-        lst1 = [self.btn_disconnect, self.test_view, self.btn_refresh]
+        lst1 = [self.btn_disconnect, self.test_view]
         lst2 = [self.btn_connect]
         for ctrl in lst1:
             ctrl.Enable(enable)

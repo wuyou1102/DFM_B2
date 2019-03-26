@@ -97,7 +97,7 @@ class FPV(Base.TestPage):
     @staticmethod
     def GetFlag(t):
         if t in ["MACHINE", u"整机"]:
-            return String.MACHINE_FPV
+            return String.FPV_MACHINE
 
 
 class Player(wx.Frame):

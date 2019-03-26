@@ -61,4 +61,6 @@ class USB(Base.TestPage):
     @staticmethod
     def GetFlag(t):
         if t == "PCBA":
-            return String.PCBA_USB
+            return String.USB_PCBA
+        elif t in ["MACHINE", u"整机"]:
+            return String.USB_MACH

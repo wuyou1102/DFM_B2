@@ -44,6 +44,7 @@ class TestPage(wx.Panel):
     def __init__(self, parent, type):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.__parent = parent
+        self.__auto_pass = False
         self.lock = threading.Lock()
         self.type = type
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -142,10 +143,10 @@ class TestPage(wx.Panel):
 
     def LogMessage(self, msg):
         msg = msg.strip('\r\n')
-        uart = self.get_communicat()
-        if uart is None:
+        comm = self.get_communicat()
+        if comm is None:
             return
-        with open(os.path.join(Path.LOG_SAVE, "%s.log" % uart.SerialNumber), 'a') as log:
+        with open(os.path.join(Path.LOG_SAVE, "%s.log" % comm.SerialNumber), 'a') as log:
             log.write(u"{time}:{message}\n".format(time=Utility.get_timestamp(), message=msg))
 
     @staticmethod
@@ -301,7 +302,7 @@ class ReportPage(wx.Panel):
 
     def __update_color_based_on_result(self):
         self.__set_result_color_as_default()
-        socket = Variable.get_uart()
+        socket = Variable.get_socket()
         self.serial_number.SetValue(socket.get_serial_number())
         results = socket.get_all_flag_results()
         if results is not None:
