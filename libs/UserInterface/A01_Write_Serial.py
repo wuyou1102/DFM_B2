@@ -62,14 +62,15 @@ class Panel(wx.Panel):
 
     def __init_serial_number_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        title = wx.StaticText(self, wx.ID_ANY, u"序列号: ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.title = wx.StaticText(self, wx.ID_ANY, u"序列号: ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.serial_number = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
-                                         wx.TE_CENTER)
+                                         wx.TE_CENTER | wx.TE_PROCESS_ENTER)
         self.serial_number.Bind(wx.EVT_SET_FOCUS, self.click_on_text_ctrl)
+
         f = wx.Font(23, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
-        title.SetFont(f)
+        self.title.SetFont(f)
         self.serial_number.SetFont(f)
-        sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.TOP | wx.LEFT, 5)
+        sizer.Add(self.title, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.TOP | wx.LEFT, 5)
         sizer.Add(self.serial_number, 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
         return sizer
 
@@ -163,8 +164,12 @@ class Panel(wx.Panel):
             ctrl.Enable(enable)
         for ctrl in lst2:
             ctrl.Enable(not enable)
+        if enable:
+            if self.serial_number.GetValue() == "":
+                self.serial_number.SetFocus()
+            else:
+                self.title.SetFocus()
 
     def click_on_text_ctrl(self, event):
         self.serial_number.SetValue("")
         event.Skip()
-
