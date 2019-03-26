@@ -1,8 +1,6 @@
 # -*- encoding:UTF-8 -*-
 import logging
 import sys
-
-import serial
 import wx
 
 from TestPages import Variable
