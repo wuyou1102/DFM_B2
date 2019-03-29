@@ -13,22 +13,19 @@ logger = logging.getLogger(__name__)
 class USB(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
+        self.AUTO = True
 
     def init_test_sizer(self):
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        desc = wx.StaticText(self, wx.ID_ANY, "请插入U盘", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER)
-        desc.SetFont(Font.DESC)
-        desc.SetBackgroundColour(Color.LightSkyBlue1)
-        self.output = wx.TextCtrl(self, -1, '', style=wx.TE_MULTILINE | wx.TE_READONLY | wx.HSCROLL)
-        self.output.SetInsertionPointEnd()
-        sizer.Add(desc, 0, wx.EXPAND | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
-        sizer.Add(self.output, 1, wx.EXPAND | wx.ALL, 0)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.desc = wx.StaticText(self, wx.ID_ANY, u"请插入U盘", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.desc.SetFont(Font.DESC)
+        self.desc.SetBackgroundColour(Color.LightSkyBlue1)
+        sizer.Add(self.desc, 1, wx.EXPAND | wx.ALIGN_CENTER | wx.ALL, 1)
         return sizer
 
     def before_test(self):
         super(USB, self).before_test()
         self.stop_flag = True
-        self.output.SetValue("")
 
     def start_test(self):
         Utility.append_thread(target=self.is_usb_connected)
@@ -39,16 +36,13 @@ class USB(Base.TestPage):
         self.FormatPrint(info="Stop")
 
     def is_usb_connected(self):
-        uart = self.get_communicat()
+        comm = self.get_communicat()
         while self.stop_flag:
-            result = uart.is_usb_connected()
-            state = u"已插入" if result else u"未插入"
-            self.append_log(u"查询是否插入U盘 \"%s\"" % state)
+            self.Sleep(0.05)
+            result = comm.is_usb_connected()
             if result:
-                self.append_log(u"测试通过，请点击PASS。")
                 self.EnablePass()
                 break
-            self.Sleep(1)
 
     def append_log(self, msg):
         self.LogMessage(msg)

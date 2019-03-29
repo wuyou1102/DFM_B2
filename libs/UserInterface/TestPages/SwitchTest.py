@@ -13,10 +13,11 @@ logger = logging.getLogger(__name__)
 class Switch(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
+        self.AUTO = True
 
     def init_test_sizer(self):
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.desc = wx.StaticText(self, wx.ID_ANY, u"请按下治具上的开关", wx.DefaultPosition, wx.DefaultSize, 0)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.desc = wx.StaticText(self, wx.ID_ANY, u"请按下按键", wx.DefaultPosition, wx.DefaultSize, 0)
         self.desc.SetFont(Font.DESC)
         self.desc.SetBackgroundColour(Color.LightSkyBlue1)
         sizer.Add(self.desc, 1, wx.EXPAND | wx.ALIGN_CENTER | wx.ALL, 1)
@@ -24,9 +25,8 @@ class Switch(Base.TestPage):
 
     def before_test(self):
         super(Switch, self).before_test()
-        self.desc.SetLabel(u"请按下治具上的开关")
-        uart = self.get_communicat()
-        uart.reset_button_click()
+        comm = self.get_communicat()
+        comm.reset_button_click()
         self.stop_flag = True
 
     def start_test(self):
@@ -38,11 +38,11 @@ class Switch(Base.TestPage):
         self.FormatPrint(info="Stop")
 
     def is_button_clicked(self):
-        uart = self.get_communicat()
+        comm = self.get_communicat()
         while self.stop_flag:
-            result = uart.is_button_clicked()
+            self.Sleep(0.05)
+            result = comm.is_button_clicked()
             if result:
-                self.desc.SetLabel(u"测试通过，请点击PASS。")
                 self.EnablePass()
                 break
 
@@ -52,7 +52,7 @@ class Switch(Base.TestPage):
 
     @staticmethod
     def GetName():
-        return u"开关测试"
+        return u"按键测试"
 
     @staticmethod
     def GetFlag(t):

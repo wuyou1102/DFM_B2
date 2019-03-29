@@ -158,7 +158,7 @@ class Panel(wx.Panel):
         if socket is not None:
             socket.close()
         try:
-            socket = Socket.Client(address="192.168.90.242")
+            socket = Socket.Client(address="192.168.1.1")
             self.set_variable(socket=socket)
             self.update_serial_number()
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
@@ -246,14 +246,6 @@ class Panel(wx.Panel):
     def clear_variable():
         Variable.set_uart()
         Variable.set_socket()
-
-    def get_selected_port(self):
-        selected = self.port_choice.GetStringSelection()
-        if selected:
-            return selected
-        else:
-            Utility.Alert.Error(u"请选择端口号")
-            return False
 
     def get_type(self):
         return self._type

@@ -103,6 +103,14 @@ def get_serial_number():
     return "get_serial_number"
 
 
+def load_protocol_stack():
+    return "dfm_test_end"
+
+
+def unload_protocol_stack():
+    return "dfm_test_start"
+
+
 def set_flag_result(flag, result):
     return "set_flag_result({flag},{result})".format(flag=flag, result=result)
 
@@ -125,6 +133,14 @@ def is_uart_connected():
 
 def is_usb_connected():
     return "is_usb_connect"
+
+
+def start_web_server():
+    return "dfm_websever_start"
+
+
+def stop_web_server():
+    return "dfm_websever_stop"
 
 
 def reset_button_click():

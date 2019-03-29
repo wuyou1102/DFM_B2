@@ -14,6 +14,7 @@ class TransmitBase(Base.TestPage):
         self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
 
+
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hori_sizer = wx.BoxSizer(wx.HORIZONTAL)

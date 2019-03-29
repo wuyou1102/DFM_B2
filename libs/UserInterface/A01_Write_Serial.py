@@ -90,7 +90,7 @@ class Panel(wx.Panel):
         if self.socket is not None:
             self.socket.close()
         try:
-            self.socket = Socket.Client(address="192.168.90.242")
+            self.socket = Socket.Client(address="192.168.1.1")
             self.refresh_serial_number()
             self.Enable(enable=True)
         except Timeout:
@@ -127,7 +127,7 @@ class Panel(wx.Panel):
             dlg = wx.MessageDialog(
                 None,
                 u"设备中已存在序列号：\"%s\"，\n是否要用新的序列号：\"%s\" 替换。" % (result, serial),
-                u"",
+                u"消息",
                 wx.YES_NO | wx.ICON_QUESTION
             )
             if dlg.ShowModal() == wx.ID_YES:

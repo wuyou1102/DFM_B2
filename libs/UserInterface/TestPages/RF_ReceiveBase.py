@@ -11,6 +11,7 @@ matplotlib.use('WXAgg')
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 import numpy
+from libs.Config import Color
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +54,10 @@ class ReceiveBase(Base.TestPage):
         rssi_1_title = wx.StaticText(self, wx.ID_ANY, u"天线1: ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.rssi_0 = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (50, -1),
                                   wx.TE_READONLY | wx.TE_CENTRE)
+        self.rssi_0.SetBackgroundColour(Color.LightGray)
         self.rssi_1 = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (50, -1),
                                   wx.TE_READONLY | wx.TE_CENTRE)
+        self.rssi_1.SetBackgroundColour(Color.LightGray)
         sizer.Add(rssi_0_title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.rssi_0, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(rssi_1_title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
@@ -87,7 +90,6 @@ class ReceiveBase(Base.TestPage):
 
     def __init_status_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-
         restart = wx.BitmapButton(self, wx.ID_ANY, Picture.restart, wx.DefaultPosition, (33, 33), 0)
         restart.Bind(wx.EVT_BUTTON, self.on_restart)
         sizer.Add(restart, 0, wx.ALL, 1)
@@ -133,7 +135,9 @@ class ReceiveBase(Base.TestPage):
 
     def init_variable(self):
         self.stop_flag = True
-        self.slot = []
+        self.lst_slot = []
+        self.lst_rssi0 = []
+        self.lst_rssi1 = []
 
     def start_test(self):
         self.FormatPrint(info="Started")
@@ -147,33 +151,36 @@ class ReceiveBase(Base.TestPage):
         return self.GetFlag(t=self.type)
 
     def draw_line(self):
-        uart = self.get_communicat()
-        self.Sleep(1)
-        while self.stop_flag:
-            if uart.is_instrument_connected():
-                self.status.SetBitmap(Picture.status_connect1)
-                self.message.SetLabel(u"信号发生器已连接，测试中")
-                break
-            else:
-                self.message.SetLabel(u"正在连接信号发生器")
-                self.status.SetBitmap(Picture.status_disconnect)
-                uart.hold_baseband()
-                self.status.SetBitmap(wx.NullBitmap)
-                uart.release_baseband()
+        # comm = self.get_communicat()
+        # self.Sleep(1)
+        # while self.stop_flag:
+        #     if self.is_instrument_connected():
+        #         self.status.SetBitmap(Picture.status_connect1)
+        #         self.message.SetLabel(u"信号发生器已连接，测试中")
+        #         break
+        #     else:
+        #         self.message.SetLabel(u"正在连接信号发生器")
+        #         self.status.SetBitmap(Picture.status_disconnect)
+        #         self.hold_baseband()
+        #         self.status.SetBitmap(wx.NullBitmap)
+        #         self.release_baseband()
         for x in range(40):
             if not self.stop_flag:
                 return
             self.update_bler()
-            self.panel_mpl.refresh(self.slot)
+            self.panel_mpl.refresh(self.lst_slot)
             self.Sleep(1)
             if self.check_result():
                 self.set_message_result(isPass=True)
-                self.PassButton.Enable()
+                self.SetResult("PASS")
                 return
         self.set_message_result(isPass=False)
+        self.SetResult("FAIL")
 
     def check_result(self):
-        if self.slot.count(0) >= 10:
+        logger.debug(u"天线0平均信号强度：%s" % (sum(self.lst_rssi0) / len(self.lst_rssi0)))
+        logger.debug(u"天线1平均信号强度：%s" % (sum(self.lst_rssi1) / len(self.lst_rssi1)))
+        if self.lst_slot.count(0) >= 10:
             return True
         return False
 
@@ -205,7 +212,9 @@ class ReceiveBase(Base.TestPage):
             bler = int(result[8:], 16)
             rssi0 = int(result[0:4], 16) - 65536
             rssi1 = int(result[4:8], 16) - 65536
-            self.slot.append(bler)
+            self.lst_slot.append(bler)
+            self.lst_rssi0.append(rssi0)
+            self.lst_rssi1.append(rssi1)
             self.rssi_0.SetValue(str(rssi0))
             self.rssi_1.SetValue(str(rssi1))
         else:

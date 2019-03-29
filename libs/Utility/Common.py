@@ -3,6 +3,7 @@ import subprocess
 import logging
 from libs import Command
 import time
+from psutil import net_if_addrs
 
 __logger = logging.getLogger(__name__)
 
@@ -134,6 +135,19 @@ def convert_freq_point(value):
     d0 = int(d0, 16)
     f = round((d1d3 / 16777216.0 + d0) * rf_multi, 2)
     return str(f)
+
+
+def get_local_mac():
+    for k, v in net_if_addrs().items():
+        interface_name = k.decode("gbk")
+        print interface_name
+        if interface_name in [u"本地连接", u"以太网"]:
+            print v[0].address.replace("-", ":")
+            return v[0].address.replace("-", ":")
+        elif u"本地连接" in interface_name:
+            print v[0].address.replace("-", ":")
+            return v[0].address.replace("-", ":")
+    raise IOError
 
 
 if __name__ == '__main__':

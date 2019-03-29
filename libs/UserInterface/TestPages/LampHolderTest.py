@@ -9,7 +9,7 @@ from libs.Config import String
 logger = logging.getLogger(__name__)
 
 
-class Light(Base.TestPage):
+class LampHolder(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.count = 0
@@ -24,7 +24,7 @@ class Light(Base.TestPage):
         output.AppendText(u"  其他情况    FAIL\n")
         output.SetInsertionPointEnd()
         output.SetBackgroundColour(Color.LightSkyBlue1)
-        output.SetFont(Font.COMMON_1_LARGE_BOLD)
+        output.SetFont(Font.DESC)
         sizer.Add(output, 1, wx.EXPAND | wx.ALL, 1)
         return sizer
 

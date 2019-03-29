@@ -10,10 +10,15 @@ import time
 import threading
 
 logger = logging.getLogger(__name__)
-result_mapping = {
+result2value = {
     "NotTest": "1",
     "PASS": "2",
     "FAIL": "3",
+}
+value2result = {
+    "1": "NotTest",
+    "2": "PASS",
+    "3": "FAIL",
 }
 
 
@@ -44,7 +49,7 @@ class TestPage(wx.Panel):
     def __init__(self, parent, type):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
         self.__parent = parent
-        self.__auto_pass = False
+        self.AUTO = False
         self.lock = threading.Lock()
         self.type = type
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -118,9 +123,7 @@ class TestPage(wx.Panel):
 
     def on_result_button(self, event):
         obj = event.GetEventObject()
-        logger.debug("\"%s\" Result is : <%s>" % (self.get_name(), obj.Name))
-        if self.SetResult(result_mapping[obj.Name]):
-            self.__parent.next_page()
+        self.SetResult(obj.Name)
 
     def before_test(self):
         self.EnablePass(enable=False)
@@ -132,14 +135,17 @@ class TestPage(wx.Panel):
         print 'stop_test'
 
     def SetResult(self, result):
+        logger.debug("\"%s\" Result is : <%s>" % (self.get_name(), result))
         self.FormatPrint(result, symbol="=")
         uart = self.get_communicat()
-        if uart.set_flag_result(flag=self.get_flag(), result=result):
-            return True
-        return False
+        if uart.set_flag_result(flag=self.get_flag(), result=result2value[result]):
+            self.__parent.next_page()
 
     def EnablePass(self, enable=True):
-        self.PassButton.Enable(enable=enable)
+        if enable and self.AUTO:
+            self.SetResult("PASS")
+        else:
+            self.PassButton.Enable(enable=enable)
 
     def LogMessage(self, msg):
         msg = msg.strip('\r\n')
@@ -242,7 +248,7 @@ class ReportPage(wx.Panel):
 
     def capture_screen(self):
         default_name = "%s.png" % self.serial_number.GetValue()
-        dlg = wx.FileDialog(self, "保存截图", "", style=wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT,
+        dlg = wx.FileDialog(self, "保存截图", "", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
                             wildcard="Screenshots(*.png)|*.png|All files(*.*)|*.*",
                             defaultFile=default_name)
         if dlg.ShowModal() == wx.ID_OK:

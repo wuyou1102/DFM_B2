@@ -21,7 +21,7 @@ class Client(object):
         self._lock = threading.Lock()
         self._connect(address, port)
 
-    @Timeout.timeout(2)
+    @Timeout.timeout(1)
     def _connect(self, address, port):
         self._socket.connect((address, port))
 
@@ -33,6 +33,14 @@ class Client(object):
         cmd = command.get_serial_number()
         self.__serial_number = self._get(cmd=cmd)
         return self.__serial_number
+
+    def load_protocol_stack(self):
+        cmd = command.load_protocol_stack
+        return self._set(cmd=cmd)
+
+    def unload_protocol_stack(self):
+        cmd = command.unload_protocol_stack()
+        return self._set(cmd=cmd)
 
     def set_serial_number(self, serial):
         cmd = command.set_serial_number(value=serial)
@@ -83,6 +91,14 @@ class Client(object):
         if self._get(cmd=cmd).endswith("True"):
             return True
         return False
+
+    def start_web_server(self):
+        cmd = command.start_web_server()
+        return self._set(cmd=cmd)
+
+    def stop_web_server(self):
+        cmd = command.stop_web_server()
+        return self._set(cmd=cmd)
 
     # 协议栈接口
     def set_radio_frequency_power(self, value):
@@ -178,7 +194,6 @@ class Client(object):
     def _protocol_get(self, cmd):
         for i in range(3):
             try:
-                print cmd
                 result = self.execute_command(command=cmd)
                 if result.exit_code == 0 and len(result.outputs) == 16:
                     return result.outputs
@@ -249,11 +264,8 @@ class Client(object):
 
 
 if __name__ == '__main__':
-    s = Client(address='192.168.90.242')
-    while True:
-        (s.get_rssi_and_bler())
-        (s.get_rssi(0))
-        (s.get_rssi(1))
+    s = Client(address='192.168.1.1')
+    s.start_web_server()
 
     # print s.get_serial_number()
     # # print s.set_serial_number("22222222")

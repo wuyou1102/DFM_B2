@@ -62,7 +62,7 @@ def copy_vlc(path):
 def deploy():
     deploy_path = os.path.join(abs_path, "DFM_%s" % Utility.get_timestamp())
     shutil.move(os.path.join(abs_path, 'out', python_name), deploy_path)
-    # copy_vlc(path=deploy_path)
+    copy_vlc(path=deploy_path)
     shutil.rmtree(os.path.join(abs_path, 'tmp'))
     shutil.rmtree(os.path.join(abs_path, 'out'))
     os.remove(os.path.join(abs_path, '%s.spec' % python_name))
