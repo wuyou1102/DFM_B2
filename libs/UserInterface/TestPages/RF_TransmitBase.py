@@ -129,6 +129,7 @@ class TransmitBase(Base.TestPage):
         x = self.slider.GetValue()
         uart = self.get_communicat()
         uart.set_radio_frequency_power(value=x)
+        self.Sleep(0.2)
         self.update_current_power()
 
     def on_scroll(self, event):

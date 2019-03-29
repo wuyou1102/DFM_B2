@@ -265,7 +265,7 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-    s.start_web_server()
+    print s.unload_protocol_stack()
 
     # print s.get_serial_number()
     # # print s.set_serial_number("22222222")
