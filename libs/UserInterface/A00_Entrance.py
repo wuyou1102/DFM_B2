@@ -71,6 +71,7 @@ class Panel(wx.Panel):
         elif name == "FPV":
             from A03_FPV import Frame
 
-        f = Frame()
-        f.Show()
+        frame = Frame()
+        frame.Show()
+
         self.parent.Close()

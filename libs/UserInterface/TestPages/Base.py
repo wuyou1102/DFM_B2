@@ -45,6 +45,7 @@ class Variable(object):
         return True
 
 
+
 class TestPage(wx.Panel):
     def __init__(self, parent, type):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
