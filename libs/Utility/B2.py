@@ -70,10 +70,12 @@ class WebSever(object):
         return False
 
     def SetAsBS(self, NW_ID, TYF):
+        self.__login()
         url = "http://{address}/write_txt.php".format(address=self._address)
         data = {
             'USR_ID': 0,
             'NW_NUM': 1,
+            'NW_ID': NW_ID,
             'NW_ID0': NW_ID,
             'NW_ID1': NW_ID + 1,
             'NW_ID2': NW_ID + 2,
@@ -94,6 +96,7 @@ class WebSever(object):
         return False
 
     def SetAsND(self, USR_ID, NW_ID, NW_NUM=1, NW_ID1=None, NW_ID2=None, NW_ID3=None):
+        self.__login()
         NW_ID1 = NW_ID1 if NW_ID1 is not None else NW_ID + 1
         NW_ID2 = NW_ID2 if NW_ID2 is not None else NW_ID + 2
         NW_ID3 = NW_ID3 if NW_ID3 is not None else NW_ID + 3
@@ -121,9 +124,15 @@ class WebSever(object):
         return False
 
     def RebootDevice(self):
+        self.__login()
         url = "http://{address}/upload.php?signal=9".format(address=self._address)
-        self.__get(url=url)
-        self._token = ''
+        try:
+            self.__get(url=url)
+        except requests.exceptions.ChunkedEncodingError and requests.ConnectionError:
+            pass
+        finally:
+            self._token = ""
+            return True
 
     def GetVersion(self):
         self.__login()
@@ -141,28 +150,34 @@ class WebSever(object):
         soup = BeautifulSoup(resp.content, "html.parser")
         count = 0
         for a in soup.find_all('option'):
-
             try:
                 d = a.get('value').split('_')
                 if len(d) == 3:
                     count += 1
                     z = [int(x) for x in d]
                     print '%s:%s,' % (count, tuple(z))
-
             except Exception:
                 pass
 
-    def Reboot(self):
-        self.__login()
-        url = "http://{address}/upload.php?signal=9".format(address=self._address)
-        self.__get(url=url)
-        return True
+    def isStart(self):
+        try:
+            resp = self._session.request(method='get', url='http://{address}/login.php'.format(address=self._address),
+                                         timeout=1)
+            if resp.status_code == 200:
+                return True
+            return False
+        except requests.ConnectTimeout:
+            return False
+        except requests.ReadTimeout:
+            return False
+        except requests.ConnectionError:
+            return False
 
 
 if __name__ == '__main__':
     ws = WebSever('192.168.1.1')
     # ws.Login()
-    ws.GetConfig()
+    ws.SetAsBS(4444, 5)
 
     # ws.Login()
     # ws.Set(USR_ID=0, NW_ID=1, FN_INDEX=7, DEV_TYPE=1, BAND=2, UL_BW=4, UL_MCS=5, FERQ=0)

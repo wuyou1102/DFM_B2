@@ -4,6 +4,7 @@ import logging
 from libs import Command
 import time
 from psutil import net_if_addrs
+import os
 
 __logger = logging.getLogger(__name__)
 
@@ -150,5 +151,13 @@ def get_local_mac():
     raise IOError
 
 
+def is_device_started(address='192.168.1.1', timeout=10):
+    result = os.popen("ping {address} -w {timeout} -n 1".format(address=address, timeout=timeout)).read()
+    if "TTL=64" in result:
+        return True
+    return False
+
+
 if __name__ == '__main__':
-    print convert_freq_point("0x55555553")
+    while True:
+        print is_device_started()

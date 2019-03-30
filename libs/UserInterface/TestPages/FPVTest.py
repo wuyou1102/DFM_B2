@@ -9,14 +9,33 @@ from libs import Utility
 import vlc
 from libs.Config import String
 import time
+from libs.Utility.B2 import WebSever
+from libs.Utility import Timeout
 
 logger = logging.getLogger(__name__)
+
+
+class FLAG(object):
+    STOP = False
+
+
+def step(func):
+    def wrapper(*args, **kwargs):
+        if FLAG.STOP:
+            raise StopIteration
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 class FPV(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
-        self.preview = None
+        self.stop_flag = False
+        self.target = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='address')
+        self.__player = vlc.Instance().media_player_new()
+        self.__player.set_hwnd(self.panel.GetHandle())
+        self.reset_media()
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -63,8 +82,8 @@ class FPV(Base.TestPage):
             button.Bind(wx.EVT_BUTTON, self.on_button_click)
             return button
 
-        self.btn_config = create_button(label=u"修改配置", name="config")
-        self.btn_start = create_button(label=u"开始测试", name="start")
+        self.btn_config = create_button(label=u"修改文件配置", name="config")
+        self.btn_start = create_button(label=u"将配置更新到设备中", name="update")
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.btn_config, 0, wx.EXPAND, 1)
         sizer.Add(self.btn_start, 0, wx.EXPAND, 1)
@@ -75,46 +94,47 @@ class FPV(Base.TestPage):
         name = obj.GetName()
         if name == "config":
             dlg = ConfigDialog()
-            dlg.ShowModal()
+            if dlg.ShowModal() == wx.ID_OK:
+                self.target = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='address')
+                self.reset_media()
+            dlg.Destroy()
+        if name == "update":
+            self.update_device_config()
 
-    def play(self):
+    def before_test(self):
+        self.stop_flag = False
+
+    def start_test(self):
+        Utility.append_thread(self.check_device_is_connect)
+        Utility.append_thread(self.update_info)
+
+    def update_device_config(self):
         socket = self.get_communicat()
+        pass
 
-        print self.preview.GetScreenPosition()
-        print self.preview.GetSize()
-        # print self.GetScreenPosition()
+    def check_device_is_connect(self):
+        while not self.stop_flag:
+            if Utility.is_device_started(address=self.target, timeout=1000):
+                self.play()
+            else:
+                self.stop()
 
-        while True:
-            self.preview.play()
+    def update_info(self):
+        socket = self.get_communicat()
+        while not self.stop_flag:
+            print self.__player.get_state()
             result = socket.get_rssi_and_bler()
             bler = int(result[8:], 16)
             rssi0 = int(result[0:4], 16) - 65536
             rssi1 = int(result[4:8], 16) - 65536
-            self.rssi_0.SetValue(str(rssi0))
-            self.rssi_1.SetValue(str(rssi1))
-            self.bler.SetValue(str(bler))
+            wx.CallAfter(self.rssi_0.SetValue, str(rssi0))
+            wx.CallAfter(self.rssi_1.SetValue, str(rssi1))
+            wx.CallAfter(self.bler.SetValue, str(bler))
             self.Sleep(1)
 
-    def before_test(self):
-        super(FPV, self).before_test()
-        # Utility.append_thread(self.is_active)
-        if self.preview is None:
-            self.preview = PreviewDialog()
-        self.preview.SetPosition(self.GetParentPosition())
-        self.preview.Show()
-        self.SetFocus()
-
-    def GetParentPosition(self):
-        x, y = self.Parent.Parent.Parent.Parent.GetPosition()
-        w, h = self.Parent.Parent.Parent.Parent.GetSize()
-        return (x + w + 4, y + 4)
-
-    def start_test(self):
-        self.FormatPrint(info="Started")
-
     def stop_test(self):
-        if self.preview is not None and self.preview.IsShown():
-            self.preview.Hide()
+        self.stop_flag = True
+        self.stop()
 
     @staticmethod
     def GetName():
@@ -125,25 +145,19 @@ class FPV(Base.TestPage):
         if t in ["MACHINE", u"整机"]:
             return String.FPV_MACHINE
 
-
-class PreviewDialog(wx.Dialog):
-    def __init__(self):
-        wx.Dialog.__init__(self, parent=None, id=wx.ID_ANY, title=u"预览", size=(640, 360),
-                           pos=wx.DefaultPosition, style=wx.STAY_ON_TOP | wx.CAPTION | wx.MINIMIZE_BOX | wx.SYSTEM_MENU)
-        self.panel = wx.Panel(self)
-        self.panel.SetBackgroundColour(wx.BLACK)
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel.SetSizer(main_sizer)
-        self.Layout()
-
-        self.__player = vlc.Instance().media_player_new()
-        self.__player.set_hwnd(self.GetHandle())
-        self.reset_media()
-
     def play(self):
-        print self.__player.get_state()
-        if self.__player.get_state() != vlc.State.Playing:
+        if self.__player.get_state() not in [vlc.State.Playing, vlc.State.Opening, vlc.State.Buffering]:
+            logger.debug("Start the vlc play.")
             self.__player.play()
+
+    def pause(self):
+        if self.__player.get_state() in [vlc.State.Playing, vlc.State.Opening, vlc.State.Buffering]:
+            logger.debug("Pause the vlc play.")
+            self.__player.pause()
+
+    def stop(self):
+        if self.__player.get_state() != vlc.State.Stopped:
+            self.__player.stop()
 
     def reset_media(self):
         while self.__player.get_state() != vlc.State.Stopped:
@@ -207,9 +221,8 @@ class ConfigDialog(wx.Dialog):
 
     def __init_button_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        cancel = wx.Button(self.panel, wx.ID_ANY, u"取消", wx.DefaultPosition, wx.DefaultSize, wx.NO_BORDER)
-        save = wx.Button(self.panel, wx.ID_ANY, u"保存", wx.DefaultPosition, wx.DefaultSize, wx.NO_BORDER)
-        cancel.Bind(wx.EVT_BUTTON, self.on_cancel)
+        cancel = wx.Button(self.panel, wx.ID_CANCEL, u"取消", wx.DefaultPosition, wx.DefaultSize, wx.NO_BORDER)
+        save = wx.Button(self.panel, wx.ID_OK, u"保存", wx.DefaultPosition, wx.DefaultSize, wx.NO_BORDER)
         save.Bind(wx.EVT_BUTTON, self.on_save)
         sizer.Add(save, 0, wx.EXPAND | wx.ALL, 0)
         sizer.Add(cancel, 0, wx.EXPAND | wx.ALL, 0)
@@ -223,7 +236,81 @@ class ConfigDialog(wx.Dialog):
         data["password"] = self.password.GetValue()
         data["id"] = self.network_id.GetValue()
         Utility.ParseConfig.modify(path=Path.CONFIG, data={"rtsp": data})
+        event.Skip()
+
+
+class UpdateDeviceConfigDialog(wx.Dialog):
+    def __init__(self, socket):
+        wx.Dialog.__init__(self, parent=None, id=wx.ID_ANY, title="重启中", size=(250, 200), pos=wx.DefaultPosition)
+        self.panel = wx.Panel(self)
+        self.web = WebSever("192.168.1.1")
+        self.socket = socket
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.panel.SetSizer(main_sizer)
+        self.Center()
+        self.Layout()
+
+    def __reboot_device(self):
+        for x in range(120):
+            if self.is_device_started():
+                break
+            time.sleep(0.5)
         self.Destroy()
 
-    def on_cancel(self, event):
-        self.Destroy()
+    @step
+    def is_device_started(self):
+        return Utility.is_device_started()
+
+    def ShowM(self):
+        self.modify_device_config()
+        self.ShowModal()
+
+    def modify_device_config(self):
+        if self._start_web():
+            self.output(u"WebServer启动成功")
+        else:
+            self.output(u"WebServer启动失败，请手动进入配置模式后重试。")
+            return False
+        if not self.__setup_config():
+            return False
+        self.__reboot()
+
+    def _start_web(self):
+        if self.__is_web_server_started():
+            return True
+        if self.__start_web_server():
+            time.sleep(2)
+            for x in range(10):
+                if self.__is_web_server_started():
+                    return True
+        return False
+
+    @step
+    def __start_web_server(self):
+        self.output(u"正在尝试启动WebServer")
+        return self.socket.start_web_server()
+
+    @step
+    def __is_web_server_started(self):
+        self.output(u"正在检查WebServer是否已经启动")
+        return self.web.isStart()
+
+    @step
+    def __setup_config(self):
+        network_id = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='id')
+        logger.debug("I got network id : %s" % network_id)
+        self.output(u"正在修改设备配置")
+        if self.web.SetAsBS(NW_ID=int(network_id), TYF=4):
+            self.output(u"修改配置成功")
+            return True
+        self.output(u"修改配置失败")
+        return False
+
+    @step
+    def __reboot(self):
+        self.web.RebootDevice()
+
+    def output(self, msg):
+        msg = "%s: %s\n" % (Utility.get_timestamp(), msg)
+        wx.CallAfter(self.message.AppendText, msg)
+        self.Sleep(0.005)
