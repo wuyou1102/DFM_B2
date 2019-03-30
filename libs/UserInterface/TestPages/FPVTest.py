@@ -36,6 +36,7 @@ class FPV(Base.TestPage):
         self.__player = vlc.Instance().media_player_new()
         self.__player.set_hwnd(self.panel.GetHandle())
         self.reset_media()
+        print self.get_rtsp_media()
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
