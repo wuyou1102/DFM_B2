@@ -2,8 +2,6 @@
 
 import logging
 import sys
-import wx
-import TestPages
 import A01_CIT_Base
 
 logger = logging.getLogger(__name__)

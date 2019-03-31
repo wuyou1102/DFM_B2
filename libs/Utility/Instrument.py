@@ -1,12 +1,10 @@
 # -*- encoding:UTF-8 -*-
-from libs.Utility import Logger
 import pyvisa
 import logging
 import threading
 import time
 
 logger = logging.getLogger(__name__)
-
 ResourceManager = pyvisa.ResourceManager()
 
 
@@ -15,7 +13,7 @@ def list_resources():
 
 
 class SCPI(object):
-    def __init__(self, port, timeout=2000):
+    def __init__(self, port, timeout=1000):
         self.__port = port
         self.__timeout = timeout
         self.__session = self.__init_session()
@@ -29,18 +27,29 @@ class SCPI(object):
 
     def __get_model_name(self):
         model_info = self.execute_command('*IDN?')
-        return model_info.split(',')[1]
+        return model_info.split(',')[1].strip(' ')
 
     def disconnect(self):
         if self.__session:
             self.__session.close()
 
+    def Set(self, command):
+        if command.endswith('?'):
+            raise IOError("Set command can not endswith \"?\"")
+        output = self.execute_command(command=command)
+        if output == pyvisa.constants.StatusCode.success:
+            return True
+        return False
+
+    def Get(self, command):
+        if not command.endswith('?'):
+            raise IOError("Get command must endswith \"?\"")
+        return self.execute_command(command=command)
+
     def __query(self, cmd):
-        logger.debug("SCPI|Query  :%s" % cmd)
         return self.__session.query(cmd).strip('\r\n')
 
     def __write(self, cmd):
-        logger.debug("SCPI|Write  :%s" % cmd)
         return self.__session.write(cmd)[1]
 
     def execute_command(self, command):
@@ -49,13 +58,11 @@ class SCPI(object):
         if self.__lock.acquire():
             try:
                 result = self.__query(command) if command.endswith('?') else self.__write(command)
-                print type(result)
-                Logger.debug("* STDOUT: {result}".format(result=repr(result)))
+                logger.debug("* STDOUT: {result}".format(result=repr(result)))
                 return result
             finally:
-                time.sleep(0.01)
-                Logger.debug('********************************************************')
-                self._lock.release()
+                logger.debug('********************************************************')
+                self.__lock.release()
 
 
 if __name__ == '__main__':

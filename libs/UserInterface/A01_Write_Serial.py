@@ -90,7 +90,11 @@ class Panel(wx.Panel):
         if self.socket is not None:
             self.socket.close()
         try:
+            import time
+            print time.time()
             self.socket = Socket.Client(address="192.168.1.1")
+            self.socket.get_serial_number()
+            print time.time()
             self.refresh_serial_number()
             self.Enable(enable=True)
         except timeout:

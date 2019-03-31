@@ -19,7 +19,7 @@ class Client(object):
         self._address = address
         self._port = port
         self.__serial_number = ""
-        self._lock = threading.Lock()
+        self.__lock = threading.Lock()
         self._connect(address, port)
 
     def _connect(self, address, port):
@@ -249,9 +249,13 @@ class Client(object):
         return False
 
     def execute_command(self, command, sleep=0):
+        import time
+        print "a%s"%time.time()
         Logger.debug('********************************************************')
+        print "A%s"%time.time()
         Logger.debug('* SOCKET COMMAND:\"%s\"' % command)
-        if self._lock.acquire():
+        print "c%s"%time.time()
+        if self.__lock.acquire():
             try:
                 self.send(command=command)
                 result = self.read()
@@ -267,7 +271,7 @@ class Client(object):
             finally:
                 time.sleep(sleep)
                 Logger.debug('********************************************************')
-                self._lock.release()
+                self.__lock.release()
 
     def send(self, command):
         command = command.strip('\r\n') + '\n'
@@ -282,8 +286,10 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
+    import time
+    print time.time()
     print s.unload_protocol_stack()
-
+    print time.time()
     # print s.get_serial_number()
     # # print s.set_serial_number("22222222")
     # print s.get_serial_number()

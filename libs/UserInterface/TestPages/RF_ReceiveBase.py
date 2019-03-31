@@ -21,7 +21,9 @@ class ReceiveBase(Base.TestPage):
         self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.init_variable()
-        self.SignalSources = self.Parent.Parent.Parent.Parent.SignalSources
+
+    def GetSignalSources(self):
+        return self.Parent.Parent.Parent.Parent.SignalSources
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -127,8 +129,11 @@ class ReceiveBase(Base.TestPage):
 
     def before_test(self):
         self.PassButton.Disable()
-        if self.SignalSources is not None:
-            self.SignalSources.SetFrequency(self.freq)
+
+        print self.GetSignalSources()
+
+        if self.GetSignalSources() is not None:
+            Utility.append_thread(self.GetSignalSources().SetFrequency, self.freq)
         self.init_variable()
         self.panel_mpl.init_axes()
         uart = self.get_communicat()
