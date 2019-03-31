@@ -7,7 +7,7 @@ from TestPages import Variable
 from TestPages.Base import ReportPage
 from libs import Utility
 from libs.Config import Color
-from libs.Utility.Timeout import Timeout
+from socket import timeout
 
 from libs.Utility import Socket
 
@@ -162,7 +162,7 @@ class Panel(wx.Panel):
             self.set_variable(socket=socket)
             self.update_serial_number()
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
-        except Timeout:
+        except timeout:
             Utility.Alert.Error(u"连接失败：超时。")
             return False
         except IndexError:

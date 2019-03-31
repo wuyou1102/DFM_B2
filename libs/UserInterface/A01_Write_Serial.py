@@ -1,6 +1,6 @@
 # -*- encoding:UTF-8 -*-
 import wx
-from libs.Utility.Timeout import Timeout
+from socket import timeout
 import logging
 import sys
 from libs.Config import Color
@@ -93,7 +93,7 @@ class Panel(wx.Panel):
             self.socket = Socket.Client(address="192.168.1.1")
             self.refresh_serial_number()
             self.Enable(enable=True)
-        except Timeout:
+        except timeout:
             Utility.Alert.Error(u"连接失败：超时。")
             return False
         except IndexError:

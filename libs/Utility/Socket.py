@@ -17,13 +17,13 @@ Logger = logging.getLogger(__name__)
 class Client(object):
     def __init__(self, address="192.168.1.1", port=51341):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.settimeout(1)
         self._address = address
         self._port = port
         self.__serial_number = ""
         self._lock = threading.Lock()
         self._connect(address, port)
 
-    @Timeout.timeout(1)
     def _connect(self, address, port):
         self._socket.connect((address, port))
 

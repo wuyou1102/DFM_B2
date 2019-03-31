@@ -41,7 +41,6 @@ class FPV(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.stop_flag = False
-        self.target = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='address')
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -101,7 +100,6 @@ class FPV(Base.TestPage):
             dlg = ConfigDialog()
             if dlg.ShowModal() == wx.ID_OK:
                 Utility.Alert.Info(u"请重新启动测试使配置生效。")
-                self.target = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='address')
             dlg.Destroy()
         if name == "update":
             self.update_device_config()
@@ -111,17 +109,20 @@ class FPV(Base.TestPage):
         self.preview.Reset()
 
     def start_test(self):
-        self.test_thread = Utility.append_thread(self.check_device_is_connect)
+        self.test_thread = Utility.append_thread(self.check_rtsp_server)
         self.info_thread = Utility.append_thread(self.update_info)
 
     def update_device_config(self):
         socket = self.get_communicat()
         pass
 
-    def check_device_is_connect(self):
+    def check_rtsp_server(self):
+        config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
+        address = config.get('address', '192.168.1.243')
+        port = config.get('port', 554)
         while not self.stop_flag:
-            print 'is_device_started'
-            if Utility.is_device_started(address=self.target, timeout=500):
+            logger.debug("check_rtsp_server_connect")
+            if Utility.is_rtsp_server_connect(address=address, port=port, timeout=0.5):
                 ipc = IpCamera(self.get_rtsp_media())
                 if ipc.isOpened():
                     self.refresh_preview(ipc=ipc)
@@ -129,7 +130,7 @@ class FPV(Base.TestPage):
             del ipc
         except UnboundLocalError:
             pass
-        logger.debug("FPV CHECK DEVICE IS CONNECTED OVER")
+        logger.debug("FPV RTSP SERVER IS CONNECTED OVER")
 
     def refresh_preview(self, ipc):
         while not self.stop_flag:
