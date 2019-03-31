@@ -159,7 +159,7 @@ def is_device_started(address='192.168.1.1', timeout=10):
     return False
 
 
-def is_rtsp_server_connect(address, port=554, timeout=1):
+def is_device_connected(address, port=554, timeout=1):
     try:
         tmp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tmp.settimeout(timeout)
@@ -170,5 +170,6 @@ def is_rtsp_server_connect(address, port=554, timeout=1):
         return False
 
 
+
 if __name__ == '__main__':
-    print is_rtsp_server_connect("192.168.1.243", timeout=0.3)
+    print is_device_connected("192.168.1.243", timeout=0.3)

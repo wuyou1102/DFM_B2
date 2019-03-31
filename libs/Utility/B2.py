@@ -124,15 +124,15 @@ class WebSever(object):
         return False
 
     def RebootDevice(self):
-        self.__login()
         url = "http://{address}/upload.php?signal=9".format(address=self._address)
         try:
             self.__get(url=url)
-        except requests.exceptions.ChunkedEncodingError and requests.ConnectionError:
-            pass
+        except requests.exceptions.ChunkedEncodingError:
+            return True
+        except requests.exceptions.ConnectionError:
+            return True
         finally:
             self._token = ""
-            return True
 
     def GetVersion(self):
         self.__login()

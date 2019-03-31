@@ -8,8 +8,6 @@ from libs.Config.ErrorCode import ErrorCode
 from libs.Command import AT as command
 import Alert
 from libs.Utility import convert_freq_point
-from socket import error
-import Timeout
 
 Logger = logging.getLogger(__name__)
 
@@ -28,7 +26,21 @@ class Client(object):
         self._socket.connect((address, port))
 
     def reconnect(self):
-        self._connect(address=self._address, port=self._port)
+        temp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        temp.settimeout(1)
+        for i in range(1, 11):
+            try:
+                Logger.debug("Try Socket Reconnect [%s]" % i)
+                temp.connect((self._address, self._port))
+                self._socket = temp
+                Logger.debug("Socket Connected.")
+                return True
+            except socket.timeout:
+                pass
+            except socket.error:
+                pass
+        Logger.debug("Socket Reconnect Fail")
+        return False
 
     @property
     def SerialNumber(self):

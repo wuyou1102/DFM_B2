@@ -23,20 +23,6 @@ def Image2Bitmap(Image):
     return wx.Bitmap.FromBuffer(width, height, buff)
 
 
-#
-class FLAG(object):
-    STOP = False
-
-
-def step(func):
-    def wrapper(*args, **kwargs):
-        if FLAG.STOP:
-            raise StopIteration
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
 class FPV(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
@@ -86,7 +72,7 @@ class FPV(Base.TestPage):
             button.Bind(wx.EVT_BUTTON, self.on_button_click)
             return button
 
-        self.btn_config = create_button(label=u"修改文件配置", name="config")
+        self.btn_config = create_button(label=u"修改配置文件", name="config")
         self.btn_start = create_button(label=u"将配置更新到设备中", name="update")
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.btn_config, 0, wx.EXPAND, 1)
@@ -109,12 +95,25 @@ class FPV(Base.TestPage):
         self.preview.Reset()
 
     def start_test(self):
+        Utility.append_thread(target=self.__start)
+
+    def __start(self):
+        time.sleep(1.1)
         self.test_thread = Utility.append_thread(self.check_rtsp_server)
         self.info_thread = Utility.append_thread(self.update_info)
 
     def update_device_config(self):
+        self.stop_flag = True
         socket = self.get_communicat()
-        pass
+        dlg = UpdateDeviceConfigDialog(socket=socket)
+        dlg.show_modal()
+        if dlg.get_result():
+            Utility.Alert.Error("更新设备配置失败，失败项:\"%s\"" % dlg.get_result())
+        if socket.reconnect():
+            self.stop_flag = False
+            Utility.append_thread(target=self.__start)
+        else:
+            self.Parent.Parent.Parent.disconnect()
 
     def check_rtsp_server(self):
         config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
@@ -122,7 +121,7 @@ class FPV(Base.TestPage):
         port = config.get('port', 554)
         while not self.stop_flag:
             logger.debug("check_rtsp_server_connect")
-            if Utility.is_rtsp_server_connect(address=address, port=port, timeout=0.5):
+            if Utility.is_device_connected(address=address, port=port, timeout=0.5):
                 ipc = IpCamera(self.get_rtsp_media())
                 if ipc.isOpened():
                     self.refresh_preview(ipc=ipc)
@@ -146,6 +145,8 @@ class FPV(Base.TestPage):
         socket = self.get_communicat()
         while not self.stop_flag:
             result = socket.get_rssi_and_bler()
+            if result == "0000000000000000":
+                continue
             bler = int(result[8:], 16)
             rssi0 = int(result[0:4], 16) - 65536
             rssi1 = int(result[4:8], 16) - 65536
@@ -288,61 +289,82 @@ class ConfigDialog(wx.Dialog):
 
 class UpdateDeviceConfigDialog(wx.Dialog):
     def __init__(self, socket):
-        wx.Dialog.__init__(self, parent=None, id=wx.ID_ANY, title="重启中", size=(250, 200), pos=wx.DefaultPosition)
+        wx.Dialog.__init__(self, parent=None, id=wx.ID_ANY, title="更新设备配置", size=(400, 300), pos=wx.DefaultPosition,
+                           style=wx.CAPTION)
         self.panel = wx.Panel(self)
         self.web = WebSever("192.168.1.1")
         self.socket = socket
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.result = ""
+        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.message = wx.TextCtrl(self.panel, wx.ID_ANY, '', style=wx.TE_MULTILINE | wx.TE_READONLY)
+        main_sizer.Add(self.message, 1, wx.EXPAND | wx.ALL, 1)
         self.panel.SetSizer(main_sizer)
         self.Center()
         self.Layout()
 
-    def __reboot_device(self):
-        for x in range(120):
-            if self.is_device_started():
-                break
-            time.sleep(0.5)
-        self.Destroy()
-
-    @step
-    def is_device_started(self):
-        return Utility.is_device_started()
-
-    def ShowM(self):
-        self.modify_device_config()
+    def show_modal(self):
+        Utility.append_thread(self.modify_device_config)
         self.ShowModal()
 
+    def get_result(self):
+        return self.result
+
     def modify_device_config(self):
-        if self._start_web():
-            self.output(u"WebServer启动成功")
-        else:
-            self.output(u"WebServer启动失败，请手动进入配置模式后重试。")
-            return False
-        if not self.__setup_config():
-            return False
-        self.__reboot()
+        try:
+            if not self._start_web():
+                self.result = "WebServer启动失败"
+                return False
+            if not self.__setup_config():
+                self.result = "参数配置失败"
+                return False
+            if not self.__reboot():
+                self.__wait_for_reboot()
+            if not self.__wait_for_boot_up():
+                self.result = "启动检测失败"
+                return False
+        finally:
+            self.Destroy()
+
+    def GetResult(self):
+        return self.result
+
+    def __wait_for_boot_up(self, timeout=100):
+        time.sleep(20)
+        for x in range(timeout - 20):
+            self.output(u"检查设备是否已经启动[%s]" % (x + 1))
+            if Utility.is_device_connected(address="192.168.1.1", port=51341):
+                self.output(u"启动成功")
+                return True
+        self.output(u"启动失败")
+        return False
+
+    def __wait_for_reboot(self):
+        while True:
+            if Utility.is_device_connected(address="192.168.1.1", port=51341):
+                self.output(u"重启失败，请手动重启")
+            else:
+                self.output(u"检测到重启")
+                break
+            time.sleep(1)
 
     def _start_web(self):
-        if self.__is_web_server_started():
-            return True
         if self.__start_web_server():
             time.sleep(2)
             for x in range(10):
                 if self.__is_web_server_started():
+                    self.output(u"WebServer启动成功")
                     return True
+        self.output(u"WebServer启动失败，请手动进入配置模式后重试。")
         return False
 
-    @step
     def __start_web_server(self):
         self.output(u"正在尝试启动WebServer")
         return self.socket.start_web_server()
 
-    @step
     def __is_web_server_started(self):
         self.output(u"正在检查WebServer是否已经启动")
         return self.web.isStart()
 
-    @step
     def __setup_config(self):
         network_id = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='id')
         logger.debug("I got network id : %s" % network_id)
@@ -353,11 +375,18 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         self.output(u"修改配置失败")
         return False
 
-    @step
     def __reboot(self):
-        self.web.RebootDevice()
+        for x in range(3):
+            self.output(u"正在自动重启设备")
+            self.web.RebootDevice()
+            time.sleep(2)
+            if not Utility.is_device_connected(address="192.168.1.1", port=51341):
+                self.output(u"自动重启成功")
+                return True
+        self.output(u"自动重启失败，请手动重启")
+        return False
 
     def output(self, msg):
-        msg = "%s: %s\n" % (Utility.get_timestamp(), msg)
+        msg = "%s: %s\n" % (Utility.get_timestamp('%H:%M:%S'), msg)
         wx.CallAfter(self.message.AppendText, msg)
-        self.Sleep(0.005)
+        time.sleep(0.005)

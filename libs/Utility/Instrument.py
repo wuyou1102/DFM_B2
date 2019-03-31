@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 ResourceManager = pyvisa.ResourceManager()
 
 
+def list_resources():
+    return ResourceManager.list_resources()
+
+
 class SCPI(object):
     def __init__(self, port, timeout=2000):
         self.__port = port
@@ -19,13 +23,12 @@ class SCPI(object):
         self.model_name = self.__get_model_name()
 
     def __init_session(self):
-
         session = ResourceManager.open_resource(self.__port)
         session.timeout = self.__timeout
         return session
 
     def __get_model_name(self):
-        model_info = self.send_command('*IDN?')
+        model_info = self.execute_command('*IDN?')
         return model_info.split(',')[1]
 
     def disconnect(self):
@@ -40,15 +43,19 @@ class SCPI(object):
         logger.debug("SCPI|Write  :%s" % cmd)
         return self.__session.write(cmd)[1]
 
-    def send_command(self, command):
+    def execute_command(self, command):
+        logger.debug('********************************************************')
+        logger.debug('* SCPI COMMAND:\"%s\"' % command)
         if self.__lock.acquire():
             try:
-                output = self.__query(command) if command.endswith('?') else self.__write(command)
-                logger.debug("SCPI|Result :%s" % str(output))
-                return output
+                result = self.__query(command) if command.endswith('?') else self.__write(command)
+                print type(result)
+                Logger.debug("* STDOUT: {result}".format(result=repr(result)))
+                return result
             finally:
-                time.sleep(0.05)
-                self.__lock.release()
+                time.sleep(0.01)
+                Logger.debug('********************************************************')
+                self._lock.release()
 
 
 if __name__ == '__main__':
@@ -69,7 +76,7 @@ if __name__ == '__main__':
             # inst.send_command("TXP:BAND 20000kHz")
             for x in range(10):
                 time.sleep(1)
-                print inst.send_command("FETC:BPOW?")
+                print inst.execute_command("FETC:BPOW?")
 
         inst.disconnect()
 

@@ -13,6 +13,7 @@ class TransmitBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
+        self.SignalAnalyzer = self.Parent.Parent.Parent.Parent.SignalAnalyzer
 
 
     def init_test_sizer(self):

@@ -21,6 +21,7 @@ class ReceiveBase(Base.TestPage):
         self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.init_variable()
+        self.SignalSources = self.Parent.Parent.Parent.Parent.SignalSources
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -71,11 +72,11 @@ class ReceiveBase(Base.TestPage):
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         button = wx.Button(self, wx.ID_ANY, u"重设频点", wx.DefaultPosition, (65, 27), 0, name=str(self.freq))
-        button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
+        button.Bind(wx.EVT_BUTTON, self.reset_frequency)
         sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         return sizer
 
-    def on_freq_point_selected(self, event):
+    def reset_frequency(self, event):
         obj = event.GetEventObject()
         uart = self.get_communicat()
         uart.set_frequency_point(obj.Name + "000")
@@ -126,6 +127,8 @@ class ReceiveBase(Base.TestPage):
 
     def before_test(self):
         self.PassButton.Disable()
+        if self.SignalSources is not None:
+            self.SignalSources.SetFrequency(self.freq)
         self.init_variable()
         self.panel_mpl.init_axes()
         uart = self.get_communicat()
@@ -151,19 +154,19 @@ class ReceiveBase(Base.TestPage):
         return self.GetFlag(t=self.type)
 
     def draw_line(self):
-        # comm = self.get_communicat()
-        # self.Sleep(1)
-        # while self.stop_flag:
-        #     if self.is_instrument_connected():
-        #         self.status.SetBitmap(Picture.status_connect1)
-        #         self.message.SetLabel(u"信号发生器已连接，测试中")
-        #         break
-        #     else:
-        #         self.message.SetLabel(u"正在连接信号发生器")
-        #         self.status.SetBitmap(Picture.status_disconnect)
-        #         self.hold_baseband()
-        #         self.status.SetBitmap(wx.NullBitmap)
-        #         self.release_baseband()
+        comm = self.get_communicat()
+        self.Sleep(1)
+        while self.stop_flag:
+            if comm.is_instrument_connected():
+                self.status.SetBitmap(Picture.status_connect1)
+                self.message.SetLabel(u"信号发生器已连接，测试中")
+                break
+            else:
+                self.message.SetLabel(u"正在连接信号发生器")
+                self.status.SetBitmap(Picture.status_disconnect)
+                comm.hold_baseband()
+                self.status.SetBitmap(wx.NullBitmap)
+                comm.release_baseband()
         for x in range(40):
             if not self.stop_flag:
                 return
