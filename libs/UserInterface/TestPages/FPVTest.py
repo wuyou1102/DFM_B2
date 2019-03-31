@@ -6,15 +6,24 @@ from libs.Config import Font
 from libs.Config import Color
 from libs.Config import Path
 from libs import Utility
-import vlc
 from libs.Config import String
 import time
 from libs.Utility.B2 import WebSever
 from libs.Utility import Timeout
+from PIL import Image
+import cv2
+import threading
 
 logger = logging.getLogger(__name__)
 
 
+def Image2Bitmap(Image):
+    width, height = Image.size
+    buff = Image.convert('RGB').tobytes()
+    return wx.Bitmap.FromBuffer(width, height, buff)
+
+
+#
 class FLAG(object):
     STOP = False
 
@@ -33,10 +42,6 @@ class FPV(Base.TestPage):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.stop_flag = False
         self.target = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='address')
-        self.__player = vlc.Instance().media_player_new()
-        self.__player.set_hwnd(self.panel.GetHandle())
-        self.reset_media()
-        print self.get_rtsp_media()
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -72,9 +77,8 @@ class FPV(Base.TestPage):
 
     def __init_previewer_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.panel = wx.Panel(self)
-        self.panel.SetBackgroundColour(wx.BLACK)
-        sizer.Add(self.panel, 1, wx.EXPAND | wx.ALL, 0)
+        self.preview = PreviewPanel(parent=self)
+        sizer.Add(self.preview, 1, wx.EXPAND | wx.ALL, 0)
         return sizer
 
     def __init_button_sizer(self):
@@ -96,18 +100,19 @@ class FPV(Base.TestPage):
         if name == "config":
             dlg = ConfigDialog()
             if dlg.ShowModal() == wx.ID_OK:
+                Utility.Alert.Info(u"请重新启动测试使配置生效。")
                 self.target = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='address')
-                self.reset_media()
             dlg.Destroy()
         if name == "update":
             self.update_device_config()
 
     def before_test(self):
         self.stop_flag = False
+        self.preview.Reset()
 
     def start_test(self):
-        Utility.append_thread(self.check_device_is_connect)
-        Utility.append_thread(self.update_info)
+        self.test_thread = Utility.append_thread(self.check_device_is_connect)
+        self.info_thread = Utility.append_thread(self.update_info)
 
     def update_device_config(self):
         socket = self.get_communicat()
@@ -115,15 +120,30 @@ class FPV(Base.TestPage):
 
     def check_device_is_connect(self):
         while not self.stop_flag:
-            if Utility.is_device_started(address=self.target, timeout=1000):
-                self.play()
+            print 'is_device_started'
+            if Utility.is_device_started(address=self.target, timeout=500):
+                ipc = IpCamera(self.get_rtsp_media())
+                if ipc.isOpened():
+                    self.refresh_preview(ipc=ipc)
+        try:
+            del ipc
+        except UnboundLocalError:
+            pass
+        logger.debug("FPV CHECK DEVICE IS CONNECTED OVER")
+
+    def refresh_preview(self, ipc):
+        while not self.stop_flag:
+            retval, image = ipc.GetFrame(tuple(self.preview.GetSize()))
+            self.preview.SetBitmap(Image2Bitmap(image))
+            self.preview.UpdateBitmap()
+            if retval:
+                time.sleep(0.015)
             else:
-                self.stop()
+                break
 
     def update_info(self):
         socket = self.get_communicat()
         while not self.stop_flag:
-            print self.__player.get_state()
             result = socket.get_rssi_and_bler()
             bler = int(result[8:], 16)
             rssi0 = int(result[0:4], 16) - 65536
@@ -132,10 +152,13 @@ class FPV(Base.TestPage):
             wx.CallAfter(self.rssi_1.SetValue, str(rssi1))
             wx.CallAfter(self.bler.SetValue, str(bler))
             self.Sleep(1)
+        wx.CallAfter(self.rssi_0.SetValue, "")
+        wx.CallAfter(self.rssi_1.SetValue, "")
+        wx.CallAfter(self.bler.SetValue, "")
+        logger.debug("FPV UPDATE INFO OVER")
 
     def stop_test(self):
         self.stop_flag = True
-        self.stop()
 
     @staticmethod
     def GetName():
@@ -145,27 +168,6 @@ class FPV(Base.TestPage):
     def GetFlag(t):
         if t in ["MACHINE", u"整机"]:
             return String.FPV_MACHINE
-
-    def play(self):
-        if self.__player.get_state() not in [vlc.State.Playing, vlc.State.Opening, vlc.State.Buffering]:
-            logger.debug("Start the vlc play.")
-            self.__player.play()
-
-    def pause(self):
-        if self.__player.get_state() in [vlc.State.Playing, vlc.State.Opening, vlc.State.Buffering]:
-            logger.debug("Pause the vlc play.")
-            self.__player.pause()
-
-    def stop(self):
-        if self.__player.get_state() != vlc.State.Stopped:
-            self.__player.stop()
-
-    def reset_media(self):
-        while self.__player.get_state() != vlc.State.Stopped:
-            self.__player.stop()
-            time.sleep(0.2)
-        media = self.__player.get_instance().media_new(self.get_rtsp_media())
-        self.__player.set_media(media)
 
     @staticmethod
     def get_rtsp_media():
@@ -180,6 +182,49 @@ class FPV(Base.TestPage):
             port=port,
             address=address
         )
+
+
+class IpCamera(object):
+    def __init__(self, url):
+        self.video = cv2.VideoCapture(url)
+
+    def isOpened(self):
+        return self.video.isOpened()
+
+    def GetFrame(self, size):
+        try:
+            frame = self.__get_frame(size=size)
+            return True, frame
+        except Timeout.Timeout:
+            return False, Image.new("RGB", size, color='black')
+
+    @Timeout.timeout(1)
+    def __get_frame(self, size):
+        retval, image = self.video.read()
+        return Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)).resize(size=size)
+
+
+class PreviewPanel(wx.Panel):
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent=parent)
+        self.bitmap = Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black'))
+        self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+
+    def UpdateBitmap(self):
+        self.Refresh()
+        self.Update()
+
+    def SetBitmap(self, bitmap):
+        self.bitmap = bitmap
+
+    def OnPaint(self, event):
+        dc = wx.AutoBufferedPaintDC(self)
+        dc.DrawBitmap(self.bitmap, 0, 0)
+
+    def Reset(self):
+        self.SetBitmap(Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black')))
+        self.UpdateBitmap()
 
 
 class ConfigDialog(wx.Dialog):
