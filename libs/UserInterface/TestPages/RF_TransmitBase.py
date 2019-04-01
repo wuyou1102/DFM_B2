@@ -13,8 +13,9 @@ class TransmitBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
-        self.SignalAnalyzer = self.Parent.Parent.Parent.Parent.SignalAnalyzer
 
+    def GetSignalAnalyzer(self):
+        return self.Parent.Parent.Parent.Parent.SignalAnalyzer
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -69,8 +70,8 @@ class TransmitBase(Base.TestPage):
     def update_current_freq_point(self):
         def update_freq():
             self.Sleep(0.05)
-            uart = self.get_communicat()
-            value = uart.get_frequency_point()
+            comm = self.get_communicat()
+            value = comm.get_frequency_point()
             self.current_point.SetValue(value)
             if float(value) != self.freq:
                 Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")
@@ -87,30 +88,56 @@ class TransmitBase(Base.TestPage):
 
     def update_current_power(self):
         def update_power():
-            uart = self.get_communicat()
-            value = uart.get_radio_frequency_power()
+            self.Sleep(0.05)
+            comm = self.get_communicat()
+            value = comm.get_radio_frequency_power()
             self.slider.SetValue(value)
             self.static_text.SetLabel(hex(value).upper())
 
         Utility.append_thread(target=update_power, allow_dupl=True)
 
     def before_test(self):
-        self.init_variable()
-        uart = self.get_communicat()
-        uart.set_tx_mode_20m()
-        uart.set_frequency_point(self.freq * 1000)
-        uart.set_radio_frequency_power(15)
+        self.stop_flag = False
+        comm = self.get_communicat()
+        comm.set_tx_mode_20m()
+        comm.set_frequency_point(self.freq * 1000)
+        comm.set_radio_frequency_power(15)
         self.update_current_power()
         self.update_current_freq_point()
-
-    def init_variable(self):
-        self.stop_flag = True
+        if self.GetSignalAnalyzer() is not None:
+            self.slider.Disable()
+        else:
+            self.slider.Enable()
 
     def start_test(self):
-        self.FormatPrint(info="Started")
+        Utility.append_thread(self.transmit_test, thread_name="transmit_test_%s" % self.freq)
+
+    def transmit_test(self):
+        signal_analyzer = self.GetSignalAnalyzer()
+        if signal_analyzer is not None:
+            signal_analyzer.SetFrequency(self.freq)
+            for x in range(210):
+                if self.stop_flag:
+                    return
+                self.Sleep(0.05)
+                if x % 21 == 0:
+                    result = signal_analyzer.GetBurstPower()
+                    txp = self.convert_result_to_txp(result=result)
+                    print txp
+                    if txp > 15:
+                        self.SetResult("PASS")
+            self.SetResult("FAIL")
+
+    def convert_result_to_txp(self, result):
+        result = result.split(',')[2]
+        value = result.split('E')
+        value, power = value[0], value[1]
+        value = round(float(value), 3)
+        power = pow(10, int(power))
+        return value * power
 
     def stop_test(self):
-        self.FormatPrint(info="Stop")
+        self.stop_flag = True
 
     def on_restart(self, event):
         obj = event.GetEventObject()

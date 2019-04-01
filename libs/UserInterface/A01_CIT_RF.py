@@ -17,9 +17,6 @@ class Frame(A01_CIT_Base.Frame):
         self.__Sources = None
         self.__Analyzer = None
         A01_CIT_Base.Frame.__init__(self, title=u"射频测试", type="RF", size=(1100, 700))
-        Utility.append_thread(self.__init_instrument)
-
-    def __init_instrument(self):
         resources = Instrument.list_resources()
         for resource in resources:
             if resource in [u'ASRL1::INSTR']:
@@ -31,6 +28,9 @@ class Frame(A01_CIT_Base.Frame):
                 self.__Sources = SignalSources(instrument=inst)
             else:
                 logger.error("Unknown Instrument [%s]" % inst.model_name)
+        Utility.append_thread(self.__init_instrument)
+
+    def __init_instrument(self):
         if self.__Sources:
             Utility.append_thread(self.__Sources.init_sources_setting)
         if self.__Analyzer:
@@ -55,23 +55,25 @@ class SignalSources(object):
 
     def init_sources_setting(self):
         config = Utility.ParseConfig.get(Path.CONFIG, "SignalSources")
+        print config
         result = True
         result = result and self.Reset()
-        result = result and self.SetPower(config.get("Power", 50.0))
+        result = result and self.SetPower(config.get("power", 90.0))
         result = result and self.MOD(ON=True)
         result = result and self.RF(ON=True)
-        result = result and self.SetFileData(config.get("File", "SR_SLOT_20M_16QAM_12_1P25X4_1T.DAT"))
+        result = result and self.SetFileData(config.get("file", "SR_SLOT_20M_16QAM_12_1P25X4_1T.DAT"))
         result = result and self.ARB(ON=True)
         result = result and self.ALC(ON=False)
-        result = result and self.SetARBClock(mHz=20)
+        result = result and self.SetARBClock(mHz=22.4)
+        result = result and self.SetFrequency(mHz=2400)
         return result
 
     def Reset(self):
         command = '*RST'
         return self.__inst.Set(command)
 
-    def SetFrequency(self, MHz=2400):
-        command = ":FREQ:FIXed {value}MHz".format(value=MHz)
+    def SetFrequency(self, mHz=2400):
+        command = ":FREQ:FIXed {value}MHz".format(value=mHz)
         return self.__inst.Set(command)
 
     def SetPower(self, DBM=10.1):
@@ -103,59 +105,35 @@ class SignalSources(object):
         return self.__inst.Set(command)
 
 
-# x信号发生器
-# for x in range(2410,2450):
-#     inst.send_command(command="FREQ %s MHz" % x)
-#     time.sleep(1)
-# inst.send_command(command=":POWer:LEVel -32.1DBM")
-# inst.send_command(command=":FREQuency:FIXed 2.51GHZ")
-# inst.send_command('RADio:ARB:SCLock:RATE 22900kHz')
-#       inst.send_command('RADio:ARB:SCLock:RATE?')
-# inst.send_command(":RAD:ARB ON")
-# inst.send_command(":RAD:ARB?")
-# inst.send_command(":POWer:ALC OFF")
-# inst.send_command(":POWer:ALC?")
-# SR_SLOT_20M_16QAM_12_1P25X4_1T
-# inst.send_command(':SOURce:RADio:ARB:WAVeform "WFM1:SR_SLOT_20M_16QAM_12_1P25X4_1T.DAT"')
-
-
-# print '======================================================================================='
-# inst.send_command("CONF:BPOW")
-#
-# inst.send_command("DISP:TXP:VIEW:WIND:TRAC:Y:RLEV 40dBm")
-# inst.send_command("CORR:SA:GAIN -20.2")
-# inst.send_command("FREQ:CENT 2410MHz")
-# inst.send_command("TXP:METH THR")
-# inst.send_command("TXP:THR -15")
-# inst.send_command("TRIG:TXP:SOUR IMM")
-# inst.send_command("TXP:BAND 20000kHz")
-# for x in range(10):
-#     time.sleep(1)
-#     print inst.execute_command("FETC:BPOW?")
-
-
 class SignalAnalyzer(object):
     def __init__(self, instrument):
         self.__inst = instrument
 
     def init_analyzer_setting(self):
         config = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer")
+        print config
         result = True
         result = result and self.EnterBurstPower()
-        result = result and self.SetBrustRracRlev(config.get("RLEV", 40))
-        result = result and self.SetCorrOffs(config.get("GAIN", 20.0))
+        result = result and self.SetPowerAtt(0)
+        result = result and self.SetBrustRracRlev(config.get("rlev", 40))
+        result = result and self.SetCorrOffs(config.get("gain", 60.0))
         result = result and self.SetMeasAsThreshold()
-        result = result and self.SetMeasThrLevel(config.get("THR_LEVEL", 15))
-        result = result and self.SetTriggerImmediately()
+        result = result and self.SetMeasThrLevel(config.get("thr_level", 15))
+        result = result and self.SetTriggerMode()
+        result = result and self.SetIFLevel()
         result = result and self.SetBandWidth(20)
         return result
 
+    def SetIFLevel(self, level=10):
+        command = ":TRIGger:IF:LEVel {value}".format(value=level)
+        return self.__inst.Set(command)
+
     def EnterBurstPower(self):
-        command = "CONF:BPO"
+        command = "CONF:BPOW"
         return self.__inst.Set(command)
 
     def SetBrustRracRlev(self, dBm=40):
-        command = "DISP:TXP:VIEW:WIND:TRAC:Y:RLEV {value}dBm", format(value=dBm)
+        command = "DISP:TXP:VIEW:WIND:TRAC:Y:RLEV {value}dBm".format(value=dBm)
         return self.__inst.Set(command)
 
     # 设置外部补偿电平
@@ -171,12 +149,12 @@ class SignalAnalyzer(object):
         command = "TXP:METH THR"
         return self.__inst.Set(command)
 
-    def SetMeasThrLevel(self, dBm=15):
+    def SetMeasThrLevel(self, dBm=10):
         command = "TXP:THR -{value}".format(value=dBm)
         return self.__inst.Set(command)
 
-    def SetTriggerImmediately(self):
-        command = "TRIG:TXP:SOUR IMM"
+    def SetTriggerMode(self, mode='VIDeo'):
+        command = "TRIG:TXP:SOUR {mode}".format(mode=mode)
         return self.__inst.Set(command)
 
     def SetBandWidth(self, mHz=20):
@@ -187,17 +165,18 @@ class SignalAnalyzer(object):
         command = "FETC:BPOW?"
         return self.__inst.Get(command)
 
+    def SetPowerAtt(self, dBm):
+        command = "POW:ATT {value}".format(value=dBm)
+        return self.__inst.Set(command)
+
 
 if __name__ == '__main__':
     x = Instrument.list_resources()[0]
     init = Instrument.SCPI(x)
-    a = SignalSources(instrument=init)
-    a.SetFileData()
-    import time
+    a = SignalAnalyzer(instrument=init)
 
-    print time.time()
-    a.init_sources_setting()
-    print time.time()
+    a.init_analyzer_setting()
+
     # for x in range(2410, 2666):
     #     print time.time()
     #     a.SetFrequency(x)

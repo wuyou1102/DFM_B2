@@ -117,7 +117,7 @@ class ReceiveBase(Base.TestPage):
             if float(value) != self.freq:
                 Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")
 
-        Utility.append_thread(target=update_freq, allow_dupl=True)
+        Utility.append_thread(target=update_freq, thread_name="update_freq_%s" % self.freq)
 
     def update_current_mcs(self):
         def update_mcs():
