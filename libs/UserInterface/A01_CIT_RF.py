@@ -4,7 +4,7 @@ import logging
 import sys
 from libs import Utility
 from libs.Config import Path
-# from libs.Utility import Instrument
+from libs.Utility import Instrument
 import A01_CIT_Base
 
 logger = logging.getLogger(__name__)
@@ -24,10 +24,7 @@ class Frame(A01_CIT_Base.Frame):
         for resource in resources:
             if resource in [u'ASRL1::INSTR']:
                 continue
-            import time
-            print time.time()
             inst = Instrument.SCPI(resource)
-            print time.time()
             if inst.model_name in ["N9020A"]:  # 信号分析仪
                 self.__Analyzer = SignalAnalyzer(instrument=inst)
             elif inst.model_name in ["N5172B"]:  # 信号发生器
@@ -36,9 +33,12 @@ class Frame(A01_CIT_Base.Frame):
                 logger.error("Unknown Instrument [%s]" % inst.model_name)
         if self.__Sources:
             Utility.append_thread(self.__Sources.init_sources_setting)
-
         if self.__Analyzer:
             Utility.append_thread(self.__Analyzer.init_analyzer_setting)
+        if self.__Sources is None:
+            Utility.Alert.Error(u"没有找到已连接的信号发生器，接收灵敏度测试无法自动测试")
+        if self.__Analyzer is None:
+            Utility.Alert.Error(u"没有找到已连接的信号分析仪，发送功率测试无法自动测试")
 
     @property
     def SignalSources(self):
@@ -194,6 +194,7 @@ if __name__ == '__main__':
     a = SignalSources(instrument=init)
     a.SetFileData()
     import time
+
     print time.time()
     a.init_sources_setting()
     print time.time()

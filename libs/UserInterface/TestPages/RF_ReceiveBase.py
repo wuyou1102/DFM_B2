@@ -128,12 +128,10 @@ class ReceiveBase(Base.TestPage):
         Utility.append_thread(target=update_mcs, allow_dupl=True)
 
     def before_test(self):
+        signal_sources = self.GetSignalSources()
         self.PassButton.Disable()
-
-        print self.GetSignalSources()
-
-        if self.GetSignalSources() is not None:
-            Utility.append_thread(self.GetSignalSources().SetFrequency, self.freq)
+        if signal_sources is not None:
+            signal_sources.SetFrequency(self.freq)
         self.init_variable()
         self.panel_mpl.init_axes()
         uart = self.get_communicat()

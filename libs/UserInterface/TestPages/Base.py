@@ -2,7 +2,7 @@
 import wx
 import logging
 from libs.Config import Color
-# from libs.Config import Font
+from libs.Config import Font
 from libs.Config import Path
 from libs import Utility
 import os

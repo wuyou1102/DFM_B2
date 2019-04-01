@@ -249,12 +249,8 @@ class Client(object):
         return False
 
     def execute_command(self, command, sleep=0):
-        import time
-        print "a%s"%time.time()
         Logger.debug('********************************************************')
-        print "A%s"%time.time()
         Logger.debug('* SOCKET COMMAND:\"%s\"' % command)
-        print "c%s"%time.time()
         if self.__lock.acquire():
             try:
                 self.send(command=command)
@@ -286,26 +282,5 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-    import time
-    print time.time()
-    print s.unload_protocol_stack()
-    print time.time()
-    # print s.get_serial_number()
-    # # print s.set_serial_number("22222222")
-    # print s.get_serial_number()
-    # print s.get_all_flag_results()
-    # print s.is_button_clicked()
-    # print s.reset_button_click()
-    # print s.is_button_clicked()
-    # print s.get_all_flag_results()
-    # for x in range(1, 33):
-    #     print s.set_flag_result(x, 2)
-    # # while True:
-    # #     for x in range(1, 33):
-    # #         print s.get_flag_result(x)
-    # # for x in range(1, 33):
-    # #     print s.set_flag_result(x, 1)
-    # # for x in range(1, 33):
-    # #     print s.get_flag_result(x)
-    #
-    # s.close()
+
+
