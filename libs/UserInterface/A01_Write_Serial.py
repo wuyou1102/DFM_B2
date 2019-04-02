@@ -66,7 +66,6 @@ class Panel(wx.Panel):
         self.serial_number = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
                                          wx.TE_CENTER | wx.TE_PROCESS_ENTER)
         self.serial_number.Bind(wx.EVT_SET_FOCUS, self.click_on_text_ctrl)
-
         f = wx.Font(23, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         self.title.SetFont(f)
         self.serial_number.SetFont(f)

@@ -104,7 +104,7 @@ class FPV(Base.TestPage):
 
     def update_device_config(self):
         self.stop_flag = True
-        socket = self.get_communicat()
+        socket = self.get_communicate()
         dlg = UpdateDeviceConfigDialog(socket=socket)
         dlg.show_modal()
         if dlg.get_result():
@@ -142,7 +142,7 @@ class FPV(Base.TestPage):
                 break
 
     def update_info(self):
-        socket = self.get_communicat()
+        socket = self.get_communicate()
         while not self.stop_flag:
             result = socket.get_rssi_and_bler()
             if result == "0000000000000000":

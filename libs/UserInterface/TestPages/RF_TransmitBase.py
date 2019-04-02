@@ -3,8 +3,9 @@ import wx
 import logging
 import Base
 from libs import Utility
-from libs.Config import Font
 from libs.Config import Picture
+from libs.Config import Path
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -13,9 +14,19 @@ class TransmitBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
+        self.init_minimum_and_maximum()
 
     def GetSignalAnalyzer(self):
         return self.Parent.Parent.Parent.Parent.SignalAnalyzer
+
+    def init_minimum_and_maximum(self):
+        config = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer")
+        if self.freq < 3000:
+            self.minimum = int(config.get('24_min', 15))
+            self.maximum = int(config.get('24_max', 17))
+        else:
+            self.minimum = int(config.get('58_min', 15))
+            self.maximum = int(config.get('58_max', 17))
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -39,14 +50,14 @@ class TransmitBase(Base.TestPage):
 
     def on_freq_point_selected(self, event):
         obj = event.GetEventObject()
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         uart.set_frequency_point(obj.Name + "000")
         self.update_current_freq_point()
 
     def on_mcs_selected(self, event):
         obj = event.GetEventObject()
         selected = obj.GetSelection()
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         uart.set_qam(value=selected)
         self.update_current_mcs()
 
@@ -70,7 +81,7 @@ class TransmitBase(Base.TestPage):
     def update_current_freq_point(self):
         def update_freq():
             self.Sleep(0.05)
-            comm = self.get_communicat()
+            comm = self.get_communicate()
             value = comm.get_frequency_point()
             self.current_point.SetValue(value)
             if float(value) != self.freq:
@@ -80,7 +91,7 @@ class TransmitBase(Base.TestPage):
 
     def update_current_mcs(self):
         def update_mcs():
-            uart = self.get_communicat()
+            uart = self.get_communicate()
             value = uart.get_qam()
             self.current_mcs.SetSelection(int(value, 16))
 
@@ -89,7 +100,7 @@ class TransmitBase(Base.TestPage):
     def update_current_power(self):
         def update_power():
             self.Sleep(0.05)
-            comm = self.get_communicat()
+            comm = self.get_communicate()
             value = comm.get_radio_frequency_power()
             self.slider.SetValue(value)
             self.static_text.SetLabel(hex(value).upper())
@@ -98,7 +109,7 @@ class TransmitBase(Base.TestPage):
 
     def before_test(self):
         self.stop_flag = False
-        comm = self.get_communicat()
+        comm = self.get_communicate()
         comm.set_tx_mode_20m()
         comm.set_frequency_point(self.freq * 1000)
         comm.set_radio_frequency_power(15)
@@ -114,8 +125,12 @@ class TransmitBase(Base.TestPage):
 
     def transmit_test(self):
         signal_analyzer = self.GetSignalAnalyzer()
-        if signal_analyzer is not None:
-            signal_analyzer.SetFrequency(self.freq)
+        if signal_analyzer is None:  # 如果没有信号分析仪 就直接退出
+            return
+        signal_analyzer.SetFrequency(self.freq)  # 设置仪器分析频点
+        for x in range(10):
+            road1 =
+
             for x in range(210):
                 if self.stop_flag:
                     return
@@ -123,15 +138,28 @@ class TransmitBase(Base.TestPage):
                 if x % 21 == 0:
                     result = signal_analyzer.GetBurstPower()
                     txp = self.convert_result_to_txp(result=result)
-                    print txp
-                    if txp > 15:
+                    if self.minimum < txp < self.maximum
                         self.SetResult("PASS")
             self.SetResult("FAIL")
 
-    def convert_result_to_txp(self, result):
+    def __test_road(self, index):
+        signal_analyzer = self.GetSignalAnalyzer()
+        comm =self.get_communicate()
+        for x in range(3):
+            for y in range(100):
+                if self.stop_flag:
+                    return None
+                time.sleep(0.02)
+            result = signal_analyzer.GetBurstPower()
+            txp = self.convert_result_to_txp(result=result)
+            print
+        pass
+
+    def get_transmit_power(self):
+        result = self.GetSignalAnalyzer().GetBurstPower()
         result = result.split(',')[2]
-        value = result.split('E')
-        value, power = value[0], value[1]
+        _lst = result.split('E')
+        value, power = _lst[0], _lst[1]
         value = round(float(value), 3)
         power = pow(10, int(power))
         return value * power
@@ -143,7 +171,7 @@ class TransmitBase(Base.TestPage):
         obj = event.GetEventObject()
         try:
             obj.Disable()
-            uart = self.get_communicat()
+            uart = self.get_communicate()
             uart.hold_baseband()
             uart.release_baseband()
             Utility.Alert.Info(u"基带重启完成")
@@ -155,7 +183,7 @@ class TransmitBase(Base.TestPage):
 
     def on_scroll_changed(self, event):
         x = self.slider.GetValue()
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         uart.set_radio_frequency_power(value=x)
         self.Sleep(0.2)
         self.update_current_power()

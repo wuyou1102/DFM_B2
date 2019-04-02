@@ -78,11 +78,11 @@ class TestPage(wx.Panel):
         return sizer
 
     @staticmethod
-    def get_communicat():
+    def get_communicate():
         return Variable.get_socket()
 
     def get_result(self):
-        comm = self.get_communicat()
+        comm = self.get_communicate()
         return comm.get_flag_result(self.get_flag())
 
     def get_type(self):
@@ -138,7 +138,7 @@ class TestPage(wx.Panel):
     def SetResult(self, result):
         logger.debug("\"%s\" Result is : <%s>" % (self.get_name(), result))
         self.FormatPrint(result, symbol="=")
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         if uart.set_flag_result(flag=self.get_flag(), result=result2value[result]):
             self.__parent.next_page()
 
@@ -150,7 +150,7 @@ class TestPage(wx.Panel):
 
     def LogMessage(self, msg):
         msg = msg.strip('\r\n')
-        comm = self.get_communicat()
+        comm = self.get_communicate()
         if comm is None:
             return
         with open(os.path.join(Path.LOG_SAVE, "%s.log" % comm.SerialNumber), 'a') as log:

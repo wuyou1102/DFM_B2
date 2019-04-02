@@ -25,7 +25,7 @@ class Switch(Base.TestPage):
 
     def before_test(self):
         super(Switch, self).before_test()
-        comm = self.get_communicat()
+        comm = self.get_communicate()
         comm.reset_button_click()
         self.stop_flag = True
 
@@ -38,7 +38,7 @@ class Switch(Base.TestPage):
         self.FormatPrint(info="Stop")
 
     def is_button_clicked(self):
-        comm = self.get_communicat()
+        comm = self.get_communicate()
         while self.stop_flag:
             self.Sleep(0.05)
             result = comm.is_button_clicked()

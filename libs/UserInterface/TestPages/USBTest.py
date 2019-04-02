@@ -36,7 +36,7 @@ class USB(Base.TestPage):
         self.FormatPrint(info="Stop")
 
     def is_usb_connected(self):
-        comm = self.get_communicat()
+        comm = self.get_communicate()
         while self.stop_flag:
             self.Sleep(0.05)
             result = comm.is_usb_connected()

@@ -80,14 +80,14 @@ class ReceiveBase(Base.TestPage):
 
     def reset_frequency(self, event):
         obj = event.GetEventObject()
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         uart.set_frequency_point(obj.Name + "000")
         self.update_current_freq_point()
 
     def on_mcs_selected(self, event):
         obj = event.GetEventObject()
         selected = obj.GetSelection()
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         uart.set_qam(value=selected)
         self.update_current_mcs()
 
@@ -111,7 +111,7 @@ class ReceiveBase(Base.TestPage):
     def update_current_freq_point(self):
         def update_freq():
             self.Sleep(0.05)
-            uart = self.get_communicat()
+            uart = self.get_communicate()
             value = uart.get_frequency_point()
             self.current_point.SetValue(value)
             if float(value) != self.freq:
@@ -121,7 +121,7 @@ class ReceiveBase(Base.TestPage):
 
     def update_current_mcs(self):
         def update_mcs():
-            uart = self.get_communicat()
+            uart = self.get_communicate()
             value = uart.get_qam()
             self.current_mcs.SetSelection(int(value, 16))
 
@@ -134,7 +134,7 @@ class ReceiveBase(Base.TestPage):
             signal_sources.SetFrequency(self.freq)
         self.init_variable()
         self.panel_mpl.init_axes()
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         uart.set_rx_mode_20m()
         uart.set_frequency_point(self.freq * 1000)
         self.update_current_freq_point()
@@ -157,7 +157,7 @@ class ReceiveBase(Base.TestPage):
         return self.GetFlag(t=self.type)
 
     def draw_line(self):
-        comm = self.get_communicat()
+        comm = self.get_communicate()
         self.Sleep(1)
         while self.stop_flag:
             if comm.is_instrument_connected():
@@ -200,7 +200,7 @@ class ReceiveBase(Base.TestPage):
         obj = event.GetEventObject()
         try:
             obj.Disable()
-            uart = self.get_communicat()
+            uart = self.get_communicate()
             uart.hold_baseband()
             uart.release_baseband()
             Utility.Alert.Info(u"基带重启完成")
@@ -212,7 +212,7 @@ class ReceiveBase(Base.TestPage):
             obj.Enable()
 
     def update_bler(self):
-        uart = self.get_communicat()
+        uart = self.get_communicate()
         result = uart.get_rssi_and_bler()
         if result is not None and int(result, 16) > 0:
             bler = int(result[8:], 16)
