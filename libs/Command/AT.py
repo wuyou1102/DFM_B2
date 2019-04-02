@@ -106,7 +106,7 @@ def set_signal_1(value):
 
 
 def get_signal_status(idx):
-    cmd = "get_an{idx}_pa_status".format(idx=idx)
+    cmd = "get_ant{idx}_pa_status".format(idx=idx)
     return __HEAD + cmd
 
 

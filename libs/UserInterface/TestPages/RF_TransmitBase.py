@@ -6,6 +6,7 @@ from libs import Utility
 from libs.Config import Picture
 from libs.Config import Path
 import time
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,8 @@ class TransmitBase(Base.TestPage):
         hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT | wx.RIGHT, 5)
         sizer.Add(hori_sizer, 0, wx.EXPAND | wx.LEFT, 15)
         sizer.Add(self.__init_scroll_bar(), 0, wx.EXPAND | wx.LEFT, 15)
+        self.message = wx.TextCtrl(self, wx.ID_ANY, '', style=wx.TE_MULTILINE | wx.TE_READONLY)
+        sizer.Add(self.message, 1, wx.EXPAND | wx.ALL, 1)
         return sizer
 
     def __init_freq_point_sizer(self):
@@ -103,6 +106,7 @@ class TransmitBase(Base.TestPage):
             self.static_text.SetLabel(hex(power).upper())
             self.signal_0.SetValue(comm.is_signal_opened(0))
             self.signal_1.SetValue(comm.is_signal_opened(1))
+
         Utility.append_thread(target=update_info, allow_dupl=True)
 
     def on_mcs_selected(self, event):
@@ -160,19 +164,22 @@ class TransmitBase(Base.TestPage):
 
     def before_test(self):
         self.stop_flag = False
+        self.message.SetValue("")
         comm = self.get_communicate()
         comm.set_tx_mode_20m()
         comm.set_frequency_point(self.freq * 1000)
         comm.set_radio_frequency_power(15)
         self.update_current_info()
+        ctrls = [self.slider, self.signal_0, self.signal_1, self.PassButton]
         if self.GetSignalAnalyzer() is not None:
-            for ctrl in [self.slider, self.signal_0, self.signal_1]:
+            for ctrl in ctrls:
                 ctrl.Disable()
         else:
-            for ctrl in [self.slider, self.signal_0, self.signal_1]:
+            for ctrl in ctrls:
                 ctrl.Enable()
 
     def start_test(self):
+        self.FormatPrint(info="Started")
         Utility.append_thread(self.transmit_test, thread_name="transmit_test_%s" % self.freq)
 
     def check_frequency_point(self):
@@ -222,7 +229,7 @@ class TransmitBase(Base.TestPage):
                 time.sleep(0.02)
             result = signal_analyzer.GetBurstPower()
             txp = self.convert_result_to_txp(result=result)
-            self.LogMessage(u"当前测试天线%s发送功率为：%s" % (index, txp))
+            self.LogMessage(u"[%s]当前测试天线%s发送功率为：%s" % (x, index, txp))
             if self.minimum < txp < self.maximum:
                 return True
         return False
@@ -238,6 +245,7 @@ class TransmitBase(Base.TestPage):
 
     def stop_test(self):
         self.stop_flag = True
+        self.FormatPrint(info="Stop")
 
     def on_restart(self, event):
         obj = event.GetEventObject()
@@ -276,3 +284,12 @@ class TransmitBase(Base.TestPage):
         sizer.Add(self.slider, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 1)
         sizer.Add(self.static_text, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         return sizer
+
+    def LogMessage(self, msg):
+        msg = u"{time}:{message}\n".format(time=Utility.get_timestamp(), message=msg.strip('\r\n'))
+        wx.CallAfter(self.message.AppendText, msg)
+        comm = self.get_communicate()
+        if comm is None:
+            return
+        with open(os.path.join(Path.LOG_SAVE, "%s.log" % comm.SerialNumber), 'a') as log:
+            log.write(msg)

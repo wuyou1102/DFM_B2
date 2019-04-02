@@ -30,7 +30,7 @@ logging.config.dictConfig({
             'formatter': 'verbose',
             'encoding': 'utf8',
             'maxBytes': 1024 * 1024 * 1,
-            "backupCount": 20,
+            "backupCount": 5,
         }
     },
     'loggers': {
