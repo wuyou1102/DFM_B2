@@ -95,6 +95,21 @@ def is_instrument_connected():
     return __HEAD + cmd
 
 
+def set_signal_0(value):  # 0:OFF 1:ON
+    cmd = "operate_ant0,{value}".format(value=value)
+    return __HEAD + cmd
+
+
+def set_signal_1(value):
+    cmd = "operate_ant1,{value}".format(value=value)
+    return __HEAD + cmd
+
+
+def get_signal_status(idx):
+    cmd = "get_an{idx}_pa_status".format(idx=idx)
+    return __HEAD + cmd
+
+
 def set_serial_number(value):
     return "set_serial_number({value})".format(value=value)
 

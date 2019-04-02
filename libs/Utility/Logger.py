@@ -2,7 +2,10 @@
 import logging.config
 import os
 import sys
+import time
 
+timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+# __LOG = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), "console_%s.log" % timestamp)
 __LOG = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), "console.log")
 
 logging.config.dictConfig({
@@ -27,6 +30,7 @@ logging.config.dictConfig({
             'formatter': 'verbose',
             'encoding': 'utf8',
             'maxBytes': 1024 * 1024 * 1,
+            "backupCount": 20,
         }
     },
     'loggers': {

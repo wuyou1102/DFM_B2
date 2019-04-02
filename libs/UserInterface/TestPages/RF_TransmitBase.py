@@ -31,7 +31,8 @@ class TransmitBase(Base.TestPage):
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hori_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        hori_sizer.Add(self.__init_freq_point_sizer(), 1, wx.EXPAND, 0)
+        hori_sizer.Add(self.__init_freq_point_sizer(), 0, wx.EXPAND, 0)
+        hori_sizer.Add(self.__init_ant_sizer(), 1, wx.EXPAND | wx.LEFT, 5)
         hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT | wx.RIGHT, 5)
         sizer.Add(hori_sizer, 0, wx.EXPAND | wx.LEFT, 15)
         sizer.Add(self.__init_scroll_bar(), 0, wx.EXPAND | wx.LEFT, 15)
@@ -41,18 +42,68 @@ class TransmitBase(Base.TestPage):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1), wx.TE_READONLY)
-        sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
-        sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         button = wx.Button(self, wx.ID_ANY, u"重设频点", wx.DefaultPosition, (65, 27), 0, name=str(self.freq))
         button.Bind(wx.EVT_BUTTON, self.on_freq_point_selected)
+        sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(button, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         return sizer
+
+    def __init_ant_sizer(self):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.signal_0 = wx.CheckBox(self, wx.ID_ANY, u"A路", wx.DefaultPosition, wx.DefaultSize, 0, name='0')
+        self.signal_1 = wx.CheckBox(self, wx.ID_ANY, u"B路", wx.DefaultPosition, wx.DefaultSize, 0, name='1')
+        self.signal_0.Bind(wx.EVT_CHECKBOX, self.on_check_box)
+        self.signal_1.Bind(wx.EVT_CHECKBOX, self.on_check_box)
+        sizer.Add(self.signal_0, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        sizer.Add(self.signal_1, 0, wx.ALIGN_CENTER_VERTICAL, 1)
+        return sizer
+
+    def on_check_box(self, event):
+        obj = event.GetEventObject()
+        name = obj.GetName()
+        self.set_signal_on_off(idx=name, ON=obj.IsChecked())
+
+    def set_signal_on_off(self, idx, ON=True):
+        comm = self.get_communicate()
+        if int(idx) == 0:
+            comm.set_signal_0(ON=ON)
+            self.Sleep(0.05)
+            self.signal_0.SetValue(comm.is_signal_opened(0))
+        else:
+            comm.set_signal_1(ON=ON)
+            self.Sleep(0.05)
+            self.signal_1.SetValue(comm.is_signal_opened(1))
 
     def on_freq_point_selected(self, event):
         obj = event.GetEventObject()
         uart = self.get_communicate()
         uart.set_frequency_point(obj.Name + "000")
         self.update_current_freq_point()
+
+    def update_current_signal_status(self):
+        def update_signal():
+            self.Sleep(0.05)
+            comm = self.get_communicate()
+            self.signal_0.SetValue(comm.is_signal_opened(0))
+            self.signal_1.SetValue(comm.is_signal_opened(1))
+
+        Utility.append_thread(target=update_signal, allow_dupl=True)
+
+    def update_current_info(self):
+        def update_info():
+            self.Sleep(0.05)
+            comm = self.get_communicate()
+            freq = comm.get_frequency_point()
+            self.current_point.SetValue(freq)
+            if float(freq) != self.freq:
+                Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")
+            power = comm.get_radio_frequency_power()
+            self.slider.SetValue(power)
+            self.static_text.SetLabel(hex(power).upper())
+            self.signal_0.SetValue(comm.is_signal_opened(0))
+            self.signal_1.SetValue(comm.is_signal_opened(1))
+        Utility.append_thread(target=update_info, allow_dupl=True)
 
     def on_mcs_selected(self, event):
         obj = event.GetEventObject()
@@ -113,38 +164,57 @@ class TransmitBase(Base.TestPage):
         comm.set_tx_mode_20m()
         comm.set_frequency_point(self.freq * 1000)
         comm.set_radio_frequency_power(15)
-        self.update_current_power()
-        self.update_current_freq_point()
+        self.update_current_info()
         if self.GetSignalAnalyzer() is not None:
-            self.slider.Disable()
+            for ctrl in [self.slider, self.signal_0, self.signal_1]:
+                ctrl.Disable()
         else:
-            self.slider.Enable()
+            for ctrl in [self.slider, self.signal_0, self.signal_1]:
+                ctrl.Enable()
 
     def start_test(self):
         Utility.append_thread(self.transmit_test, thread_name="transmit_test_%s" % self.freq)
+
+    def check_frequency_point(self):
+        comm = self.get_communicate()
+        for x in range(10):
+            if self.stop_flag:
+                return
+            self.LogMessage(u"当前第%次检查频点" % (x + 1))
+            value = comm.get_frequency_point()
+            self.LogMessage(u"当前频点为：%s" % value)
+            if float(value) == self.freq:
+                self.LogMessage(u"检查通过，准备测试。")
+                return True
+            comm.set_frequency_point("%s000" % self.freq)
+        self.LogMessage(u"检查不通过，无法测试。")
+        return False
 
     def transmit_test(self):
         signal_analyzer = self.GetSignalAnalyzer()
         if signal_analyzer is None:  # 如果没有信号分析仪 就直接退出
             return
+        if not self.check_frequency_point():
+            Utility.Alert(u"频点设置不正确的，无法自动测试。")
+            return
         signal_analyzer.SetFrequency(self.freq)  # 设置仪器分析频点
-        for x in range(10):
-            road1 =
+        road0 = self.__test_road(0)
+        road1 = self.__test_road(1)
+        if road0 is None or road1 is None:
+            return
+        if road0 and road1:
+            self.SetResult("PASS")
+        self.SetResult("FAIL")
 
-            for x in range(210):
-                if self.stop_flag:
-                    return
-                self.Sleep(0.05)
-                if x % 21 == 0:
-                    result = signal_analyzer.GetBurstPower()
-                    txp = self.convert_result_to_txp(result=result)
-                    if self.minimum < txp < self.maximum
-                        self.SetResult("PASS")
-            self.SetResult("FAIL")
-
-    def __test_road(self, index):
+    def __test_road(self, index=0):
         signal_analyzer = self.GetSignalAnalyzer()
-        comm =self.get_communicate()
+        comm = self.get_communicate()
+        if index == 0:
+            comm.set_signal_0(ON=True)
+            comm.set_signal_1(ON=False)
+        else:
+            comm.set_signal_0(ON=False)
+            comm.set_signal_1(ON=True)
         for x in range(3):
             for y in range(100):
                 if self.stop_flag:
@@ -152,8 +222,10 @@ class TransmitBase(Base.TestPage):
                 time.sleep(0.02)
             result = signal_analyzer.GetBurstPower()
             txp = self.convert_result_to_txp(result=result)
-            print
-        pass
+            self.LogMessage(u"当前测试天线%s发送功率为：%s" % (index, txp))
+            if self.minimum < txp < self.maximum:
+                return True
+        return False
 
     def get_transmit_power(self):
         result = self.GetSignalAnalyzer().GetBurstPower()

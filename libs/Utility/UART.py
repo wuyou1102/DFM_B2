@@ -228,3 +228,4 @@ class UART(Serial):
             return result
         else:
             raise KeyError("Unknown exit code: \"%s\"" % repr(result.exit_code))
+

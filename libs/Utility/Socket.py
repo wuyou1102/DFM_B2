@@ -196,6 +196,28 @@ class Client(object):
         cmd = command.set_rx_mode_20m()
         return self._protocol_set(cmd=cmd)
 
+    def set_signal_0(self, ON=True):
+        value = '1' if ON else '0'
+        cmd = command.set_signal_0(value)
+        return self._protocol_set(cmd=cmd)
+
+    def set_signal_1(self, ON=True):
+        value = '1' if ON else '0'
+        cmd = command.set_signal_1(value)
+        return self._protocol_set(cmd=cmd)
+
+    def is_signal_opened(self, idx):
+        cmd = command.get_signal_status(idx)
+        output = self._protocol_get(cmd=cmd)
+        if output is not None:
+            try:
+                is_opened = int(output)
+                if is_opened == 1:
+                    return True
+            except ValueError:
+                Logger.error("Get an abnormal value: \"%s\"" % repr(output))
+        return False
+
     def is_instrument_connected(self):
         cmd = command.is_instrument_connected()
         output = self._protocol_get(cmd=cmd)
@@ -248,12 +270,13 @@ class Client(object):
         Alert.Error(u"设置失败")
         return False
 
-    def execute_command(self, command, sleep=0):
+    def execute_command(self, command, sleep=0.015):
         Logger.debug('********************************************************')
         Logger.debug('* SOCKET COMMAND:\"%s\"' % command)
         if self.__lock.acquire():
             try:
                 self.send(command=command)
+                time.sleep(sleep)
                 result = self.read()
                 Logger.debug("* STDOUT: {result}".format(result=repr(result)))
                 if result.endswith('\n'):
@@ -265,8 +288,8 @@ class Client(object):
                 return ExecuteResult(exit_code=ErrorCode.SOCKET_EXCEPTION,
                                      outputs=u"执行命令:%s\n" % command + ErrorCode.SOCKET_EXCEPTION.MSG)
             finally:
-                time.sleep(sleep)
                 Logger.debug('********************************************************')
+                time.sleep(sleep)
                 self.__lock.release()
 
     def send(self, command):
@@ -282,5 +305,5 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-
-
+    s.set_signal_0(True)
+    print s.execute_command("AT+DFM=get_an0_pa_status")
