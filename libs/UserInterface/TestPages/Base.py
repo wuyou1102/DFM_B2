@@ -491,7 +491,7 @@ class RF_ConfigPage(wx.Panel):
         if name == "unlock":
             dlg = wx.TextEntryDialog(self, u'请输入解锁码:', u'解锁配置', style=wx.TE_PASSWORD | wx.OK | wx.CANCEL)
             if dlg.ShowModal() == wx.ID_OK:
-                if dlg.GetValue() in ["13641746250", "13636359582"]:
+                if dlg.GetValue() in ["13641746250", "13636359582", "15921863784"]:
                     self.EnableConfig(True)
                 else:
                     Utility.Alert.Error(u"解锁码错误")
@@ -516,7 +516,6 @@ class RF_ConfigPage(wx.Panel):
         return "Report"
 
     def EnableConfig(self, enable):
-        enable = True
         for ctrl in self.__recv_lst:
             ctrl.Enable(enable=enable)
         for ctrl in self.__tran_lst:
