@@ -5,6 +5,7 @@ import wx
 
 from TestPages import Variable
 from TestPages.Base import ReportPage
+from TestPages.Base import RF_ConfigPage
 from libs import Utility
 from libs.Config import Color
 from socket import timeout
@@ -275,12 +276,20 @@ class ListBook(wx.Panel):
             self.__ScrolledWindow.append(c)
             self.__CaseView.append(c)
         self.__add_report_page()
+        print self.parent.type
+        if self.parent.type == "RF":
+            self.__add_rf_config_page()
         self.__ScrolledWindow.refresh_scroll_window()
 
     def __add_report_page(self):
-        report = ReportPage(self.__CaseView)
-        self.__ScrolledWindow.append(report)
-        self.__CaseView.append(report)
+        page = ReportPage(self.__CaseView)
+        self.__ScrolledWindow.append(page)
+        self.__CaseView.append(page)
+
+    def __add_rf_config_page(self):
+        page = RF_ConfigPage(self.__CaseView)
+        self.__ScrolledWindow.append(page)
+        self.__CaseView.append(page)
 
     def update_case_result(self):
         self.__ScrolledWindow.update_case_result()

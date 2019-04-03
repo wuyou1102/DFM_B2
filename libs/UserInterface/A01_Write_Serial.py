@@ -153,7 +153,9 @@ class Panel(wx.Panel):
             self.socket.set_serial_number(serial)
             result = self.socket.get_serial_number()
             if serial == result:
-                self.serial_number.SetValue(u"写入成功 ")
+                dialog = Utility.Alert.CountdownDialog(u"写入成功，3秒后自动关闭。")
+                dialog.Countdown(countdown=3)
+                self.disconnect()
                 return True
         Utility.Alert.Error(u"写入失败，请重试。")
         self.refresh_serial_number()
