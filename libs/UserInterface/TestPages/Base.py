@@ -1,13 +1,15 @@
 # -*- encoding:UTF-8 -*-
-import wx
 import logging
+import os
+import threading
+import time
+
+import wx
+
+from libs import Utility
 from libs.Config import Color
 from libs.Config import Font
 from libs.Config import Path
-from libs import Utility
-import os
-import time
-import threading
 
 logger = logging.getLogger(__name__)
 result2value = {
@@ -368,9 +370,9 @@ class StaticText(wx.StaticText):
 class RF_ConfigPage(wx.Panel):
     def __init__(self, parent, name=u"射频配置"):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
-
         self.__parent = parent
-        self.__result_controls = list()
+        self.__recv_lst = list()
+        self.__tran_lst = list()
         self.name = name
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         title = wx.StaticText(self, wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize,
@@ -378,96 +380,132 @@ class RF_ConfigPage(wx.Panel):
         title.SetFont(Font.TEST_TITLE)
         title.SetBackgroundColour(Color.LightYellow1)
         self.main_sizer.Add(title, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.main_sizer.Add(self.__init_result_sizer(), 1, wx.EXPAND | wx.ALL, 1)
+        self.main_sizer.Add(self.__init_configuration_sizer(), 1, wx.EXPAND | wx.ALL, 1)
         self.SetSizer(self.main_sizer)
         self.Layout()
+        self.EnableConfig(enable=False)
 
-    def __init_result_sizer(self):
+    def __init_configuration_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.__init_device_info(), 0, wx.EXPAND | wx.ALL, 0)
-        sizer.Add(self.__init_case_result_sizer(), 1, wx.EXPAND | wx.ALL, 0)
-        sizer.Add(self.__init_operation_sizer(), 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_BOTTOM | wx.ALL, 0)
+        sizer.Add(self.__init_receiver_sizer(), 0, wx.EXPAND, 5)
+        sizer.Add(self.__init_transmit_sizer(), 0, wx.EXPAND, 5)
+        sizer.Add(self.__init_operation_sizer(), 0, wx.ALIGN_CENTER_HORIZONTAL, 5)
         return sizer
 
-    def __init_device_info(self):
-        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "设备信息"), wx.VERTICAL)
-        row0 = wx.BoxSizer(wx.HORIZONTAL)
-        title = wx.StaticText(self, wx.ID_ANY, u"序列号: ", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.serial_number = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
-                                         wx.TE_READONLY | wx.NO_BORDER)
-        self.serial_number.SetBackgroundColour(Color.gray81)
-        title.SetFont(Font.COMMON_1)
-        self.serial_number.SetFont(Font.COMMON_1_LARGE)
-        row0.Add(title, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
-        row0.Add(self.serial_number, 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, 1)
-        sizer.Add(row0, 0, wx.EXPAND | wx.LEFT, 10)
+    def create_attr_value_sizer(self, label, attr_name, attr_value):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        name = wx.StaticText(self, wx.ID_ANY, label, wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER)
+        value = wx.TextCtrl(self, wx.ID_ANY, attr_value, wx.DefaultPosition, wx.DefaultSize, 0, name=attr_name)
+        sizer.Add(name, 0, wx.EXPAND | wx.TOP, 4)
+        sizer.Add(value, 1, wx.EXPAND | wx.ALL, 2)
+        return sizer, value
+
+    def create_min_max_sizer(self, freq, cfg):
+        def create_unit_size(name):
+            unit_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            min_string = "%s(min)" % name
+            max_string = "%s(max)" % name
+            name = wx.StaticText(self, wx.ID_ANY, u"%s路 判定范围: " % name.upper(), wx.DefaultPosition, wx.DefaultSize,
+                                 wx.ALIGN_CENTER)
+            wavy = wx.StaticText(self, wx.ID_ANY, u"～", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER)
+            min = wx.TextCtrl(self, wx.ID_ANY, cfg[min_string], wx.DefaultPosition, (40, -1), wx.TE_CENTER,
+                              name=min_string)
+            max = wx.TextCtrl(self, wx.ID_ANY, cfg[max_string], wx.DefaultPosition, (40, -1), wx.TE_CENTER,
+                              name=max_string)
+            self.__tran_lst.append(min)
+            self.__tran_lst.append(max)
+            unit_sizer.Add(name, 0, wx.TOP, 4)
+            unit_sizer.Add(min, 0, wx.ALL, 1)
+            unit_sizer.Add(wavy, 0, wx.TOP, 4)
+            unit_sizer.Add(max, 0, wx.ALL, 1)
+            return unit_sizer
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(create_unit_size(name="%sa" % freq), 0, wx.EXPAND, 0)
+        sizer.Add(create_unit_size(name="%sb" % freq), 0, wx.EXPAND, 0)
         return sizer
 
-    def __init_case_result_sizer(self):
-        from libs.Config.Cases import RF_CASES
-        from libs.Config.Cases import PCBA_CASES
-        from libs.Config.Cases import MACHINE_CASES
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.__init_result_ctrl_sizer(cases=RF_CASES, t="RF", gap=3), 0, wx.EXPAND | wx.ALL, 1)
-        sizer.Add(self.__init_result_ctrl_sizer(cases=PCBA_CASES, t="PCBA", gap=5), 0, wx.EXPAND | wx.ALL, 1)
-        sizer.Add(self.__init_result_ctrl_sizer(cases=MACHINE_CASES, t="整机", gap=5), 0, wx.EXPAND | wx.ALL, 1)
+    def __init_receiver_sizer(self):
+        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "接收灵敏度设置"), wx.VERTICAL)
+        row_sizer1 = wx.BoxSizer(wx.HORIZONTAL)
+        config = Utility.ParseConfig.get(Path.CONFIG, "SignalSources")
+        power_2400, self.power_2400 = self.create_attr_value_sizer("2.4G信号源功率: ", attr_name="2400power",
+                                                                   attr_value=config["2400power"])
+        power_5800, self.power_5800 = self.create_attr_value_sizer("5.8G信号源功率: ", attr_name="5800power",
+                                                                   attr_value=config["5800power"])
+        wave_file, self.wave_file = self.create_attr_value_sizer("波形文件: ", attr_name="wave_file",
+                                                                 attr_value=config["wave_file"])
+        self.__recv_lst.append(self.power_2400)
+        self.__recv_lst.append(self.power_5800)
+        self.__recv_lst.append(self.wave_file)
+
+        row_sizer1.Add(power_2400, 0, wx.EXPAND | wx.ALL, 5)
+        row_sizer1.Add(power_5800, 0, wx.EXPAND | wx.ALL, 5)
+        row_sizer1.Add(wave_file, 1, wx.EXPAND | wx.ALL, 5)
+        sizer.Add(row_sizer1, 1, wx.EXPAND, 0)
+        return sizer
+
+    def __init_transmit_sizer(self):
+        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "发射功率设置"), wx.VERTICAL)
+        row_sizer1 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer3 = wx.BoxSizer(wx.HORIZONTAL)
+        config = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer")
+        for freq in [2410, 2450, 2475]:
+            row_sizer1.Add(self.create_min_max_sizer(freq=freq, cfg=config), 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+        for freq in [5750, 5800, 5850]:
+            row_sizer2.Add(self.create_min_max_sizer(freq=freq, cfg=config), 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+
+        ref_level, self.ref_level = self.create_attr_value_sizer("功率参考值: ", attr_name="ref_level",
+                                                                 attr_value=config["ref_level"])
+        thr_level, self.thr_level = self.create_attr_value_sizer("功率阀值: ", attr_name="thr_level",
+                                                                 attr_value=config["thr_level"])
+        gain, self.gain = self.create_attr_value_sizer("线损设置: ", attr_name="gain", attr_value=config["gain"])
+        self.__tran_lst.append(self.ref_level)
+        self.__tran_lst.append(self.thr_level)
+        self.__tran_lst.append(self.gain)
+        row_sizer3.Add(ref_level, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+        row_sizer3.Add(thr_level, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+        row_sizer3.Add(gain, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(row_sizer1, 0, wx.EXPAND, 0)
+        sizer.Add(row_sizer2, 0, wx.EXPAND, 0)
+        sizer.Add(row_sizer3, 0, wx.EXPAND, 0)
         return sizer
 
     def __init_operation_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        upload = wx.Button(self, wx.ID_ANY, u"TODO:上传测试结果", wx.DefaultPosition, (-1, 40), 0, name="upload_result")
-        refresh = wx.Button(self, wx.ID_ANY, u"刷新结果", wx.DefaultPosition, (-1, 40), 0, name="refresh_result")
-        screenshot = wx.Button(self, wx.ID_ANY, u"保存截图", wx.DefaultPosition, (-1, 40), 0, name="screenshot")
-        upload.Bind(wx.EVT_BUTTON, self.__on_button_click)
-        refresh.Bind(wx.EVT_BUTTON, self.__on_button_click)
-        screenshot.Bind(wx.EVT_BUTTON, self.__on_button_click)
-        sizer.Add(upload, 0, wx.ALL, 5)
-        sizer.Add(refresh, 0, wx.ALL, 5)
-        sizer.Add(screenshot, 0, wx.ALL, 5)
+        self.unlock = wx.Button(self, wx.ID_ANY, u"解锁", wx.DefaultPosition, (-1, 40), 0, name="unlock")
+        self.lock = wx.Button(self, wx.ID_ANY, u"锁定", wx.DefaultPosition, (-1, 40), 0, name="lock")
+        self.save = wx.Button(self, wx.ID_ANY, u"保存", wx.DefaultPosition, (-1, 40), 0, name="save")
+        self.unlock.Bind(wx.EVT_BUTTON, self.on_button_click)
+        self.lock.Bind(wx.EVT_BUTTON, self.on_button_click)
+        self.save.Bind(wx.EVT_BUTTON, self.on_button_click)
+        sizer.Add(self.unlock, 0, wx.ALL, 5)
+        sizer.Add(self.lock, 0, wx.ALL, 5)
+        sizer.Add(self.save, 0, wx.ALL, 5)
         return sizer
 
-    def __on_button_click(self, event):
+    def on_button_click(self, event):
         obj = event.GetEventObject()
         name = obj.GetName()
-        if name == "refresh_result":
-            Utility.append_thread(target=self.__update_color_based_on_result)
-        elif name == "upload_result":
-            Utility.Alert.Info("Hello World!")
-        elif name == "screenshot":
-            self.capture_screen()
-        else:
-            Utility.Alert.Error("Hello WUYOU!")
+        if name == "unlock":
+            dlg = wx.TextEntryDialog(self, u'请输入解锁码:', u'解锁配置', style=wx.TE_PASSWORD | wx.OK | wx.CANCEL)
+            if dlg.ShowModal() == wx.ID_OK:
+                if dlg.GetValue() in ["13641746250", "13636359582"]:
+                    self.EnableConfig(True)
+                else:
+                    Utility.Alert.Error(u"解锁码错误")
+        elif name == "lock":
+            self.EnableConfig(False)
+        elif name == "save":
+            pass
 
     def get_name(self):
         return self.name
 
-    def capture_screen(self):
-        default_name = "%s.png" % self.serial_number.GetValue()
-        dlg = wx.FileDialog(self, "保存截图", "", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
-                            wildcard="Screenshots(*.png)|*.png|All files(*.*)|*.*",
-                            defaultFile=default_name)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
-            if not os.path.splitext(filename)[1]:  # 如果没有文件名后缀
-                filename = filename + '.png'
-        else:
-            filename = None
-        dlg.Destroy()
-        time.sleep(1)
-        if filename is not None:
-            screen = wx.ScreenDC()
-            size, pos = self.GetSize(), self.GetScreenPosition()
-            width, height = size[0], size[1]
-            x, y = pos[0], pos[1]
-            bmp = wx.Bitmap(width, height)
-            memory = wx.MemoryDC(bmp)
-            memory.Blit(0, 0, width, height, screen, x, y)
-            bmp.SaveFile(filename, wx.BITMAP_TYPE_PNG)
-
     def Show(self):
         super(RF_ConfigPage, self).Show()
         self.__parent.refresh()
-        Utility.append_thread(target=self.__update_color_based_on_result)
 
     def Hide(self):
         super(RF_ConfigPage, self).Hide()
@@ -476,46 +514,21 @@ class RF_ConfigPage(wx.Panel):
     def get_result(self):
         return "Report"
 
-    def __init_result_ctrl_sizer(self, cases, t, gap=3):
-        def split_cases():
-            lst = list()
-            for case in cases:
-                flag = case.GetFlag(t=t)
-                name = case.GetName()
-                wx_control = self.__init_result_ctrl(flag=flag, name=name)
-                lst.append(wx_control)
-            split_lst = [lst[i:i + gap] for i in range(0, len(lst), gap)]
-            return split_lst
+    def EnableConfig(self, enable):
+        for ctrl in self.__recv_lst:
+            ctrl.Enable(enable=enable)
+        for ctrl in self.__tran_lst:
+            ctrl.Enable(enable=enable)
+        self.unlock.Enable(enable=not enable)
+        self.lock.Enable(enable=enable)
+        self.save.Enable(enable=enable)
 
-        rows = split_cases()
-        sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, t), wx.VERTICAL)
-        for row in rows:
-            row_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            for ctrl in row:
-                row_sizer.Add(ctrl, 0, wx.ALL, 3)
-            sizer.Add(row_sizer, 0, wx.EXPAND | wx.ALL, 5)
-        return sizer
+    def SaveConfig(self):
+        recv_data = dict()
+        tran_data = dict
+        for ctrl in self.__recv_lst:
+            recv_data[ctrl.GetName()]-
 
-    def __init_result_ctrl(self, flag, name):
-        title = StaticText(parent=self, flag=flag, name=name)
-        self.__result_controls.append(title)
-        return title
 
-    def __update_color_based_on_result(self):
-        self.__set_result_color_as_default()
-        socket = Variable.get_socket()
-        self.serial_number.SetValue(socket.get_serial_number())
-        results = socket.get_all_flag_results()
-        if results is not None:
-            for ctrl in self.__result_controls:
-                result = results[ctrl.GetFlag() - 1]
-                ctrl.SetResult(result)
-        else:
-            for ctrl in self.__result_controls:
-                result = socket.get_flag_result(ctrl.GetFlag())
-                ctrl.SetResult(result)
-
-    def __set_result_color_as_default(self):
-        self.serial_number.SetValue("")
-        for ctrl in self.__result_controls:
-            ctrl.SetResult("NotTest")
+        for ctrl in self.__tran_lst:
+            ctrl.Enable(enable=enable)

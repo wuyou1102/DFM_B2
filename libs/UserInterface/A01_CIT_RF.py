@@ -58,13 +58,13 @@ class SignalSources(object):
         print config
         result = True
         result = result and self.Reset()
-        result = result and self.SetPower(config.get("power", 90.0))
         result = result and self.MOD(ON=True)
         result = result and self.RF(ON=True)
-        result = result and self.SetFileData(config.get("file", "SR_SLOT_20M_16QAM_12_1P25X4_1T.DAT"))
+        result = result and self.SetFileData(config.get("wave_file", "SR_SLOT_20M_16QAM_12_1P25X4_1T.DAT"))
         result = result and self.ARB(ON=True)
         result = result and self.ALC(ON=False)
         result = result and self.SetARBClock(mHz=22.4)
+        result = result and self.SetPower(90)
         result = result and self.SetFrequency(mHz=2400)
         return result
 
@@ -115,7 +115,7 @@ class SignalAnalyzer(object):
         result = True
         result = result and self.EnterBurstPower()
         result = result and self.SetPowerAtt(0)
-        result = result and self.SetBrustRracRlev(config.get("rlev", 40))
+        result = result and self.SetBrustRracRlev(config.get("ref_level", 40))
         result = result and self.SetCorrOffs(config.get("gain", 60.0))
         result = result and self.SetMeasAsThreshold()
         result = result and self.SetMeasThrLevel(config.get("thr_level", 15))
