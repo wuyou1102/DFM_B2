@@ -498,7 +498,8 @@ class RF_ConfigPage(wx.Panel):
         elif name == "lock":
             self.EnableConfig(False)
         elif name == "save":
-            pass
+            self.SaveConfig()
+            self.EnableConfig(False)
 
     def get_name(self):
         return self.name
@@ -515,6 +516,7 @@ class RF_ConfigPage(wx.Panel):
         return "Report"
 
     def EnableConfig(self, enable):
+        enable = True
         for ctrl in self.__recv_lst:
             ctrl.Enable(enable=enable)
         for ctrl in self.__tran_lst:
@@ -525,10 +527,13 @@ class RF_ConfigPage(wx.Panel):
 
     def SaveConfig(self):
         recv_data = dict()
-        tran_data = dict
+        tran_data = dict()
         for ctrl in self.__recv_lst:
-            recv_data[ctrl.GetName()]-
-
-
+            recv_data[ctrl.GetName()] = ctrl.GetValue()
         for ctrl in self.__tran_lst:
-            ctrl.Enable(enable=enable)
+            tran_data[ctrl.GetName()] = ctrl.GetValue()
+        data = {
+            "SignalAnalyzer": tran_data,
+            "SignalSources": recv_data,
+        }
+        Utility.ParseConfig.modify(Path.CONFIG, data=data)
