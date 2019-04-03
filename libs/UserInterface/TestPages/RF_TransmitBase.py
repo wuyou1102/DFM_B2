@@ -187,7 +187,7 @@ class TransmitBase(Base.TestPage):
         for x in range(10):
             if self.stop_flag:
                 return
-            self.LogMessage(u"当前第%次检查频点" % (x + 1))
+            self.LogMessage(u"当前第%s次检查频点" % (x + 1))
             value = comm.get_frequency_point()
             self.LogMessage(u"当前频点为：%s" % value)
             if float(value) == self.freq:
@@ -214,7 +214,6 @@ class TransmitBase(Base.TestPage):
         self.SetResult("FAIL")
 
     def __test_road(self, index=0):
-        signal_analyzer = self.GetSignalAnalyzer()
         comm = self.get_communicate()
         if index == 0:
             comm.set_signal_0(ON=True)
@@ -222,13 +221,14 @@ class TransmitBase(Base.TestPage):
         else:
             comm.set_signal_0(ON=False)
             comm.set_signal_1(ON=True)
+        self.update_current_signal_status()
+        time.sleep(2)
         for x in range(3):
             for y in range(100):
                 if self.stop_flag:
                     return None
                 time.sleep(0.02)
-            result = signal_analyzer.GetBurstPower()
-            txp = self.convert_result_to_txp(result=result)
+            txp = self.get_transmit_power()
             self.LogMessage(u"[%s]当前测试天线%s发送功率为：%s" % (x, index, txp))
             if self.minimum < txp < self.maximum:
                 return True
