@@ -22,12 +22,13 @@ class TransmitBase(Base.TestPage):
 
     def init_minimum_and_maximum(self):
         config = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer")
-        if self.freq < 3000:
-            self.minimum = int(config.get('24_min', 15))
-            self.maximum = int(config.get('24_max', 17))
-        else:
-            self.minimum = int(config.get('58_min', 15))
-            self.maximum = int(config.get('58_max', 17))
+        self.a_min = float(config.get('%sa(min)' % self.freq))
+        self.a_max = float(config.get('%sa(max)' % self.freq))
+        self.b_min = float(config.get('%sb(min)' % self.freq))
+        self.b_max = float(config.get('%sb(max)' % self.freq))
+        logger.info(u"{freq}: A({ai}-{aa})  B({bi}-{ba})".format(freq=self.freq,
+                                                                 ai=self.a_min, aa=self.a_max,
+                                                                 bi=self.b_min, ba=self.b_max))
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -214,6 +215,9 @@ class TransmitBase(Base.TestPage):
         self.SetResult("FAIL")
 
     def __test_road(self, index=0):
+        name = 'a' if index == 0 else 'b'
+        minimum = self.a_min if index == 0 else self.b_min
+        maximum = self.a_max if index == 0 else self.b_max
         comm = self.get_communicate()
         if index == 0:
             comm.set_signal_0(ON=True)
@@ -222,15 +226,14 @@ class TransmitBase(Base.TestPage):
             comm.set_signal_0(ON=False)
             comm.set_signal_1(ON=True)
         self.update_current_signal_status()
-        time.sleep(2)
         for x in range(3):
-            for y in range(100):
+            for y in range(150):
                 if self.stop_flag:
                     return None
                 time.sleep(0.02)
             txp = self.get_transmit_power()
-            self.LogMessage(u"[%s]当前测试天线%s发送功率为：%s" % (x, index, txp))
-            if self.minimum < txp < self.maximum:
+            self.LogMessage(u"[%s] 当前测试%s路发送功率为：%s" % (name.upper(), index, txp))
+            if minimum < txp < maximum:
                 return True
         return False
 

@@ -65,8 +65,7 @@ class Panel(wx.Panel):
             from A01_CIT_RF import Frame
         elif name == "WriteSN":
             from A01_Write_Serial import Frame
-        elif name == "FPV":
-            from A03_FPV import Frame
+
 
         frame = Frame()
         frame.Show()
