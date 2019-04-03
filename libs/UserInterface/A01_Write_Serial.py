@@ -89,11 +89,8 @@ class Panel(wx.Panel):
         if self.socket is not None:
             self.socket.close()
         try:
-            import time
-            print time.time()
             self.socket = Socket.Client(address="192.168.1.1")
             self.socket.get_serial_number()
-            print time.time()
             self.refresh_serial_number()
             self.Enable(enable=True)
         except timeout:
@@ -124,8 +121,11 @@ class Panel(wx.Panel):
         elif len(serial) > 18:
             Utility.Alert.Error(u"输入的序列号太长，\n当前：%s，最大：18" % len(serial))
             return
-
         result = self.socket.get_serial_number()
+        if result is None:
+            Utility.Alert.Error("通讯异常，请重新连接。")
+            self.disconnect()
+            return False
         if result != "123456789012345678":
             dlg = wx.MessageDialog(
                 None,
@@ -135,11 +135,9 @@ class Panel(wx.Panel):
             )
             if dlg.ShowModal() == wx.ID_YES:
                 self.update_serial_number(serial=serial)
-            self.refresh_serial_number()
             dlg.Destroy()
             return
         self.update_serial_number(serial=serial)
-        self.refresh_serial_number()
 
     def refresh_serial_number(self):
         value = self.socket.get_serial_number()
@@ -155,9 +153,10 @@ class Panel(wx.Panel):
             self.socket.set_serial_number(serial)
             result = self.socket.get_serial_number()
             if serial == result:
-                Utility.Alert.Info(u"序列号写入成功。")
+                self.serial_number.SetValue(u"写入成功 ")
                 return True
-        Utility.Alert.Error(u"序列号写入失败，请重试。")
+        Utility.Alert.Error(u"写入失败，请重试。")
+        self.refresh_serial_number()
         return False
 
     def Enable(self, enable=True):
