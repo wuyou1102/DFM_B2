@@ -59,21 +59,21 @@ def param_to_property(*props, **kwprops):
 def execute_command(command, encoding=None):
     outputs = list()
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, shell=True)
-    __logger.debug('********************************************************')
-    __logger.debug('* EXECUTED COMMAND:\"%s\"' % command)
+    __logger.info('********************************************************')
+    __logger.info('* EXECUTED COMMAND:\"%s\"' % command)
     try:
         for line in iter(p.stdout.readline, b''):
             if encoding is None:
                 line = line.strip('\r\n')
             else:
                 line = line.decode(encoding=encoding, errors="strict").strip('\r\n')
-            __logger.debug("* STDOUT: {line}".format(line=line))
+            __logger.info("* STDOUT: {line}".format(line=line))
             outputs.append(line)
     finally:
         exit_code = p.wait()
         p.kill()
-        __logger.debug('* EXIT CODE: \"%s\"' % exit_code)
-        __logger.debug('********************************************************')
+        __logger.info('* EXIT CODE: \"%s\"' % exit_code)
+        __logger.info('********************************************************')
         return ExecuteResult(exit_code=exit_code, outputs=outputs)
 
 

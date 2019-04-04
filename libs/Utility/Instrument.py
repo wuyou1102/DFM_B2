@@ -53,15 +53,15 @@ class SCPI(object):
         return self.__session.write(cmd)[1]
 
     def execute_command(self, command):
-        logger.debug('********************************************************')
-        logger.debug('* SCPI COMMAND:\"%s\"' % command)
+        logger.info('********************************************************')
+        logger.info('* SCPI COMMAND:\"%s\"' % command)
         if self.__lock.acquire():
             try:
                 result = self.__query(command) if command.endswith('?') else self.__write(command)
-                logger.debug("* STDOUT: {result}".format(result=repr(result)))
+                logger.info("* STDOUT: {result}".format(result=repr(result)))
                 return result
             finally:
-                logger.debug('********************************************************')
+                logger.info('********************************************************')
                 self.__lock.release()
 
 

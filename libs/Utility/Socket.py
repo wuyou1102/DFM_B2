@@ -30,16 +30,14 @@ class Client(object):
         temp.settimeout(1)
         for i in range(1, 11):
             try:
-                Logger.debug("Try Socket Reconnect [%s]" % i)
                 temp.connect((self._address, self._port))
                 self._socket = temp
-                Logger.debug("Socket Connected.")
                 return True
             except socket.timeout:
                 pass
             except socket.error:
                 pass
-        Logger.debug("Socket Reconnect Fail")
+        Logger.error("Socket Reconnect Fail")
         return False
 
     @property
@@ -271,14 +269,14 @@ class Client(object):
         return False
 
     def execute_command(self, command, sleep=0.015):
-        Logger.debug('********************************************************')
-        Logger.debug('* SOCKET COMMAND:\"%s\"' % command)
+        Logger.info('********************************************************')
+        Logger.info('* SOCKET COMMAND:\"%s\"' % command)
         if self.__lock.acquire():
             try:
                 self.send(command=command)
                 time.sleep(sleep)
                 result = self.read()
-                Logger.debug("* STDOUT: {result}".format(result=repr(result)))
+                Logger.info("* STDOUT: {result}".format(result=repr(result)))
                 if result.endswith('\n'):
                     return ExecuteResult(exit_code=0, outputs=result.strip('\n'))
                 else:
@@ -288,7 +286,7 @@ class Client(object):
                 return ExecuteResult(exit_code=ErrorCode.SOCKET_EXCEPTION,
                                      outputs=u"执行命令:%s\n" % command + ErrorCode.SOCKET_EXCEPTION.MSG)
             finally:
-                Logger.debug('********************************************************')
+                Logger.info('********************************************************')
                 time.sleep(sleep)
                 self.__lock.release()
 
