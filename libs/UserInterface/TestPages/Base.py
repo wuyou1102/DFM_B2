@@ -159,7 +159,7 @@ class TestPage(wx.Panel):
         comm = self.get_communicate()
         if comm is None:
             return
-        with open(os.path.join(Path.LOG_SAVE, "%s.log" % comm.SerialNumber), 'a') as log:
+        with open(os.path.join(Path.TEST_LOG_SAVE, "%s.log" % comm.SerialNumber), 'a') as log:
             log.write(u"{time}:{message}\n".format(time=Utility.get_timestamp(), message=msg))
 
     @staticmethod

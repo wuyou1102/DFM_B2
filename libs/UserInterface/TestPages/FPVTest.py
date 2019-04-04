@@ -169,7 +169,7 @@ class FPV(Base.TestPage):
     @staticmethod
     def GetFlag(t):
         if t in ["MACHINE", u"整机"]:
-            return String.FPV_MACHINE
+            return String.FPV_MACH
 
     @staticmethod
     def get_rtsp_media():

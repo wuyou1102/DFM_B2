@@ -32,8 +32,8 @@ class Panel(wx.Panel):
         PCBA = self.__create_button(label=u"PCBA", name=u"PCBA")
         Machine = self.__create_button(label=u"组装", name=u"Machine")
         RF = self.__create_button(label=u"射频", name=u"RF")
-        FI_BS = self.__create_button(label=u"出厂检查（全向天线）", name=u"FI_O")
-        FI_ND = self.__create_button(label=u"出厂检查（定向天线）", name=u"FI_D")
+        FI_BS = self.__create_button(label=u"出厂检查(全向天线)", name=u"FI_O")
+        FI_ND = self.__create_button(label=u"出厂检查(定向天线)", name=u"FI_D")
 
         tool_sizer.Add(WriteSN, 0, wx.EXPAND | wx.ALL, 5)
         test_sizer.Add(RF, 0, wx.EXPAND | wx.ALL, 5)

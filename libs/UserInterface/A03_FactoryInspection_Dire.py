@@ -11,4 +11,4 @@ sys.setdefaultencoding('utf-8')
 
 class Frame(A03_FactoryInspection_Base.Frame):
     def __init__(self):
-        A03_FactoryInspection_Base.Frame.__init__(self, title=u"出厂检查Node", type_="Dire")
+        A03_FactoryInspection_Base.Frame.__init__(self, title=u"出厂检查（定向天线）", type_="Dire")
