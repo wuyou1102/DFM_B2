@@ -213,7 +213,6 @@ class ListBook(wx.Panel):
             self.__ScrolledWindow.append(c)
             self.__CaseView.append(c)
         self.__add_report_page()
-        print self.parent.type
         if self.parent.type == "RF":
             self.__add_rf_config_page()
         self.__ScrolledWindow.refresh_scroll_window()
