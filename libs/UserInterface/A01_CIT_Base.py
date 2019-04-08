@@ -7,7 +7,8 @@ from TestPages.Base import ReportPage
 from TestPages.Base import RF_ConfigPage
 from libs import Utility
 from libs.Config import Color
-from socket import timeout
+from socket import timeout as SocketTimeout
+from socket import error as SocketError
 
 from libs.Utility import Socket
 
@@ -125,7 +126,10 @@ class Panel(wx.Panel):
             self.set_variable(socket=socket)
             self.update_serial_number()
             Utility.append_thread(target=self.update_case_result, allow_dupl=False)
-        except timeout:
+        except SocketError:
+            Utility.Alert.Error(u"连接失败：超时。")
+            return False
+        except SocketTimeout:
             Utility.Alert.Error(u"连接失败：超时。")
             return False
         except IndexError:

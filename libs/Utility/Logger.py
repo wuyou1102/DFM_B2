@@ -1,12 +1,20 @@
 # -*- encoding:UTF-8 -*-
 import logging.config
 import os
-import sys
 import time
+from libs.Config.Path import CONSOLE_LOG_SAVE
+
+backupCount = 10
+logs = os.listdir(CONSOLE_LOG_SAVE)
+logs.sort(reverse=True)
+if len(logs) > backupCount:
+    logs = logs[backupCount:]
+for log in logs:
+    os.remove(os.path.join(CONSOLE_LOG_SAVE, log))
 
 timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-# __LOG = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), "console_%s.log" % timestamp)
-__LOG = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), "console.log")
+__LOG = os.path.join(CONSOLE_LOG_SAVE, "%s.log" % timestamp)
+
 
 logging.config.dictConfig({
     'version': 1,
@@ -29,8 +37,7 @@ logging.config.dictConfig({
             'filename': __LOG,
             'formatter': 'verbose',
             'encoding': 'utf8',
-            'maxBytes': 1024 * 1024 * 1,
-            "backupCount": 5,
+            'maxBytes': 1024 * 1024 * 100,
         }
     },
     'loggers': {

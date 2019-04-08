@@ -17,18 +17,19 @@ class Frame(A01_CIT_Base.Frame):
         self.__Sources = None
         self.__Analyzer = None
         A01_CIT_Base.Frame.__init__(self, title=u"射频测试", type="RF", size=(1100, 700))
-        resources = Instrument.list_resources()
-        for resource in resources:
-            if resource in [u'ASRL1::INSTR']:
-                continue
-            inst = Instrument.SCPI(resource)
-            if inst.model_name in ["N9020A"]:  # 信号分析仪
-                self.__Analyzer = SignalAnalyzer(instrument=inst)
-            elif inst.model_name in ["N5172B"]:  # 信号发生器
-                self.__Sources = SignalSources(instrument=inst)
-            else:
-                logger.error("Unknown Instrument [%s]" % inst.model_name)
-        Utility.append_thread(self.__init_instrument)
+        if Instrument.FLAG:
+            resources = Instrument.list_resources()
+            for resource in resources:
+                if resource in [u'ASRL1::INSTR']:
+                    continue
+                inst = Instrument.SCPI(resource)
+                if inst.model_name in ["N9020A"]:  # 信号分析仪
+                    self.__Analyzer = SignalAnalyzer(instrument=inst)
+                elif inst.model_name in ["N5172B"]:  # 信号发生器
+                    self.__Sources = SignalSources(instrument=inst)
+                else:
+                    logger.error("Unknown Instrument [%s]" % inst.model_name)
+            Utility.append_thread(self.__init_instrument)
 
     def __init_instrument(self):
         if self.__Sources:

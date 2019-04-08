@@ -2,10 +2,25 @@
 import pyvisa
 import logging
 import threading
-import time
+import wx
 
 logger = logging.getLogger(__name__)
-ResourceManager = pyvisa.ResourceManager()
+FLAG = False
+
+
+def Error(Message, From=None):
+    title = u"错误" if From is None else u"来自 \"%s\" 的错误" % From
+    logger.error('{title}:{Message}'.format(title=title, Message=Message))
+    dialog = wx.MessageDialog(None, Message, title, wx.OK | wx.ICON_ERROR)
+    dialog.ShowModal()
+    dialog.Center()
+    dialog.Destroy()
+
+try:
+    ResourceManager = pyvisa.ResourceManager()
+    FLAG = True
+except OSError:
+    Error(u"如需自动测试，请先安装NI VISA。")
 
 
 def list_resources():
@@ -74,4 +89,3 @@ if __name__ == '__main__':
             print inst.execute_command(":TRIGger:IF:LEVel 10")
             print inst.execute_command(":TRIGger:IF:LEVel?")
         inst.disconnect()
-

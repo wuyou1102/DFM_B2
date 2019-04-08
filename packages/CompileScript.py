@@ -37,7 +37,7 @@ def get_add_data_part(resources):
 def build():
     find_resource_files(os.path.join(project_path, 'resource'))
     data_part = get_add_data_part(resources=resource_files)
-    command = "pyinstaller  -w -y --icon=favicon.ico --workpath {tmp} --distpath {out} {data} {script}".format(
+    command = "pyinstaller  -y --icon=favicon.ico --workpath {tmp} --distpath {out} {data} {script}".format(
         tmp=os.path.join(abs_path, 'tmp'),
         out=os.path.join(abs_path, 'out'),
         data=data_part,
@@ -59,9 +59,15 @@ def copy_vlc(path):
             shutil.copytree(src=f_path, dst=os.path.join(path, f))
 
 
+def copy_config(path):
+    config = os.path.join(project_path, 'B2.conf')
+    shutil.copy(src=config, dst=os.path.join(path, 'B2.conf'))
+
+
 def deploy():
     deploy_path = os.path.join(abs_path, "DFM_%s" % Utility.get_timestamp())
     shutil.move(os.path.join(abs_path, 'out', python_name), deploy_path)
+    copy_config(path=deploy_path)
     # copy_vlc(path=deploy_path)
     shutil.rmtree(os.path.join(abs_path, 'tmp'))
     shutil.rmtree(os.path.join(abs_path, 'out'))

@@ -1,12 +1,12 @@
 # -*- encoding:UTF-8 -*-
 import wx
-from socket import timeout
 import logging
 import sys
+from socket import timeout as SocketTimeout
+from socket import error as SocketError
 from libs.Config import Color
 from libs.Utility import Socket
 from libs import Utility
-
 logger = logging.getLogger(__name__)
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -93,7 +93,10 @@ class Panel(wx.Panel):
             self.socket.get_serial_number()
             self.refresh_serial_number()
             self.Enable(enable=True)
-        except timeout:
+        except SocketError:
+            Utility.Alert.Error(u"连接失败：超时。")
+            return False
+        except SocketTimeout:
             Utility.Alert.Error(u"连接失败：超时。")
             return False
         except IndexError:

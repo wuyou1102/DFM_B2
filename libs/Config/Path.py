@@ -11,6 +11,6 @@ def join(*args):
     return p
 
 
-TEST_LOG_SAVE = join(__ABS, "TestLog")
-CONSOLE_LOG_SAVE = join(__ABS, "ConsoleLog")
+TEST_LOG_SAVE = join(__ABS, "LogTest")
+CONSOLE_LOG_SAVE = join(__ABS, "LogConsole")
 CONFIG = os.path.join(__ABS, "B2.conf")
