@@ -76,6 +76,7 @@ class WaitBootUpDialog(wx.Dialog):
                            pos=wx.DefaultPosition,
                            style=wx.CAPTION)
         self.panel = wx.Panel(self)
+        self.result = False
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.message = wx.TextCtrl(self.panel, wx.ID_ANY, '', style=wx.TE_MULTILINE | wx.TE_READONLY)
         main_sizer.Add(self.message, 1, wx.EXPAND | wx.ALL, 1)

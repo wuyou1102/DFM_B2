@@ -10,7 +10,7 @@ FLAG = False
 
 def Error(Message, From=None):
     title = u"错误" if From is None else u"来自 \"%s\" 的错误" % From
-    logger.error('{title}:{Message}'.format(title=title, Message=Message))
+    logger.error(u'{title}:{Message}'.format(title=title, Message=Message))
     dialog = wx.MessageDialog(None, Message, title, wx.OK | wx.ICON_ERROR)
     dialog.ShowModal()
     dialog.Center()

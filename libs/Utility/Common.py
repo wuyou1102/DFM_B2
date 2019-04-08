@@ -168,7 +168,9 @@ def is_device_connected(address, port=554, timeout=1):
         return True
     except socket.timeout:
         return False
-
+    except socket.error:
+        time.sleep(1)
+        return False
 
 
 if __name__ == '__main__':
