@@ -11,7 +11,8 @@ COMMON_1_SLANT_BOLD = wx.Font(10, wx.SWISS, wx.SLANT, wx.BOLD)
 TEST_TITLE = wx.Font(30, wx.SWISS, wx.NORMAL, wx.BOLD)
 DESC = wx.Font(22, wx.SWISS, wx.NORMAL, wx.BOLD)
 REPORT_LARGE = wx.Font(16, wx.SWISS, wx.NORMAL, wx.NORMAL)
-NORMAL_18 = wx.Font(14, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+NORMAL_14 = wx.Font(14, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+NORMAL_20 = wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 
 # family用于快速指定一个字体而无需知道该字体的实际的名字.字体的准确选择依赖于系统和具体可用的字体.你所得到的精确的字体将依赖于你的系统。字体类别如下:
 # wx.DECORATIVE：一个正式的，老的英文样式字体。

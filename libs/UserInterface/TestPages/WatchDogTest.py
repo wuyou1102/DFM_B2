@@ -15,14 +15,27 @@ class WatchDog(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.AUTO = True
+        self.thread = None
 
     def init_test_sizer(self):
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.desc = wx.StaticText(self, wx.ID_ANY, u"请长按按键6秒后松开", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.desc.SetFont(Font.DESC)
-        self.desc.SetBackgroundColour(Color.LightSkyBlue1)
-        sizer.Add(self.desc, 1, wx.EXPAND | wx.ALIGN_CENTER | wx.ALL, 1)
-        return sizer
+        v_sizer = wx.BoxSizer(wx.VERTICAL)
+        h_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        reboot_button = wx.Button(self, wx.ID_ANY, u"点击开始测试", wx.DefaultPosition, wx.DefaultSize, 0)
+        reboot_button.SetFont(Font.DESC)
+        reboot_button.Bind(wx.EVT_BUTTON, self.on_reboot)
+        h_sizer.Add(reboot_button, 0, wx.ALIGN_CENTER | wx.ALL, 1)
+        v_sizer.Add(h_sizer, 1, wx.ALIGN_CENTER | wx.ALL, 1)
+        return v_sizer
+
+    def on_reboot(self, event):
+        obj = event.GetEventObject()
+        obj.Disable()
+
+        Utility.append_thread(self.enable_button, obj=obj)
+
+    def enable_button(self, obj):
+        self.Sleep(2)
+        obj.Enable()
 
     def before_test(self):
         super(WatchDog, self).before_test()
@@ -30,8 +43,11 @@ class WatchDog(Base.TestPage):
 
     def start_test(self):
         self.FormatPrint(info="Started")
-        thread = Utility.append_thread(self.wait_for_reboot)
-        self.check_thread(thread=thread)
+        if self.thread is not None:
+            while self.thread.isAlive():
+                time.sleep(0.1)
+        self.thread = Utility.append_thread(self.wait_for_reboot)
+        self.check_thread(thread=self.thread)
 
     def check_thread(self, thread):
         if thread.isAlive():

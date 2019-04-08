@@ -303,6 +303,5 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-    s.set_signal_0(True)
+    s.unload_protocol_stack()
 
-    print s.execute_command("AT+DFM=get_ant0_pa_status")

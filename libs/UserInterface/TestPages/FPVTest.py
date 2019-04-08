@@ -12,9 +12,10 @@ from libs.Utility.B2 import WebSever
 from libs.Utility import Timeout
 from PIL import Image
 import cv2
-import threading
 
 logger = logging.getLogger(__name__)
+
+COUNTDOWN = 10
 
 
 def Image2Bitmap(Image):
@@ -27,6 +28,7 @@ class FPV(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.stop_flag = False
+        self.connect_flag = False
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -57,7 +59,8 @@ class FPV(Base.TestPage):
         rssi_sizer.Add(sizer0, 0, wx.ALL, 1)
         rssi_sizer.Add(sizer1, 0, wx.ALL, 1)
         rssi_sizer.Add(sizer2, 0, wx.ALL, 1)
-        rssi_sizer.Add(self.__init_button_sizer(), 0, wx.ALL, 1)
+        rssi_sizer.Add(self.__init_button_sizer(), 1, wx.ALL, 1)
+        rssi_sizer.Add(self.__init_countdown_sizer(), 0, wx.ALL, 1)
         return rssi_sizer
 
     def __init_previewer_sizer(self):
@@ -79,6 +82,13 @@ class FPV(Base.TestPage):
         sizer.Add(self.btn_start, 0, wx.EXPAND, 1)
         return sizer
 
+    def __init_countdown_sizer(self):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.countdown = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
+        self.countdown.SetFont(Font.NORMAL_20)
+        sizer.Add(self.countdown, 0, wx.ALIGN_RIGHT, 1)
+        return sizer
+
     def on_button_click(self, event):
         obj = event.GetEventObject()
         name = obj.GetName()
@@ -91,16 +101,22 @@ class FPV(Base.TestPage):
             self.update_device_config()
 
     def before_test(self):
+        super(FPV, self).before_test()
         self.stop_flag = False
+        self.connect_flag = False
+        self.countdown.SetLabel(u"")
+        self.countdown.SetForegroundColour(Color.Black)
         self.preview.Reset()
 
     def start_test(self):
         Utility.append_thread(target=self.__start)
 
     def __start(self):
+
         time.sleep(1.1)
         self.test_thread = Utility.append_thread(self.check_rtsp_server)
         self.info_thread = Utility.append_thread(self.update_info)
+        self.timeout_thread = Utility.append_thread(self.countdown_thread)
 
     def update_device_config(self):
         self.stop_flag = True
@@ -115,6 +131,27 @@ class FPV(Base.TestPage):
         else:
             self.Parent.Parent.Parent.disconnect()
 
+    def countdown_thread(self):
+        start_time = time.time()
+        self.countdown.SetLabel(u"")
+        self.countdown.SetForegroundColour(Color.Black)
+        while not self.stop_flag:
+            if self.connect_flag:
+                return
+            i = int(COUNTDOWN - (time.time() - start_time))
+            self.countdown.SetLabel(u"倒计时：%s" % i)
+            time.sleep(1)
+            if i < 1:
+                self.countdown.SetLabel(u"未检测到连接，请点击Fail")
+                self.countdown.SetForegroundColour(Color.GoogleRed)
+                return
+
+    def set_as_connect(self):
+        self.countdown.SetLabel(u"已检测到连接")
+        self.countdown.SetForegroundColour(Color.GoogleGreen)
+        self.connect_flag = True
+        self.EnablePass(enable=True)
+
     def check_rtsp_server(self):
         config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
         address = config.get('address', '192.168.1.243')
@@ -122,6 +159,7 @@ class FPV(Base.TestPage):
         while not self.stop_flag:
             logger.debug("check_rtsp_server_connect")
             if Utility.is_device_connected(address=address, port=port, timeout=0.5):
+                self.set_as_connect()
                 ipc = IpCamera(self.get_rtsp_media())
                 if ipc.isOpened():
                     self.refresh_preview(ipc=ipc)
