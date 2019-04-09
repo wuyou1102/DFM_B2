@@ -160,6 +160,7 @@ def is_device_started(address='192.168.1.1', timeout=10):
 
 
 def is_device_connected(address, port=554, timeout=1):
+    __logger.debug(u"开始检查[%s:%s:%s]" % (address, port, timeout))
     try:
         tmp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tmp.settimeout(timeout)
