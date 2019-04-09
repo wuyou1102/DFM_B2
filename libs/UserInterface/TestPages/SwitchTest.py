@@ -14,6 +14,13 @@ class Switch(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.AUTO = True
+        self.timer = wx.Timer(self)  # 创建定时器
+        self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)  # 绑定一个定时器事件
+
+    def OnTimer(self, event):
+        comm = self.get_communicate()
+        if comm.is_button_clicked():
+            self.EnablePass()
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -27,24 +34,14 @@ class Switch(Base.TestPage):
         super(Switch, self).before_test()
         comm = self.get_communicate()
         comm.reset_button_click()
-        self.stop_flag = True
 
     def start_test(self):
-        Utility.append_thread(target=self.is_button_clicked)
         self.FormatPrint(info="Started")
+        self.timer.Start(100)
 
     def stop_test(self):
-        self.stop_flag = False
+        self.timer.Stop()
         self.FormatPrint(info="Stop")
-
-    def is_button_clicked(self):
-        comm = self.get_communicate()
-        while self.stop_flag:
-            self.Sleep(0.05)
-            result = comm.is_button_clicked()
-            if result:
-                self.EnablePass()
-                break
 
     def append_log(self, msg):
         self.LogMessage(msg)

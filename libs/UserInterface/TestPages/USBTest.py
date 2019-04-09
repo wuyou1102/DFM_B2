@@ -14,6 +14,13 @@ class USB(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.AUTO = True
+        self.timer = wx.Timer(self)  # 创建定时器
+        self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)  # 绑定一个定时器事件
+
+    def OnTimer(self, event):
+        comm = self.get_communicate()
+        if comm.is_usb_connected():
+            self.EnablePass()
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -25,28 +32,14 @@ class USB(Base.TestPage):
 
     def before_test(self):
         super(USB, self).before_test()
-        self.stop_flag = True
 
     def start_test(self):
-        Utility.append_thread(target=self.is_usb_connected)
         self.FormatPrint(info="Started")
+        self.timer.Start(100)
 
     def stop_test(self):
-        self.stop_flag = False
+        self.timer.Stop()
         self.FormatPrint(info="Stop")
-
-    def is_usb_connected(self):
-        comm = self.get_communicate()
-        while self.stop_flag:
-            self.Sleep(0.05)
-            result = comm.is_usb_connected()
-            if result:
-                self.EnablePass()
-                break
-
-    def append_log(self, msg):
-        self.LogMessage(msg)
-        wx.CallAfter(self.output.AppendText, u"{time}\t{message}\n".format(time=Utility.get_time(), message=msg))
 
     @staticmethod
     def GetName():
