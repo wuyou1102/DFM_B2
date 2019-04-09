@@ -43,10 +43,9 @@ class WatchDog(Base.TestPage):
 
     def start_test(self):
         self.FormatPrint(info="Started")
-        if self.thread is not None:
-            while self.thread.isAlive():
-                time.sleep(0.1)
-        self.thread = Utility.append_thread(self.wait_for_reboot)
+        self.Sleep(0.05)
+        if self.thread is None or not self.thread.isAlive():
+            self.thread = Utility.append_thread(self.wait_for_reboot)
         self.check_thread(thread=self.thread)
 
     def check_thread(self, thread):
@@ -61,7 +60,7 @@ class WatchDog(Base.TestPage):
                     if socket.reconnect():
                         self.EnablePass()
                 else:
-                    Utility.Alert.Error(u"启动失败，请重新连接。")
+                    Utility.Alert.Error(u"启动失败，请重新连接,然后重试，如果多次失败，请点击Fail")
                     self.Parent.Parent.Parent.disconnect()
             else:
                 logger.info(u"Watch Dog Test Is Over.")
@@ -71,10 +70,13 @@ class WatchDog(Base.TestPage):
         self.FormatPrint(info="Stop")
 
     def wait_for_reboot(self):
-        while not self.stop_flag:
+        while True:
+            for x in range(1000):
+                time.sleep(0.001)
+                if self.stop_flag:
+                    return False
             if not Utility.is_device_connected("192.168.1.1", port=51341, timeout=1):
-                return
-            self.Sleep(1)
+                return True
 
     @staticmethod
     def GetName():
@@ -117,6 +119,10 @@ class WaitBootUpDialog(wx.Dialog):
                     return True
             self.output(u"启动失败")
             self.result = False
+            return False
+        except Exception as e:
+            logger.error(e)
+            logger.error(e.message)
             return False
         finally:
             self.Destroy()

@@ -15,7 +15,7 @@ import cv2
 
 logger = logging.getLogger(__name__)
 
-COUNTDOWN = 10
+COUNTDOWN = 60
 
 
 def Image2Bitmap(Image):
