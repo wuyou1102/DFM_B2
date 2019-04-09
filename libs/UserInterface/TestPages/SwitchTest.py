@@ -37,7 +37,7 @@ class Switch(Base.TestPage):
 
     def start_test(self):
         self.FormatPrint(info="Started")
-        self.timer.Start(100)
+        self.timer.Start(200)
 
     def stop_test(self):
         self.timer.Stop()
