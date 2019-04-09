@@ -110,6 +110,9 @@ def get_signal_status(idx):
     return __HEAD + cmd
 
 
+def reboot():
+    return "dfm_test_reboot"
+
 def set_serial_number(value):
     return "set_serial_number({value})".format(value=value)
 

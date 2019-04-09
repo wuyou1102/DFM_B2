@@ -3,7 +3,6 @@ import wx
 import logging
 import Base
 from libs.Config import Font
-from libs.Config import Color
 from libs.Config import String
 from libs import Utility
 import time
@@ -20,7 +19,7 @@ class WatchDog(Base.TestPage):
     def init_test_sizer(self):
         v_sizer = wx.BoxSizer(wx.VERTICAL)
         h_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        reboot_button = wx.Button(self, wx.ID_ANY, u"点击开始测试", wx.DefaultPosition, wx.DefaultSize, 0)
+        reboot_button = wx.Button(self, wx.ID_ANY, u"点击测试", wx.DefaultPosition, wx.DefaultSize, 0)
         reboot_button.SetFont(Font.DESC)
         reboot_button.Bind(wx.EVT_BUTTON, self.on_reboot)
         h_sizer.Add(reboot_button, 0, wx.ALIGN_CENTER | wx.ALL, 1)
@@ -30,7 +29,8 @@ class WatchDog(Base.TestPage):
     def on_reboot(self, event):
         obj = event.GetEventObject()
         obj.Disable()
-
+        comm = self.get_communicate()
+        comm.reboot()
         Utility.append_thread(self.enable_button, obj=obj)
 
     def enable_button(self, obj):
@@ -61,7 +61,7 @@ class WatchDog(Base.TestPage):
                     if socket.reconnect():
                         self.EnablePass()
                 else:
-                    Utility.Alert.Error("启动失败，请重新连接。")
+                    Utility.Alert.Error(u"启动失败，请重新连接。")
                     self.Parent.Parent.Parent.disconnect()
             else:
                 logger.info(u"Watch Dog Test Is Over.")
@@ -107,7 +107,7 @@ class WaitBootUpDialog(wx.Dialog):
     def GetResult(self):
         return self.result
 
-    def __wait_for_boot_up(self, timeout=120):
+    def __wait_for_boot_up(self, timeout=40):
         try:
             for x in range(timeout):
                 self.output(u"检查设备是否已经启动[%s]" % (x + 1))

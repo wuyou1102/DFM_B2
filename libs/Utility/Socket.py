@@ -44,6 +44,20 @@ class Client(object):
     def SerialNumber(self):
         return self.__serial_number
 
+    def reboot(self):
+        cmd = command.reboot()
+        Logger.info('********************************************************')
+        Logger.info('* SOCKET COMMAND:\"%s\"' % command)
+        if self.__lock.acquire():
+            try:
+                self.send(command=cmd)
+                return True
+            except socket.error:
+                return False
+            finally:
+                Logger.info('********************************************************')
+                self.__lock.release()
+
     def get_serial_number(self):
         cmd = command.get_serial_number()
         self.__serial_number = self._get(cmd=cmd)
@@ -304,4 +318,3 @@ class Client(object):
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
     s.unload_protocol_stack()
-
