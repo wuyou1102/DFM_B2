@@ -47,7 +47,7 @@ class Client(object):
     def reboot(self):
         cmd = command.reboot()
         Logger.info('********************************************************')
-        Logger.info('* SOCKET COMMAND:\"%s\"' % command)
+        Logger.info('* SOCKET COMMAND:\"%s\"' % cmd)
         if self.__lock.acquire():
             try:
                 self.send(command=cmd)

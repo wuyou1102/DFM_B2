@@ -7,6 +7,8 @@ from libs.Config import String
 from libs import Utility
 import time
 
+import threading
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,7 +16,23 @@ class WatchDog(Base.TestPage):
     def __init__(self, parent, type):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.AUTO = True
+        self.stop_flag = True
         self.thread = None
+        self.timer = wx.Timer(self)  # 创建定时器
+        self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)  # 绑定一个定时器事件
+
+    def OnTimer(self, event):
+        if self.thread.isReboot():
+            self.timer.Stop()
+            dlg = WaitBootUpDialog()
+            dlg.show_modal()
+            if dlg.GetResult():
+                socket = self.get_communicate()
+                if socket.reconnect():
+                    self.EnablePass()
+            else:
+                Utility.Alert.Error(u"启动失败，请重新连接,然后重试，如果多次失败，请点击Fail")
+                self.Parent.Parent.Parent.disconnect()
 
     def init_test_sizer(self):
         v_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -39,44 +57,20 @@ class WatchDog(Base.TestPage):
 
     def before_test(self):
         super(WatchDog, self).before_test()
-        self.stop_flag = False
 
     def start_test(self):
         self.FormatPrint(info="Started")
-        self.Sleep(0.05)
-        if self.thread is None or not self.thread.isAlive():
-            self.thread = Utility.append_thread(self.wait_for_reboot)
-        self.check_thread(thread=self.thread)
-
-    def check_thread(self, thread):
-        if thread.isAlive():
-            wx.CallLater(100, self.check_thread, thread=thread)
-        else:
-            if not self.stop_flag:
-                dlg = WaitBootUpDialog()
-                dlg.show_modal()
-                if dlg.GetResult():
-                    socket = self.get_communicate()
-                    if socket.reconnect():
-                        self.EnablePass()
-                else:
-                    Utility.Alert.Error(u"启动失败，请重新连接,然后重试，如果多次失败，请点击Fail")
-                    self.Parent.Parent.Parent.disconnect()
-            else:
-                logger.info(u"Watch Dog Test Is Over.")
+        self.thread = DetectionReboot()
+        self.thread.setDaemon(True)
+        self.thread.start()
+        self.timer.Start(100)
 
     def stop_test(self):
         self.stop_flag = True
+        self.timer.Stop()
+        if self.thread is not None:
+            self.thread.stop()
         self.FormatPrint(info="Stop")
-
-    def wait_for_reboot(self):
-        while True:
-            for x in range(1000):
-                time.sleep(0.001)
-                if self.stop_flag:
-                    return False
-            if not Utility.is_device_connected("192.168.1.1", port=51341, timeout=1):
-                return True
 
     @staticmethod
     def GetName():
@@ -131,3 +125,31 @@ class WaitBootUpDialog(wx.Dialog):
         msg = "%s: %s\n" % (Utility.get_timestamp('%H:%M:%S'), msg)
         wx.CallAfter(self.message.AppendText, msg)
         time.sleep(0.005)
+
+
+class DetectionReboot(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.stop_flag = False
+        self.reboot_flag = False
+
+    def isReboot(self):
+        return self.reboot_flag
+
+    def run(self):
+        self.stop_flag = False
+        self.reboot_flag = False
+        logger.info(u"开始重启检测。")
+        while True:
+            for x in range(100):
+                time.sleep(0.01)
+                if self.stop_flag:
+                    logger.info(u"重启检测已经停止。")
+                    return False
+            if not Utility.is_device_connected("192.168.1.1", port=51341, timeout=1):
+                self.reboot_flag = True
+                logger.info(u"已检测到重启。")
+                return True
+
+    def stop(self):
+        self.stop_flag = True
