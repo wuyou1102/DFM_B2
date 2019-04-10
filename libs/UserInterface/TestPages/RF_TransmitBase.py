@@ -212,7 +212,9 @@ class TransmitBase(Base.TestPage):
             return
         if road0 and road1:
             self.SetResult("PASS")
+            return
         self.SetResult("FAIL")
+        return
 
     def __test_road(self, index=0):
         name = 'a' if index == 0 else 'b'
@@ -226,13 +228,17 @@ class TransmitBase(Base.TestPage):
             comm.set_signal_0(ON=False)
             comm.set_signal_1(ON=True)
         self.update_current_signal_status()
-        for x in range(3):
-            for y in range(150):
+        for i in range(3):
+            for _ in range(100):
                 if self.stop_flag:
                     return None
-                time.sleep(0.02)
-            txp = self.get_transmit_power()
-            self.LogMessage(u"[%s] 当前测试%s路发送功率为：%s" % (name.upper(), index, txp))
+                time.sleep(0.01)
+            try:
+                txp = self.get_transmit_power()
+            except Exception as e:
+                self.LogMessage(u"[%s] 当前测试%s路发送功率为：%s" % (i, name.upper(), e.message))
+                return False
+            self.LogMessage(u"[%s] 当前测试%s路发送功率为：%s" % (i, name.upper(), txp))
             if minimum < txp < maximum:
                 return True
         return False

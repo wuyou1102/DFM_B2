@@ -120,13 +120,24 @@ class SignalAnalyzer(object):
         result = result and self.SetCorrOffs(config.get("gain", 60.0))
         result = result and self.SetMeasAsThreshold()
         result = result and self.SetMeasThrLevel(config.get("thr_level", 15))
-        result = result and self.SetTriggerMode()
-        result = result and self.SetIFLevel()
+        result = result and self.SetTriggerMode(mode="IMM")
+        result = result and self.SetSweepTime(ms=50)
+        result = result and self.SetAvg(ON=False)
+        # result = result and self.SetIFLevel()
         result = result and self.SetBandWidth(20)
         return result
 
+    def SetAvg(self, ON=True):
+        STAT = "ON" if ON else "OFF"
+        command = ":TXPower:AVERage %s" % STAT
+        return self.__inst.Set(command)
+
     def SetIFLevel(self, level=10):
         command = ":TRIGger:IF:LEVel {value}".format(value=level)
+        return self.__inst.Set(command)
+
+    def SetSweepTime(self, ms=1000):
+        command = "TXP:SWE:TIME %s ms" % ms
         return self.__inst.Set(command)
 
     def EnterBurstPower(self):
@@ -174,10 +185,13 @@ class SignalAnalyzer(object):
 if __name__ == '__main__':
     x = Instrument.list_resources()[0]
     init = Instrument.SCPI(x)
-    a = SignalAnalyzer(instrument=init)
-
-    a.init_analyzer_setting()
-
+    # a = SignalAnalyzer(instrument=init)
+    #
+    # a()
+    init.execute_command("BPOWer:AVER 0")
+    init.execute_command("BPOWer:AVER?")
+    init.execute_command("BPOWer:AVER:COUNt 1")
+    init.execute_command("BPOWer:AVER:COUNt?")
     # for x in range(2410, 2666):
     #     print time.time()
     #     a.SetFrequency(x)

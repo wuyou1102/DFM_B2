@@ -6,6 +6,7 @@ import Base
 from libs import Utility
 from libs.Config import Font
 from libs.Config import Picture
+from libs.Config import Path
 
 matplotlib.use('WXAgg')
 from matplotlib.figure import Figure
@@ -19,6 +20,9 @@ logger = logging.getLogger(__name__)
 class ReceiveBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
+        config = Utility.ParseConfig.get(Path.CONFIG, "SignalSources")
+        self.power = config.get("2400power") if self.freq < 3000 else config.get("5800power")
+
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.init_variable()
 
@@ -132,6 +136,7 @@ class ReceiveBase(Base.TestPage):
         self.PassButton.Disable()
         if signal_sources is not None:
             signal_sources.SetFrequency(self.freq)
+            signal_sources.SetPower(self.power)
         self.init_variable()
         self.panel_mpl.init_axes()
         uart = self.get_communicate()
