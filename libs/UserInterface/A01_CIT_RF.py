@@ -56,7 +56,6 @@ class SignalSources(object):
 
     def init_sources_setting(self):
         config = Utility.ParseConfig.get(Path.CONFIG, "SignalSources")
-        print config
         result = True
         result = result and self.Reset()
         result = result and self.MOD(ON=True)
@@ -65,8 +64,11 @@ class SignalSources(object):
         result = result and self.ARB(ON=True)
         result = result and self.ALC(ON=False)
         result = result and self.SetARBClock(mHz=22.4)
-        result = result and self.SetPower(90)
         result = result and self.SetFrequency(mHz=2400)
+        if result:
+            Utility.Alert.Info(u"信号发生器初始化成功。")
+        else:
+            Utility.Alert.Error(u"信号发生器初始化失败，请重试")
         return result
 
     def Reset(self):
@@ -112,7 +114,6 @@ class SignalAnalyzer(object):
 
     def init_analyzer_setting(self):
         config = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer")
-        print config
         result = True
         result = result and self.EnterBurstPower()
         result = result and self.SetPowerAtt(0)
@@ -125,6 +126,10 @@ class SignalAnalyzer(object):
         result = result and self.SetAvg(ON=False)
         # result = result and self.SetIFLevel()
         result = result and self.SetBandWidth(20)
+        if result:
+            Utility.Alert.Info(u"频谱仪初始化成功。")
+        else:
+            Utility.Alert.Error(u"频谱仪初始化失败，请重试")
         return result
 
     def SetAvg(self, ON=True):

@@ -64,7 +64,7 @@ class Client(object):
         return self.__serial_number
 
     def load_protocol_stack(self):
-        cmd = command.load_protocol_stack
+        cmd = command.load_protocol_stack()
         return self._set(cmd=cmd)
 
     def unload_protocol_stack(self):
@@ -317,4 +317,5 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-    s.unload_protocol_stack()
+    for x in range(1,33):
+        s.set_flag_result(x, 1)

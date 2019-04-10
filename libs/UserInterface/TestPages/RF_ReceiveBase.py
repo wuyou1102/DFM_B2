@@ -1,12 +1,14 @@
 # -*- encoding:UTF-8 -*-
 import logging
+
 import matplotlib
 import wx
+
 import Base
 from libs import Utility
 from libs.Config import Font
-from libs.Config import Picture
 from libs.Config import Path
+from libs.Config import Picture
 
 matplotlib.use('WXAgg')
 from matplotlib.figure import Figure
@@ -20,11 +22,11 @@ logger = logging.getLogger(__name__)
 class ReceiveBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
-        config = Utility.ParseConfig.get(Path.CONFIG, "SignalSources")
-        self.power = config.get("2400power") if self.freq < 3000 else config.get("5800power")
-
+        self.stop_flag = False
+        option = "2400power" if self.freq < 3000 else "5800power"
+        self.power = Utility.ParseConfig.get(Path.CONFIG, "SignalSources", option=option)
         Base.TestPage.__init__(self, parent=parent, type=type)
-        self.init_variable()
+        self.panel_mpl.init_axes()
 
     def GetSignalSources(self):
         return self.Parent.Parent.Parent.Parent.SignalSources
@@ -132,74 +134,146 @@ class ReceiveBase(Base.TestPage):
         Utility.append_thread(target=update_mcs, allow_dupl=True)
 
     def before_test(self):
-        signal_sources = self.GetSignalSources()
+        self.Sleep(0.11)
         self.PassButton.Disable()
+        self.panel_mpl.refresh(slot=[])
+        self.message.SetLabel(u"信号发生器未连接")
+        self.status.SetBitmap(Picture.status_disconnect)
+        signal_sources = self.GetSignalSources()
         if signal_sources is not None:
             signal_sources.SetFrequency(self.freq)
             signal_sources.SetPower(self.power)
-        self.init_variable()
-        self.panel_mpl.init_axes()
         uart = self.get_communicate()
         uart.set_rx_mode_20m()
         uart.set_frequency_point(self.freq * 1000)
         self.update_current_freq_point()
-
-    def init_variable(self):
-        self.stop_flag = True
-        self.lst_slot = []
-        self.lst_rssi0 = []
-        self.lst_rssi1 = []
+        self.stop_flag = False
 
     def start_test(self):
         self.FormatPrint(info="Started")
-        Utility.append_thread(target=self.draw_line, thread_name="DRAW_LINE_%s" % self.freq)
+
+        if self.GetSignalSources() is not None:
+            Utility.append_thread(target=self.draw_line, thread_name="DRAW_LINE_%s" % self.freq)
+        else:
+            Utility.append_thread(target=self.auto_test_thread, thread_name="AUTO_RECEIVE_%s" % self.freq)
 
     def stop_test(self):
-        self.stop_flag = False
+        self.stop_flag = True
         self.FormatPrint(info="Stop")
 
     def get_flag(self):
         return self.GetFlag(t=self.type)
 
+    def loop(self, func, interval, **kwargs):
+        logger.debug("Start Loop Function \"%s\"" % func.__name__, )
+        while True:
+            for x in range(interval / 50):
+                if self.stop_flag:
+                    logger.debug("Function \"%s\" is stopped by stop flag" % func.__name__, )
+                    return
+                self.Sleep(0.05)
+            try:
+                func(**kwargs)
+            except StopIteration:
+                logger.debug("Function \"%s\" is stopped by it self" % func.__name__, )
+                return
+
+    def check_instrument_connected(self, comm):
+        if not comm.is_instrument_connected():
+            self.message.SetLabel(u"信号发生器已连接")
+            self.status.SetBitmap(Picture.status_connect1)
+            raise StopIteration
+        else:
+            self.message.SetLabel(u"信号发生器未连接")
+            self.status.SetBitmap(Picture.status_disconnect)
+
+    def refresh_mpl(self, lst):
+        self.update_bler(lst=lst)
+        self.panel_mpl.refresh(slot=lst)
+
     def draw_line(self):
         comm = self.get_communicate()
-        self.Sleep(1)
-        while self.stop_flag:
+        self.loop(self.check_instrument_connected, 1000, comm=comm)
+        self.loop(self.refresh_mpl, 1000, lst=list())
+
+    def auto_test_thread(self):
+        connection_result = self.test_connection()
+        if connection_result is True:
+            block_result = self.test_block_error_count()
+            signal_result = self.test_signal_intensity()
+            if block_result is None or signal_result is None:
+                self.LogMessage(u"自动测试被打断。")
+                return True
+            if block_result is True and signal_result is True:
+                self.SetResult("PASS")
+                return True
+            else:
+                self.SetResult("FAIL")
+                return True
+        elif connection_result is None:
+            self.LogMessage(u"自动测试被打断。")
+            return True
+        else:
+            self.SetResult("FAIL")
+            return True
+
+    def test_connection(self):
+        comm = self.get_communicate()
+        for i in range(1, 11):
+            if self.stop_flag:
+                return None
             if comm.is_instrument_connected():
+                self.LogMessage(u"第%s次检查信号状态：已连接" % i)
                 self.status.SetBitmap(Picture.status_connect1)
                 self.message.SetLabel(u"信号发生器已连接，测试中")
-                break
+                return True
             else:
+                self.LogMessage(u"第%s次检查信号状态：未连接" % i)
                 self.message.SetLabel(u"正在连接信号发生器")
                 self.status.SetBitmap(Picture.status_disconnect)
                 comm.hold_baseband()
                 self.status.SetBitmap(wx.NullBitmap)
                 comm.release_baseband()
-        for x in range(40):
-            if not self.stop_flag:
-                return
-            self.update_bler()
-            self.panel_mpl.refresh(self.lst_slot)
-            self.Sleep(1)
-            if self.check_result():
-                self.set_message_result(isPass=True)
-                self.SetResult("PASS")
-                return
-        self.set_message_result(isPass=False)
-        self.SetResult("FAIL")
-
-    def check_result(self):
-        logger.debug(u"天线0平均信号强度：%s" % (sum(self.lst_rssi0) / len(self.lst_rssi0)))
-        logger.debug(u"天线1平均信号强度：%s" % (sum(self.lst_rssi1) / len(self.lst_rssi1)))
-        if self.lst_slot.count(0) >= 10:
-            return True
         return False
 
-    def set_message_result(self, isPass=True):
-        if isPass:
-            self.message.SetLabel(u"测试通过，请点击PASS")
-        else:
-            self.message.SetLabel(u"测试失败，请点击FAIL")
+    def test_block_error_count(self):
+        block_lst = list()
+        for i in range(40):
+            for _ in range(20):
+                if self.stop_flag:
+                    return None
+                self.Sleep(0.05)
+            self.update_bler(block_lst)
+            self.panel_mpl.refresh(slot=block_lst)
+            self.LogMessage(u"当前误块数[%s]" % block_lst[-1])
+            if block_lst.count(0) >= 10:
+                self.LogMessage(u"误块数测试通过")
+                return True
+        self.LogMessage(u"误块数测试失败")
+        return False
+
+    def test_signal_intensity(self):
+        signal_sources = self.GetSignalSources()
+        signal_sources.SetPower(50)
+        rssi0_lst = list()
+        rssi1_lst = list()
+        for i in range(5):
+            for _ in range(20):
+                if self.stop_flag:
+                    return None
+                self.Sleep(0.05)
+            self.update_rssi(rssi0_lst, rssi1_lst)
+            self.LogMessage(u"当前天线0信号强度[%s]" % rssi0_lst[-1])
+            self.LogMessage(u"当前天线1信号强度[%s]" % rssi1_lst[-1])
+        rssi0 = sum(rssi0_lst) / len(rssi0_lst)
+        rssi1 = sum(rssi1_lst) / len(rssi1_lst)
+        self.LogMessage(u"天线0平均信号强度[%s]" % rssi0)
+        self.LogMessage(u"天线1平均信号强度[%s]" % rssi1)
+        if abs(rssi0 - rssi1) <= 3:
+            self.LogMessage(u"信号强度测试通过")
+            return True
+        self.LogMessage(u"信号强度测试失败")
+        return False
 
     def on_restart(self, event):
         obj = event.GetEventObject()
@@ -209,35 +283,34 @@ class ReceiveBase(Base.TestPage):
             uart.hold_baseband()
             uart.release_baseband()
             Utility.Alert.Info(u"基带重启完成")
-            if uart.is_instrument_connected():
-                self.status.SetBitmap(Picture.status_connect1)
-            else:
-                self.status.SetBitmap(Picture.status_disconnect)
         finally:
             obj.Enable()
 
-    def update_bler(self):
-        uart = self.get_communicate()
-        result = uart.get_rssi_and_bler()
+    def update_bler(self, lst):
+        comm = self.get_communicate()
+        result = comm.get_rssi_and_bler()
         if result is not None and int(result, 16) > 0:
             bler = int(result[8:], 16)
             rssi0 = int(result[0:4], 16) - 65536
             rssi1 = int(result[4:8], 16) - 65536
-            self.lst_slot.append(bler)
-            self.lst_rssi0.append(rssi0)
-            self.lst_rssi1.append(rssi1)
+            lst.append(bler)
             self.rssi_0.SetValue(str(rssi0))
             self.rssi_1.SetValue(str(rssi1))
         else:
-            self.update_bler()
+            self.update_bler(lst=lst)
 
-    def get_bler(self, func):
-        value = func()
-        try:
-            block = int(value, 16)
-            return block
-        except ValueError:
-            return self.get_bler(func=func)
+    def update_rssi(self, lst0, lst1):
+        comm = self.get_communicate()
+        result = comm.get_rssi_and_bler()
+        if result is not None and int(result, 16) > 0:
+            rssi0 = int(result[0:4], 16) - 65536
+            rssi1 = int(result[4:8], 16) - 65536
+            lst0.append(rssi0)
+            lst1.append(rssi1)
+            self.rssi_0.SetValue(str(rssi0))
+            self.rssi_1.SetValue(str(rssi1))
+        else:
+            self.update_bler(lst0=lst0, lst1=lst1)
 
 
 class BaseMplPanel(wx.Panel):
@@ -372,6 +445,4 @@ class BlerMpl(BaseMplPanel):
     def __init_plot(self):
         self.slot, = self.Axes.plot(numpy.array([]), numpy.array([]), color="blue", linewidth=1.5, label=u'SLOT',
                                     linestyle='-')
-        # self.br, = self.Axes.plot(numpy.array([]), numpy.array([]), color="red", linewidth=1.5, label=u'BR',
-        #                           linestyle='-')
         self.Axes.legend()
