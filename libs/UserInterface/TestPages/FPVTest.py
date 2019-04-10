@@ -12,11 +12,10 @@ from libs.Utility.B2 import WebSever
 from libs.Utility import Timeout
 from PIL import Image
 import cv2
-import threading
 
 logger = logging.getLogger(__name__)
 
-COUNTDOWN = 10
+COUNTDOWN = 60
 COUNTDOWN_STRING = u"倒计时："
 
 
@@ -31,16 +30,10 @@ class FPV(Base.TestPage):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
         self.stop_flag = False
-        self.thread = None
-        self.ipc = None
         self.update_info_timer = wx.Timer(self)
         self.countdown_timer = wx.Timer(self)
-        self.check_connection_timer = wx.Timer(self)
-        self.preview_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update_info, self.update_info_timer)
         self.Bind(wx.EVT_TIMER, self.countdown_info, self.countdown_timer)
-        self.Bind(wx.EVT_TIMER, self.check_connection, self.check_connection_timer)
-        self.Bind(wx.EVT_TIMER, self.refresh_preview, self.preview_timer)
 
     def init_test_sizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -107,8 +100,8 @@ class FPV(Base.TestPage):
         if name == "config":
             dlg = ConfigDialog()
             if dlg.ShowModal() == wx.ID_OK:
-                self.StopDetection()
-                self.StartDetection()
+                self.config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
+                Utility.Alert.Warn(u"重启测试已使配置生效")
             dlg.Destroy()
         if name == "update":
             self.update_device_config()
@@ -120,7 +113,6 @@ class FPV(Base.TestPage):
 
     def update_device_config(self):
         self.StopTimer()
-        self.StopDetection()
         socket = self.get_communicate()
         dlg = UpdateDeviceConfigDialog(socket=socket)
         dlg.show_modal()
@@ -128,32 +120,13 @@ class FPV(Base.TestPage):
             Utility.Alert.Error(u"更新设备配置失败，失败项:\"%s\"" % dlg.get_result())
         if socket.reconnect():
             self.StartTimer()
-            self.StartDetection()
         else:
             self.Parent.Parent.Parent.disconnect()
 
     def set_as_connect(self):
-        # wx.CallAfter(self.wx_countdown.SetLabel, u"已检测到连接")
-        # wx.CallAfter(self.wx_countdown.SetForegroundColour, Color.GoogleGreen)
-        self.wx_countdown.SetLabel(u"已检测到连接")
+        wx.CallAfter(self.wx_countdown.SetLabel, u"已检测到连接")
+        wx.CallAfter(self.wx_countdown.SetForegroundColour, Color.GoogleGreen)
         self.EnablePass(enable=True)
-
-        # def check_rtsp_server(self):
-        #     config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
-        #     address = config.get('address', '192.168.1.243')
-        #     port = config.get('port', 554)
-        #     while not self.stop_flag:
-        #         logger.debug("check_rtsp_server_connect")
-        #         if Utility.is_device_connected(address=address, port=port, timeout=0.5):
-        #             self.set_as_connect()
-        #             ipc = IpCamera(self.get_rtsp_media())
-        #             if ipc.isOpened():
-        #                 self.refresh_preview(ipc=ipc)
-        #     try:
-        #         del ipc
-        #     except UnboundLocalError:
-        #         pass
-        #     logger.debug("FPV RTSP SERVER IS CONNECTED OVER")
 
     def refresh_preview(self, ipc):
         while not self.stop_flag:
@@ -163,7 +136,6 @@ class FPV(Base.TestPage):
             if retval:
                 time.sleep(0.015)
             else:
-                self.check_connection_timer.Start()
                 break
 
     def update_info(self, event):
@@ -190,45 +162,40 @@ class FPV(Base.TestPage):
         else:
             self.countdown_timer.Stop()
 
-    def check_connection(self, event):
-        if self.thread.isConnect():
-            self.check_connection_timer.Stop()
-            self.countdown_timer.Stop()
-            self.set_as_connect()
-            ipc = IpCamera(self.get_rtsp_media())
-            if ipc.isOpened():
-                wx.CallLater(1, self.refresh_preview, ipc=ipc)
+    def check_rtsp_server(self):
+        while not self.stop_flag:
+            if Utility.is_device_connected(address=self.config.get('address'), port=self.config.get('port'),
+                                           timeout=0.5):
+                self.set_as_connect()
+                ipc = IpCamera(self.get_rtsp_media())
+                if ipc.isOpened():
+                    self.refresh_preview(ipc=ipc)
+        try:
+            del ipc
+        except UnboundLocalError:
+            pass
+        logger.debug("FPV RTSP SERVER IS CONNECTED OVER")
 
     def StartTimer(self):
         self.wx_countdown.SetLabel(COUNTDOWN_STRING + str(COUNTDOWN))
         self.wx_countdown.SetForegroundColour(Color.Black)
         self.update_info_timer.Start(1001)
         self.countdown_timer.Start(1003)
-        self.check_connection_timer.Start(501)
 
     def StopTimer(self):
         self.update_info_timer.Stop()
         self.countdown_timer.Stop()
-        self.check_connection_timer.Stop()
-        self.preview_timer.Stop()
-
-    def StartDetection(self):
-        self.thread = DetectionConnection()
-        self.thread.setDaemon(True)
-        self.thread.start()
-
-    def StopDetection(self):
-        if self.thread is not None:
-            self.thread.stop()
 
     def start_test(self):
-        self.stop_flag = False
-        self.StartDetection()
+        def _start_test():
+            time.sleep(1.1)
+            self.test_thread = Utility.append_thread(self.check_rtsp_server)
+
         self.StartTimer()
+        Utility.append_thread(target=_start_test)
 
     def stop_test(self):
         self.StopTimer()
-        self.StopDetection()
         self.stop_flag = True
 
     @staticmethod
@@ -280,6 +247,7 @@ class IpCamera(object):
 class PreviewPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
+        self.default_bitmap = Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black'))
         self.bitmap = Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black'))
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -296,7 +264,7 @@ class PreviewPanel(wx.Panel):
         dc.DrawBitmap(self.bitmap, 0, 0)
 
     def Reset(self):
-        self.SetBitmap(Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black')))
+        self.SetBitmap(self.default_bitmap)
         self.UpdateBitmap()
 
 
@@ -461,32 +429,3 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         msg = "%s: %s\n" % (Utility.get_timestamp('%H:%M:%S'), msg)
         wx.CallAfter(self.message.AppendText, msg)
         time.sleep(0.005)
-
-
-class DetectionConnection(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.stop_flag = False
-        self.connect_flag = False
-        config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
-        self._address = config.get("address")
-        self._port = config.get("port")
-
-    def isConnect(self):
-        return self.connect_flag
-
-    def run(self):
-        self.stop_flag = False
-        self.connect_flag = False
-        logger.info(u"开始检查连接状态")
-        while True:
-            if self.stop_flag:
-                logger.info(u"连接状态检测已经停止。")
-                return False
-            if Utility.is_device_connected(self._address, port=self._port, timeout=1):
-                self.connect_flag = True
-                logger.info(u"已检测到连接。")
-                return True
-
-    def stop(self):
-        self.stop_flag = True
