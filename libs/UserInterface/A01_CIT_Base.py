@@ -139,7 +139,7 @@ class Panel(wx.Panel):
             self.clear_variable()
             socket.close()
 
-    def disconnect(self):
+    def disconnect(self, error_msg=None):
         self.test_view.clear_case_result()
         socket = Variable.get_socket()
         if socket is not None:
@@ -148,6 +148,8 @@ class Panel(wx.Panel):
         self.Layout()
         self.Enable(False)
         self.serial_number.SetValue("")
+        if error_msg is not None:
+            Utility.Alert.Error(error_msg)
 
     def update_serial_number(self):
         socket = Variable.get_socket()

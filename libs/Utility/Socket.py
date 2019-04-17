@@ -107,9 +107,7 @@ class Client(object):
 
     def is_usb_connected(self):
         cmd = command.is_usb_connected()
-        if self._get(cmd=cmd).endswith("True"):
-            return True
-        return False
+        return self._get(cmd=cmd)
 
     def reset_button_click(self):
         cmd = command.reset_button_click()
@@ -117,9 +115,7 @@ class Client(object):
 
     def is_button_clicked(self):
         cmd = command.is_button_clicked()
-        if self._get(cmd=cmd).endswith("True"):
-            return True
-        return False
+        return self._get(cmd=cmd)
 
     def start_web_server(self):
         cmd = command.start_web_server()
@@ -249,7 +245,6 @@ class Client(object):
                 return result.outputs
         except ValueError and TypeError:
             Logger.error("Get an abnormal value: \"%s\"" % repr(result.outputs))
-        Alert.Error(result.outputs)
         return None
 
     def _protocol_set(self, cmd):
@@ -267,7 +262,6 @@ class Client(object):
         result = self.execute_command(command=cmd)
         if result.exit_code == 0:
             return result.outputs
-        Alert.Error(result.outputs)
         return None
 
     def _set(self, cmd):

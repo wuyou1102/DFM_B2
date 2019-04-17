@@ -141,10 +141,12 @@ class FPV(Base.TestPage):
         socket = self.get_communicate()
         result = socket.get_rssi_and_bler()
         if result is None:
-            if not socket.reconnect():
-                self.stop_test()
-                self.Parent.Parent.Parent.disconnect()
-                return False
+            self.stop_test()
+            if socket.reconnect():
+                self.start_test()
+            else:
+                self.Parent.Parent.Parent.disconnect(error_msg=u"连接异常，请手动尝试重新连接")
+            return
         if result != "0000000000000000":
             bler = int(result[8:], 16)
             rssi0 = int(result[0:4], 16) - 65536

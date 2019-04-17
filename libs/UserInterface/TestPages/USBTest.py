@@ -19,7 +19,14 @@ class USB(Base.TestPage):
 
     def OnTimer(self, event):
         comm = self.get_communicate()
-        if comm.is_usb_connected():
+        result = comm.is_usb_connected()
+        if result is None:
+            self.timer.Stop()
+            if comm.reconnect():
+                self.timer.Start(200)
+            else:
+                self.Parent.Parent.Parent.disconnect(error_msg=u"连接异常，请手动尝试重新连接")
+        elif result == "True":
             self.EnablePass()
 
     def init_test_sizer(self):
