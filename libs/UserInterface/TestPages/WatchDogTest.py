@@ -114,12 +114,8 @@ class WaitBootUpDialog(wx.Dialog):
             self.output(u"启动失败")
             self.result = False
             return False
-        except Exception as e:
-            logger.error(e)
-            logger.error(e.message)
-            return False
         finally:
-            self.Destroy()
+            self.EndModal(wx.OK)
 
     def output(self, msg):
         msg = "%s: %s\n" % (Utility.get_timestamp('%H:%M:%S'), msg)

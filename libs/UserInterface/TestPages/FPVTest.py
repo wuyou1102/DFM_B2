@@ -254,7 +254,6 @@ class IpCamera(object):
 class PreviewPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        self.default_bitmap = Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black'))
         self.bitmap = Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black'))
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -271,7 +270,7 @@ class PreviewPanel(wx.Panel):
         dc.DrawBitmap(self.bitmap, 0, 0)
 
     def Reset(self):
-        self.SetBitmap(self.default_bitmap)
+        self.SetBitmap(Image2Bitmap(Image.new("RGB", tuple(self.GetSize()), color='black')))
         self.UpdateBitmap()
 
 
@@ -368,10 +367,9 @@ class UpdateDeviceConfigDialog(wx.Dialog):
             if not self.__wait_for_boot_up():
                 self.result = "启动检测失败"
                 return False
-            print 'sss'
             return True
         finally:
-            self.Destroy()
+            self.EndModal(wx.OK)
 
     def GetResult(self):
         return self.result
