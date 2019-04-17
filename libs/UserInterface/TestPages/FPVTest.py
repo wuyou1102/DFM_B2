@@ -109,17 +109,16 @@ class FPV(Base.TestPage):
     def before_test(self):
         super(FPV, self).before_test()
         self.preview.Reset()
-        self.stop_flag = False
 
     def update_device_config(self):
-        self.StopTimer()
+        self.stop_test()
         socket = self.get_communicate()
         dlg = UpdateDeviceConfigDialog(socket=socket)
         dlg.show_modal()
         if dlg.get_result():
             Utility.Alert.Error(u"更新设备配置失败，失败项:\"%s\"" % dlg.get_result())
         if socket.reconnect():
-            self.StartTimer()
+            self.start_test()
         else:
             self.Parent.Parent.Parent.disconnect()
 
@@ -141,6 +140,11 @@ class FPV(Base.TestPage):
     def update_info(self, event):
         socket = self.get_communicate()
         result = socket.get_rssi_and_bler()
+        if result is None:
+            if not socket.reconnect():
+                self.stop_test()
+                self.Parent.Parent.Parent.disconnect()
+                return False
         if result != "0000000000000000":
             bler = int(result[8:], 16)
             rssi0 = int(result[0:4], 16) - 65536
@@ -191,6 +195,7 @@ class FPV(Base.TestPage):
             time.sleep(1.1)
             self.test_thread = Utility.append_thread(self.check_rtsp_server)
 
+        self.stop_flag = False
         self.StartTimer()
         Utility.append_thread(target=_start_test)
 
@@ -238,7 +243,7 @@ class IpCamera(object):
         except IndexError:
             return False, Image.new("RGB", size, color='black')
 
-    @Timeout.timeout(1)
+    @Timeout.timeout(0.5)
     def __get_frame(self, size):
         retval, image = self.video.read()
         return Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)).resize(size=size)
@@ -361,6 +366,8 @@ class UpdateDeviceConfigDialog(wx.Dialog):
             if not self.__wait_for_boot_up():
                 self.result = "启动检测失败"
                 return False
+            print 'sss'
+            return True
         finally:
             self.Destroy()
 
@@ -368,8 +375,7 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         return self.result
 
     def __wait_for_boot_up(self, timeout=100):
-        time.sleep(20)
-        for x in range(timeout - 20):
+        for x in range(timeout):
             self.output(u"检查设备是否已经启动[%s]" % (x + 1))
             if Utility.is_device_connected(address="192.168.1.1", port=51341):
                 self.output(u"启动成功")

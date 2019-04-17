@@ -243,42 +243,38 @@ class Client(object):
         return False
 
     def _protocol_get(self, cmd):
-        for i in range(3):
-            try:
-                result = self.execute_command(command=cmd)
-                if result.exit_code == 0 and len(result.outputs) == 16:
-                    return result.outputs
-            except ValueError and TypeError:
-                Logger.error("[%s]Get an abnormal value: \"%s\"" % (i, repr(result.outputs)))
+        try:
+            result = self.execute_command(command=cmd)
+            if result.exit_code == 0 and len(result.outputs) == 16:
+                return result.outputs
+        except ValueError and TypeError:
+            Logger.error("Get an abnormal value: \"%s\"" % repr(result.outputs))
         Alert.Error(result.outputs)
         return None
 
     def _protocol_set(self, cmd):
-        for i in range(3):
-            try:
-                result = self.execute_command(command=cmd)
-                if result.exit_code == 0:
-                    if len(result.outputs) == 16 and int(result.outputs) == 0:
-                        return True
-            except ValueError and TypeError:
-                Logger.error("[%s]Get an abnormal value: \"%s\"" % (i, repr(result.outputs)))
+        try:
+            result = self.execute_command(command=cmd)
+            if result.exit_code == 0:
+                if len(result.outputs) == 16 and int(result.outputs) == 0:
+                    return True
+        except ValueError and TypeError:
+            Logger.error("Get an abnormal value: \"%s\"" % repr(result.outputs))
         Alert.Error(u"设置失败")
         return False
 
     def _get(self, cmd):
-        for i in range(3):
-            result = self.execute_command(command=cmd)
-            if result.exit_code == 0:
-                return result.outputs
+        result = self.execute_command(command=cmd)
+        if result.exit_code == 0:
+            return result.outputs
         Alert.Error(result.outputs)
         return None
 
     def _set(self, cmd):
-        for i in range(3):
-            result = self.execute_command(command=cmd)
-            if result.exit_code == 0:
-                if result.outputs.endswith("True"):
-                    return True
+        result = self.execute_command(command=cmd)
+        if result.exit_code == 0:
+            if result.outputs.endswith("True"):
+                return True
         Alert.Error(u"设置失败")
         return False
 
@@ -317,5 +313,5 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-    for x in range(1,33):
+    for x in range(1, 33):
         s.set_flag_result(x, 2)
