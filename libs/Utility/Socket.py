@@ -318,4 +318,4 @@ class Client(object):
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
     for x in range(1,33):
-        s.set_flag_result(x, 1)
+        s.set_flag_result(x, 2)

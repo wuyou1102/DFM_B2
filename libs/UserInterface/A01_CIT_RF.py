@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+print Instrument.list_resources()
+
 
 class Frame(A01_CIT_Base.Frame):
     def __init__(self):
@@ -20,7 +22,7 @@ class Frame(A01_CIT_Base.Frame):
         if Instrument.FLAG:
             resources = Instrument.list_resources()
             for resource in resources:
-                if resource in [u'ASRL1::INSTR']:
+                if resource in [u'ASRL1::INSTR', u'ASRL10::INSTR']:
                     continue
                 inst = Instrument.SCPI(resource)
                 if inst.model_name in ["N9020A"]:  # 信号分析仪
