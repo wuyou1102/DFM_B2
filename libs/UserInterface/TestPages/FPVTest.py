@@ -115,8 +115,11 @@ class FPV(Base.TestPage):
         socket = self.get_communicate()
         dlg = UpdateDeviceConfigDialog(socket=socket)
         dlg.show_modal()
-        if dlg.get_result():
+        if dlg.show_modal() == wx.OK:
+            pass
+        else:
             Utility.Alert.Error(u"更新设备配置失败，失败项:\"%s\"" % dlg.get_result())
+        dlg.Destroy()
         if socket.reconnect():
             self.start_test()
         else:
@@ -355,21 +358,22 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         return self.result
 
     def modify_device_config(self):
-        try:
-            if not self._start_web():
-                self.result = "WebServer启动失败"
-                return False
-            if not self.__setup_config():
-                self.result = "参数配置失败"
-                return False
-            if not self.__reboot():
-                self.__wait_for_reboot()
-            if not self.__wait_for_boot_up():
-                self.result = "启动检测失败"
-                return False
-            return True
-        finally:
-            self.EndModal(wx.OK)
+        if not self._start_web():
+            self.result = "WebServer启动失败"
+            self.EndModal(wx.CANCEL)
+            return False
+        if not self.__setup_config():
+            self.result = "参数配置失败"
+            self.EndModal(wx.CANCEL)
+            return False
+        if not self.__reboot():
+            self.__wait_for_reboot()
+        if not self.__wait_for_boot_up():
+            self.result = "启动检测失败"
+            self.EndModal(wx.CANCEL)
+            return False
+        self.EndModal(wx.OK)
+        return True
 
     def GetResult(self):
         return self.result

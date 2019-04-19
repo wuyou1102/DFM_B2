@@ -93,6 +93,8 @@ class WatchDog(Base.TestPage):
     def GetFlag(t):
         if t in ["MACHINE", u"整机"]:
             return String.WATCH_DOG_MACH
+        else:
+            return String.WATCH_DOG_PCBA
 
 
 class WaitBootUpDialog(wx.Dialog):
