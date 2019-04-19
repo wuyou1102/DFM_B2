@@ -25,14 +25,27 @@ class WatchDog(Base.TestPage):
         if self.thread.isReboot():
             self.timer.Stop()
             dlg = WaitBootUpDialog()
-            dlg.show_modal()
-            if dlg.GetResult():
+            Utility.append_thread(self.wait_for_boot_up, dlg=dlg)
+            if dlg.ShowModal() == wx.OK:
                 socket = self.get_communicate()
                 if socket.reconnect():
                     self.EnablePass()
+                else:
+                    Utility.Alert.Error(u"启动失败，请重新连接,然后重试，如果多次失败，请点击Fail")
+                    self.Parent.Parent.Parent.disconnect()
             else:
                 Utility.Alert.Error(u"启动失败，请重新连接,然后重试，如果多次失败，请点击Fail")
                 self.Parent.Parent.Parent.disconnect()
+            dlg.Destroy()
+
+    def wait_for_boot_up(self, dlg):
+        for x in range(40):
+            dlg.output(u"检查设备是否已经启动[%s]" % (x + 1))
+            if Utility.is_device_connected(address="192.168.1.1", port=51341):
+                dlg.EndModal(wx.OK)
+                return True
+        dlg.EndModal(wx.CANCEL)
+        return False
 
     def init_test_sizer(self):
         v_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -45,6 +58,7 @@ class WatchDog(Base.TestPage):
         return v_sizer
 
     def on_reboot(self, event):
+        self.timer.Start(100)
         obj = event.GetEventObject()
         obj.Disable()
         comm = self.get_communicate()
@@ -63,7 +77,6 @@ class WatchDog(Base.TestPage):
         self.thread = DetectionReboot()
         self.thread.setDaemon(True)
         self.thread.start()
-        self.timer.Start(100)
 
     def stop_test(self):
         self.stop_flag = True
@@ -95,27 +108,6 @@ class WaitBootUpDialog(wx.Dialog):
         self.panel.SetSizer(main_sizer)
         self.Center()
         self.Layout()
-
-    def show_modal(self):
-        Utility.append_thread(self.__wait_for_boot_up)
-        self.ShowModal()
-
-    def GetResult(self):
-        return self.result
-
-    def __wait_for_boot_up(self, timeout=40):
-        try:
-            for x in range(timeout):
-                self.output(u"检查设备是否已经启动[%s]" % (x + 1))
-                if Utility.is_device_connected(address="192.168.1.1", port=51341):
-                    self.output(u"启动成功")
-                    self.result = True
-                    return True
-            self.output(u"启动失败")
-            self.result = False
-            return False
-        finally:
-            self.EndModal(wx.OK)
 
     def output(self, msg):
         msg = "%s: %s\n" % (Utility.get_timestamp('%H:%M:%S'), msg)

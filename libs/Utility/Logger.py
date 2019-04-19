@@ -10,11 +10,13 @@ logs.sort(reverse=True)
 if len(logs) > backupCount:
     logs = logs[backupCount:]
 for log in logs:
-    os.remove(os.path.join(CONSOLE_LOG_SAVE, log))
+    try:
+        os.remove(os.path.join(CONSOLE_LOG_SAVE, log))
+    except WindowsError:
+        pass
 
 timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
 __LOG = os.path.join(CONSOLE_LOG_SAVE, "%s.log" % timestamp)
-
 
 logging.config.dictConfig({
     'version': 1,
