@@ -114,16 +114,41 @@ class FPV(Base.TestPage):
         self.stop_test()
         socket = self.get_communicate()
         dlg = UpdateDeviceConfigDialog(socket=socket)
-        dlg.show_modal()
-        if dlg.show_modal() == wx.OK:
-            pass
+        Utility.append_thread(self.modify_config, dlg=dlg)
+        if dlg.ShowModal() == wx.OK:
+            socket = self.get_communicate()
+            if socket.reconnect():
+                self.EnablePass()
+            else:
+                Utility.Alert.Error(u"启动失败，请重新连接")
+                self.Parent.Parent.Parent.disconnect()
         else:
-            Utility.Alert.Error(u"更新设备配置失败，失败项:\"%s\"" % dlg.get_result())
+            Utility.Alert.Error(self.re)
+            self.Parent.Parent.Parent.disconnect()
         dlg.Destroy()
+
         if socket.reconnect():
             self.start_test()
         else:
             self.Parent.Parent.Parent.disconnect()
+
+    def modify_config(self, dlg):
+        if not dlg.start_web():
+            self.result = "WebServer启动失败"
+            dlg.EndModal(wx.CANCEL)
+            return False
+        if not dlg.setup_config():
+            self.result = "参数配置失败"
+            dlg.EndModal(wx.CANCEL)
+            return False
+        if not dlg.reboot():
+            dlg.wait_for_reboot()
+        if not dlg.wait_for_boot_up():
+            self.result = "启动检测失败"
+            dlg.EndModal(wx.CANCEL)
+            return False
+        dlg.EndModal(wx.OK)
+        return True
 
     def set_as_connect(self):
         wx.CallAfter(self.wx_countdown.SetLabel, u"已检测到连接")
@@ -350,35 +375,13 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         self.Center()
         self.Layout()
 
-    def show_modal(self):
-        Utility.append_thread(self.modify_device_config)
-        self.ShowModal()
-
     def get_result(self):
         return self.result
-
-    def modify_device_config(self):
-        if not self._start_web():
-            self.result = "WebServer启动失败"
-            self.EndModal(wx.CANCEL)
-            return False
-        if not self.__setup_config():
-            self.result = "参数配置失败"
-            self.EndModal(wx.CANCEL)
-            return False
-        if not self.__reboot():
-            self.__wait_for_reboot()
-        if not self.__wait_for_boot_up():
-            self.result = "启动检测失败"
-            self.EndModal(wx.CANCEL)
-            return False
-        self.EndModal(wx.OK)
-        return True
 
     def GetResult(self):
         return self.result
 
-    def __wait_for_boot_up(self, timeout=100):
+    def wait_for_boot_up(self, timeout=100):
         for x in range(timeout):
             self.output(u"检查设备是否已经启动[%s]" % (x + 1))
             if Utility.is_device_connected(address="192.168.1.1", port=51341):
@@ -387,7 +390,7 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         self.output(u"启动失败")
         return False
 
-    def __wait_for_reboot(self):
+    def wait_for_reboot(self):
         while True:
             if Utility.is_device_connected(address="192.168.1.1", port=51341):
                 self.output(u"重启失败，请手动重启")
@@ -396,25 +399,25 @@ class UpdateDeviceConfigDialog(wx.Dialog):
                 break
             time.sleep(1)
 
-    def _start_web(self):
-        if self.__start_web_server():
+    def start_web(self):
+        if self.start_web_server():
             time.sleep(2)
             for x in range(10):
-                if self.__is_web_server_started():
+                if self.is_web_server_started():
                     self.output(u"WebServer启动成功")
                     return True
         self.output(u"WebServer启动失败，请手动进入配置模式后重试。")
         return False
 
-    def __start_web_server(self):
+    def start_web_server(self):
         self.output(u"正在尝试启动WebServer")
         return self.socket.start_web_server()
 
-    def __is_web_server_started(self):
+    def is_web_server_started(self):
         self.output(u"正在检查WebServer是否已经启动")
         return self.web.isStart()
 
-    def __setup_config(self):
+    def setup_config(self):
         network_id = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='id')
         logger.debug("I got network id : %s" % network_id)
         self.output(u"正在修改设备配置")
@@ -424,7 +427,7 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         self.output(u"修改配置失败")
         return False
 
-    def __reboot(self):
+    def reboot(self):
         for x in range(3):
             self.output(u"正在自动重启设备")
             self.web.RebootDevice()
