@@ -120,7 +120,7 @@ class TestResult(ReportPage):
 
     def update_config(self):
         socket = Variable.get_socket()
-        dlg = UpdateDeviceConfigDialog(socket=socket,type_=self.type_)
+        dlg = UpdateDeviceConfigDialog(socket=socket, type_=self.type_)
         dlg.show_modal()
 
 
@@ -180,12 +180,15 @@ class UpdateDeviceConfigDialog(wx.Dialog):
         return self.web.isStart()
 
     def __setup_config(self):
-        network_id = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='id')
-        logger.debug("I got network id : %s" % network_id)
-        self.output(u"正在修改设备配置")
-        if self.web.SetAsBS(NW_ID=int(network_id), TYF=4):
-            self.output(u"修改配置成功")
-            return True
+        print self.type_
+        if self.type_ == "Omni":
+            if self.web.SetAsBS(NW_ID=168, TYF=13):
+                self.output(u"修改配置成功")
+                return True
+        elif self.type_ == "Dire":
+            if self.web.SetAsND(NW_ID=168, NW_NUM=1, USR_ID=0):
+                self.output(u"修改配置成功")
+                return True
         self.output(u"修改配置失败")
         return False
 

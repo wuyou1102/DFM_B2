@@ -11,8 +11,6 @@ logger = logging.getLogger(__name__)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-print Instrument.list_resources()
-
 
 class Frame(A01_CIT_Base.Frame):
     def __init__(self):
@@ -20,6 +18,7 @@ class Frame(A01_CIT_Base.Frame):
         self.__Analyzer = None
         A01_CIT_Base.Frame.__init__(self, title=u"射频测试", type="RF", size=(1100, 700))
         if Instrument.FLAG:
+            print Instrument.list_resources()
             resources = Instrument.list_resources()
             for resource in resources:
                 if resource in [u'ASRL1::INSTR', u'ASRL10::INSTR']:
