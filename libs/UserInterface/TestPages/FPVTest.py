@@ -118,19 +118,14 @@ class FPV(Base.TestPage):
         if dlg.ShowModal() == wx.OK:
             socket = self.get_communicate()
             if socket.reconnect():
-                self.EnablePass()
+                self.start_test()
             else:
                 Utility.Alert.Error(u"启动失败，请重新连接")
                 self.Parent.Parent.Parent.disconnect()
         else:
-            Utility.Alert.Error(self.re)
+            Utility.Alert.Error(self.result)
             self.Parent.Parent.Parent.disconnect()
         dlg.Destroy()
-
-        if socket.reconnect():
-            self.start_test()
-        else:
-            self.Parent.Parent.Parent.disconnect()
 
     def modify_config(self, dlg):
         if not dlg.start_web():
