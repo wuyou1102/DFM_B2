@@ -26,7 +26,7 @@ class Frame(A01_CIT_Base.Frame):
                 inst = Instrument.SCPI(resource)
                 if inst.model_name in ["N9020A"]:  # 信号分析仪
                     self.__Analyzer = SignalAnalyzer(instrument=inst)
-                elif inst.model_name in ["N5172B"]:  # 信号发生器
+                elif inst.model_name in ["N5172B", "N5182A"]:  # 信号发生器
                     self.__Sources = SignalSources(instrument=inst)
                 else:
                     logger.error("Unknown Instrument [%s]" % inst.model_name)
@@ -125,6 +125,7 @@ class SignalAnalyzer(object):
         result = result and self.SetTriggerMode(mode="IMM")
         result = result and self.SetSweepTime(ms=50)
         result = result and self.SetAvg(ON=False)
+        result = result and self.SetTxpGain(ON=False)
         # result = result and self.SetIFLevel()
         result = result and self.SetBandWidth(20)
         if result:
@@ -187,6 +188,11 @@ class SignalAnalyzer(object):
         command = "POW:ATT {value}".format(value=dBm)
         return self.__inst.Set(command)
 
+    def SetTxpGain(self, ON=True):
+        STAT = "ON" if ON else "OFF"
+        command = "TXP:IF:GAIN %s" % STAT
+        return self.__inst.Set(command)
+
 
 if __name__ == '__main__':
     x = Instrument.list_resources()[0]
@@ -194,10 +200,9 @@ if __name__ == '__main__':
     # a = SignalAnalyzer(instrument=init)
     #
     # a()
-    init.execute_command("BPOWer:AVER 0")
-    init.execute_command("BPOWer:AVER?")
-    init.execute_command("BPOWer:AVER:COUNt 1")
-    init.execute_command("BPOWer:AVER:COUNt?")
+    init.execute_command("TXP:IF:GAIN OFF")
+    init.execute_command("TXP:IF:GAIN?")
+
     # for x in range(2410, 2666):
     #     print time.time()
     #     a.SetFrequency(x)

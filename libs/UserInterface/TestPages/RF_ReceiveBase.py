@@ -151,8 +151,7 @@ class ReceiveBase(Base.TestPage):
 
     def start_test(self):
         self.FormatPrint(info="Started")
-
-        if self.GetSignalSources() is not None:
+        if self.GetSignalSources() is None:
             Utility.append_thread(target=self.draw_line, thread_name="DRAW_LINE_%s" % self.freq)
         else:
             Utility.append_thread(target=self.auto_test_thread, thread_name="AUTO_RECEIVE_%s" % self.freq)
@@ -327,7 +326,7 @@ class BaseMplPanel(wx.Panel):
         self.dpi = 100
         self.facecolor = '#FEF9E7'
         self.data_limit_length = 30
-        self.y_max = 128
+        self.y_max = 130
         # 配置项』
         self.x_limit_range = numpy.arange(self.data_limit_length)
         self.blank_array = numpy.array([])

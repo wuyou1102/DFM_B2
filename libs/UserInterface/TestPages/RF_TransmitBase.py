@@ -228,8 +228,8 @@ class TransmitBase(Base.TestPage):
             comm.set_signal_0(ON=False)
             comm.set_signal_1(ON=True)
         self.update_current_signal_status()
-        for i in range(3):
-            for _ in range(100):
+        for i in range(5):
+            for _ in range(150):
                 if self.stop_flag:
                     return None
                 time.sleep(0.01)
@@ -237,7 +237,7 @@ class TransmitBase(Base.TestPage):
                 txp = self.get_transmit_power()
             except Exception as e:
                 self.LogMessage(u"[%s] 当前测试%s路发送功率为：%s" % (i, name.upper(), e.message))
-                return False
+                continue
             self.LogMessage(u"[%s] 当前测试%s路发送功率为：%s" % (i, name.upper(), txp))
             if minimum < txp < maximum:
                 return True
