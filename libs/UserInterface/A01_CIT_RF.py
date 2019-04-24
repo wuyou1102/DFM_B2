@@ -21,7 +21,7 @@ class Frame(A01_CIT_Base.Frame):
             print Instrument.list_resources()
             resources = Instrument.list_resources()
             for resource in resources:
-                if resource in [u'ASRL1::INSTR', u'ASRL10::INSTR']:
+                if not resource.startswith("GPIB"):
                     continue
                 inst = Instrument.SCPI(resource)
                 if inst.model_name in ["N9020A"]:  # 信号分析仪
@@ -119,7 +119,7 @@ class SignalAnalyzer(object):
         result = result and self.EnterBurstPower()
         result = result and self.SetPowerAtt(0)
         result = result and self.SetBrustRracRlev(config.get("ref_level", 40))
-        result = result and self.SetCorrOffs(config.get("gain", 60.0))
+        # result = result and self.SetCorrOffs(config.get("gain", 60.0))
         result = result and self.SetMeasAsThreshold()
         result = result and self.SetMeasThrLevel(config.get("thr_level", 15))
         result = result and self.SetTriggerMode(mode="IMM")

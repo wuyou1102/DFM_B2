@@ -58,7 +58,8 @@ def __append_thread(target, **kwargs):
     kwargs['thread_name'] = thread_name
     _thread = __thread_pool.get(thread_name)
     if _thread and _thread.isAlive():
-        __log.warn('{code}:{msg}'.format(code=ErrorCode.TARGET_ALREADY_EXIST, msg=ErrorCode.TARGET_ALREADY_EXIST.MSG))
+        __log.warn('{code}:{msg}:{name}'.format(code=ErrorCode.TARGET_ALREADY_EXIST, name=target.__name__,
+                                                msg=ErrorCode.TARGET_ALREADY_EXIST.MSG))
         return False
     return __start_thread(target=target, **kwargs)
 

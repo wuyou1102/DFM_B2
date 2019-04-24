@@ -264,11 +264,11 @@ class ReceiveBase(Base.TestPage):
             self.update_rssi(rssi0_lst, rssi1_lst)
             self.LogMessage(u"当前天线0信号强度[%s]" % rssi0_lst[-1])
             self.LogMessage(u"当前天线1信号强度[%s]" % rssi1_lst[-1])
-        rssi0 = sum(rssi0_lst) / len(rssi0_lst)
-        rssi1 = sum(rssi1_lst) / len(rssi1_lst)
+        rssi0 = sum(rssi0_lst) * 1.0 / len(rssi0_lst)
+        rssi1 = sum(rssi1_lst) * 1.0 / len(rssi1_lst)
         self.LogMessage(u"天线0平均信号强度[%s]" % rssi0)
         self.LogMessage(u"天线1平均信号强度[%s]" % rssi1)
-        if abs(rssi0 - rssi1) <= 3:
+        if abs(rssi0 - rssi1) <= 8:
             self.LogMessage(u"信号强度测试通过")
             return True
         self.LogMessage(u"信号强度测试失败")

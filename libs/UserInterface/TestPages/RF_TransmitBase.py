@@ -16,6 +16,8 @@ class TransmitBase(Base.TestPage):
         self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.init_minimum_and_maximum()
+        option = "2400gain" if self.freq < 3000 else "5800gain"
+        self.gain = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
 
     def GetSignalAnalyzer(self):
         return self.Parent.Parent.Parent.Parent.SignalAnalyzer
@@ -173,6 +175,7 @@ class TransmitBase(Base.TestPage):
         self.update_current_info()
         ctrls = [self.slider, self.signal_0, self.signal_1, self.PassButton]
         if self.GetSignalAnalyzer() is not None:
+            self.GetSignalAnalyzer().SetCorrOffs(self.gain)
             for ctrl in ctrls:
                 ctrl.Disable()
         else:
