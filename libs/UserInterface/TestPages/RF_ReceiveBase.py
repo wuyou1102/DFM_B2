@@ -245,6 +245,9 @@ class ReceiveBase(Base.TestPage):
             self.update_bler(block_lst)
             self.panel_mpl.refresh(slot=block_lst)
             self.LogMessage(u"当前误块数[%s]" % block_lst[-1])
+            if len(block_lst) >= 5 and block_lst[-5:] == [0, 0, 0, 0, 0]:
+                self.LogMessage(u"误块数测试通过")
+                return True
             if block_lst.count(0) >= 10:
                 self.LogMessage(u"误块数测试通过")
                 return True
@@ -254,20 +257,14 @@ class ReceiveBase(Base.TestPage):
     def test_signal_intensity(self):
         signal_sources = self.GetSignalSources()
         signal_sources.SetPower(50)
-        rssi0_lst = list()
-        rssi1_lst = list()
-        for i in range(5):
-            for _ in range(20):
-                if self.stop_flag:
-                    return None
-                self.Sleep(0.05)
-            self.update_rssi(rssi0_lst, rssi1_lst)
-            self.LogMessage(u"当前天线0信号强度[%s]" % rssi0_lst[-1])
-            self.LogMessage(u"当前天线1信号强度[%s]" % rssi1_lst[-1])
-        rssi0 = sum(rssi0_lst) * 1.0 / len(rssi0_lst)
-        rssi1 = sum(rssi1_lst) * 1.0 / len(rssi1_lst)
-        self.LogMessage(u"天线0平均信号强度[%s]" % rssi0)
-        self.LogMessage(u"天线1平均信号强度[%s]" % rssi1)
+
+        for _ in range(20):
+            if self.stop_flag:
+                return None
+            self.Sleep(0.05)
+        rssi0, rssi1 = self.update_rssi()
+        self.LogMessage(u"当前天线0信号强度[%s]" % rssi0)
+        self.LogMessage(u"当前天线1信号强度[%s]" % rssi1)
         if abs(rssi0 - rssi1) <= 8:
             self.LogMessage(u"信号强度测试通过")
             return True
@@ -298,18 +295,17 @@ class ReceiveBase(Base.TestPage):
         else:
             self.update_bler(lst=lst)
 
-    def update_rssi(self, lst0, lst1):
+    def update_rssi(self):
         comm = self.get_communicate()
         result = comm.get_rssi_and_bler()
         if result is not None and int(result, 16) > 0:
             rssi0 = int(result[0:4], 16) - 65536
             rssi1 = int(result[4:8], 16) - 65536
-            lst0.append(rssi0)
-            lst1.append(rssi1)
             self.rssi_0.SetValue(str(rssi0))
             self.rssi_1.SetValue(str(rssi1))
+            return rssi0, rssi1
         else:
-            self.update_bler(lst0=lst0, lst1=lst1)
+            return self.update_rssi()
 
 
 class BaseMplPanel(wx.Panel):
