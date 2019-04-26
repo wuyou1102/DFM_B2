@@ -257,8 +257,7 @@ class ReceiveBase(Base.TestPage):
     def test_signal_intensity(self):
         signal_sources = self.GetSignalSources()
         signal_sources.SetPower(50)
-
-        for _ in range(20):
+        for _ in range(25):
             if self.stop_flag:
                 return None
             self.Sleep(0.05)
