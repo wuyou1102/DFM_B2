@@ -21,6 +21,8 @@ try:
     FLAG = True
 except OSError:
     Error(u"如需自动测试，请先安装NI VISA。")
+except ValueError:
+    Error(u"如需自动测试，请先安装NI VISA。")
 
 
 def list_resources():

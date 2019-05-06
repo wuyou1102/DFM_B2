@@ -4,7 +4,7 @@ import sys
 from libs import Utility
 import shutil
 
-root_path = "C:\Users\You\Documents\GitHub"
+root_path = "C:\Users\OEMUSER\PycharmProjects"
 project_name = "DFM_B2"
 python_name = "DFM"
 project_path = os.path.join(root_path, project_name)
