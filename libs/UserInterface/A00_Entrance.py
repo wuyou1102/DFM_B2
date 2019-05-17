@@ -2,6 +2,7 @@
 
 import logging
 import sys
+
 import wx
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ class Panel(wx.Panel):
         test_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"测试"), wx.HORIZONTAL)
         check_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"检查"), wx.HORIZONTAL)
         WriteSN = self.__create_button(label=u"写号", name=u"WriteSN")
+        Calibration = self.__create_button(label=u"校准", name=u"Calibration")
         PCBA = self.__create_button(label=u"PCBA", name=u"PCBA")
         Machine = self.__create_button(label=u"组装", name=u"Machine")
         RF = self.__create_button(label=u"射频", name=u"RF")
@@ -36,6 +38,7 @@ class Panel(wx.Panel):
         FI_ND = self.__create_button(label=u"出厂检查(定向天线)", name=u"FI_D")
 
         tool_sizer.Add(WriteSN, 0, wx.EXPAND | wx.ALL, 5)
+        tool_sizer.Add(Calibration, 0, wx.EXPAND | wx.ALL, 5)
         test_sizer.Add(RF, 0, wx.EXPAND | wx.ALL, 5)
         test_sizer.Add(PCBA, 0, wx.EXPAND | wx.ALL, 5)
         test_sizer.Add(Machine, 0, wx.EXPAND | wx.ALL, 5)
@@ -69,7 +72,8 @@ class Panel(wx.Panel):
             from A03_FactoryInspection_Omni import Frame
         elif name == "FI_D":
             from A03_FactoryInspection_Dire import Frame
-
+        elif name == "Calibration":
+            from A03_RF_Calibration import Frame
         frame = Frame()
         frame.Show()
 

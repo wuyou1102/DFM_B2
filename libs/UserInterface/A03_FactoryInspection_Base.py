@@ -18,7 +18,7 @@ sys.setdefaultencoding('utf-8')
 
 
 class Frame(wx.Frame):
-    def __init__(self, title, type_="ND"):
+    def __init__(self, title, type_):
         wx.Frame.__init__(self, None, id=wx.ID_ANY, title=title, size=(800, 600))
         self.panel = Panel(self, type_=type_)
         self.SetBackgroundColour(Color.Azure2)
@@ -26,8 +26,8 @@ class Frame(wx.Frame):
 
 
 class Panel(A01_CIT_Base.Panel):
-    def __init__(self, parent, type_="FI"):
-        A01_CIT_Base.Panel.__init__(self, parent=parent, type=type_)
+    def __init__(self, parent, type_):
+        A01_CIT_Base.Panel.__init__(self, parent=parent, type_=type_)
 
     def __init_test_sizer(self):
         sizer = wx.BoxSizer(wx.HORIZONTAL)

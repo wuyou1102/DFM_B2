@@ -28,7 +28,6 @@ except ValueError:
 def list_resources():
     return ResourceManager.list_resources()
 
-
 class SCPI(object):
     def __init__(self, port, timeout=1000):
         self.__port = port
@@ -84,10 +83,10 @@ class SCPI(object):
 
 if __name__ == '__main__':
     resources = ResourceManager.list_resources()
-    print resources
+
     for resource in resources:
         inst = SCPI(resource)
-        if inst.model_name == 'N9020A':
-            print inst.execute_command(":TRIGger:IF:LEVel 10")
-            print inst.execute_command(":TRIGger:IF:LEVel?")
+        if inst.model_name == 'FSH8':
+            print inst.model_name
+            print inst.execute_command('CALC:MARK:FUNC:POW:SEL?')
         inst.disconnect()

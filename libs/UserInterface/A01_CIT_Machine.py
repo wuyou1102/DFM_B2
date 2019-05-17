@@ -11,4 +11,4 @@ sys.setdefaultencoding('utf-8')
 
 class Frame(A01_CIT_Base.Frame):
     def __init__(self):
-        A01_CIT_Base.Frame.__init__(self, title=u"整机测试", type="MACHINE", size=(1100, 750))
+        A01_CIT_Base.Frame.__init__(self, title=u"整机测试", type_="MACHINE", size=(1100, 750))

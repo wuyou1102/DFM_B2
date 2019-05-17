@@ -2,6 +2,16 @@
 __HEAD = "AT+DFM="
 
 
+def get_gain_and_power():
+    cmd = "read_refgain_targetpwr"
+    return __HEAD + cmd
+
+
+def set_gain_and_power(gain, power):
+    cmd = "set_refgain_targetpwr,{gain},{power}".format(gain=gain, power=power)
+    return __HEAD + cmd
+
+
 def get_rssi(idx):
     cmd = "read_0{idx}_rssi".format(idx=idx)
     return __HEAD + cmd
@@ -112,6 +122,7 @@ def get_signal_status(idx):
 
 def reboot():
     return "dfm_test_reboot"
+
 
 def set_serial_number(value):
     return "set_serial_number({value})".format(value=value)

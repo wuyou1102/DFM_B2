@@ -147,6 +147,14 @@ class Client(object):
         cmd = command.get_register(address=address)
         return self._protocol_get(cmd=cmd)
 
+    def set_gain_and_power(self, gain, power):
+        cmd = command.set_gain_and_power(gain=gain, power=power)
+        return self._protocol_set(cmd=cmd)
+
+    def get_gain_and_power(self):
+        cmd = command.get_gain_and_power()
+        return self._protocol_get(cmd=cmd)
+
     def set_frequency_point(self, value):
         cmd = command.set_frequency_point(value=value)
         return self._protocol_set(cmd=cmd)
@@ -307,5 +315,8 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-    for x in range(1, 33):
-        s.set_flag_result(x, 2)
+    s.unload_protocol_stack()
+    s.set_tx_mode_20m()
+    s.set_frequency_point(5800000)
+    s.set_gain_and_power(0x08, 0x60)
+    print s.get_gain_and_power()

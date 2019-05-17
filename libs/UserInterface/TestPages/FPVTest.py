@@ -148,10 +148,13 @@ class FPV(Base.TestPage):
     def set_as_connect(self):
         wx.CallAfter(self.wx_countdown.SetLabel, u"已检测到连接")
         wx.CallAfter(self.wx_countdown.SetForegroundColour, Color.GoogleGreen)
-        self.EnablePass(enable=True)
 
     def refresh_preview(self, ipc):
+        count = 0
         while not self.stop_flag:
+            if count % 33 == 0 and self.test_rssi_value():
+                self.EnablePass(enable=True)
+            count += 1
             retval, image = ipc.GetFrame(tuple(self.preview.GetSize()))
             self.preview.SetBitmap(Image2Bitmap(image))
             self.preview.UpdateBitmap()
@@ -191,6 +194,21 @@ class FPV(Base.TestPage):
         else:
             self.countdown_timer.Stop()
 
+    def test_rssi_value(self):
+        rssi0 = self.rssi_0.GetValue()
+        rssi1 = self.rssi_1.GetValue()
+        print rssi0
+        print rssi1
+        try:
+            rssi0 = int(rssi0)
+            rssi1 = int(rssi1)
+            if rssi0 > -50 and rssi1 > -50:
+                return True
+            return False
+        except Exception, e:
+            logger.error(e.message)
+            return False
+
     def check_rtsp_server(self):
         while not self.stop_flag:
             if Utility.is_device_connected(address=self.config.get('address'), port=self.config.get('port'),
@@ -199,6 +217,7 @@ class FPV(Base.TestPage):
                 ipc = IpCamera(self.get_rtsp_media())
                 if ipc.isOpened():
                     self.refresh_preview(ipc=ipc)
+
         try:
             del ipc
         except UnboundLocalError:
