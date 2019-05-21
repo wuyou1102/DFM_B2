@@ -22,6 +22,7 @@ class Client(object):
         self.__lock = threading.Lock()
         self._connect(address, port)
 
+
     def _connect(self, address, port):
         self._socket.connect((address, port))
 
@@ -246,6 +247,30 @@ class Client(object):
                 Logger.error("Get an abnormal value: \"%s\"" % repr(output))
         return False
 
+    def enable_spi(self):
+        cmd = command.enable_spi(enable=True)
+        return self._protocol_set(cmd=cmd)
+
+    def disable_spi(self):
+        cmd = command.enable_spi(enable=False)
+        return self._protocol_set(cmd=cmd)
+
+    def enable_tssi_2g(self):
+        cmd = command.enable_tssi_2g(enable=True)
+        return self._protocol_set(cmd=cmd)
+
+    def disable_tssi_2g(self):
+        cmd = command.enable_tssi_2g(enable=False)
+        return self._protocol_set(cmd=cmd)
+
+    def enable_tssi_5g(self):
+        cmd = command.enable_tssi_5g(enable=True)
+        return self._protocol_set(cmd=cmd)
+
+    def disable_tssi_5g(self):
+        cmd = command.enable_tssi_5g(enable=False)
+        return self._protocol_set(cmd=cmd)
+
     def _protocol_get(self, cmd):
         try:
             result = self.execute_command(command=cmd)
@@ -315,8 +340,18 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-    s.unload_protocol_stack()
-    s.set_tx_mode_20m()
-    s.set_frequency_point(5800000)
-    s.set_gain_and_power(0x08, 0x60)
-    print s.get_gain_and_power()
+    # s.unload_protocol_stack()
+    # s.set_tx_mode_20m()
+    # s.set_frequency_point(5800000)
+    print s.get_frequency_point()
+
+
+
+
+    s.disable_tssi_5g()
+    s.set_gain_and_power(0x09, 0x68)
+    s.enable_tssi_5g()
+    time.sleep(2)
+    s.disable_tssi_5g()
+    s.set_gain_and_power(0x10, 0x68)
+    s.enable_tssi_5g()

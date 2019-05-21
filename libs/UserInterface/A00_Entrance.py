@@ -36,9 +36,11 @@ class Panel(wx.Panel):
         RF = self.__create_button(label=u"射频", name=u"RF")
         FI_BS = self.__create_button(label=u"出厂检查(全向天线)", name=u"FI_O")
         FI_ND = self.__create_button(label=u"出厂检查(定向天线)", name=u"FI_D")
+        Debug = self.__create_button(label=u"调试工具", name=u"Debug")
 
         tool_sizer.Add(WriteSN, 0, wx.EXPAND | wx.ALL, 5)
         tool_sizer.Add(Calibration, 0, wx.EXPAND | wx.ALL, 5)
+        tool_sizer.Add(Debug, 0, wx.EXPAND | wx.ALL, 5)
         test_sizer.Add(RF, 0, wx.EXPAND | wx.ALL, 5)
         test_sizer.Add(PCBA, 0, wx.EXPAND | wx.ALL, 5)
         test_sizer.Add(Machine, 0, wx.EXPAND | wx.ALL, 5)
@@ -74,6 +76,8 @@ class Panel(wx.Panel):
             from A03_FactoryInspection_Dire import Frame
         elif name == "Calibration":
             from A03_RF_Calibration import Frame
+        elif name == "Debug":
+            from A04_Debug import Frame
         frame = Frame()
         frame.Show()
 

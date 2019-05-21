@@ -117,7 +117,7 @@ class SignalAnalyzer(object):
         config = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer")
         result = True
         result = result and self.EnterBurstPower()
-        result = result and self.SetPowerAtt(0)
+        result = result and self.SetPowerAtt(20)
         result = result and self.SetBrustRracRlev(config.get("ref_level", 40))
         # result = result and self.SetCorrOffs(config.get("gain", 60.0))
         result = result and self.SetMeasAsThreshold()

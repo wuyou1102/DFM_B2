@@ -22,6 +22,24 @@ def get_rssi_bler():
     return __HEAD + cmd
 
 
+def enable_spi(enable=True):
+    enable = 1 if enable is True else 0
+    cmd = "set_spi_en,{enable}".format(enable=enable)
+    return __HEAD + cmd
+
+
+def enable_tssi_2g(enable=True):
+    enable = 1 if enable is True else 0
+    cmd = "set_tssi_2g_en,{enable}".format(enable=enable)
+    return __HEAD + cmd
+
+
+def enable_tssi_5g(enable=True):
+    enable = 1 if enable is True else 0
+    cmd = "set_tssi_5g_en,{enable}".format(enable=enable)
+    return __HEAD + cmd
+
+
 def set_radio_frequency_power(value):
     if type(value) != int:
         raise TypeError("Frequency Power must <type 'int'>, but now is \"%s\"" % type(value))
