@@ -22,7 +22,6 @@ class Client(object):
         self.__lock = threading.Lock()
         self._connect(address, port)
 
-
     def _connect(self, address, port):
         self._socket.connect((address, port))
 
@@ -247,6 +246,11 @@ class Client(object):
                 Logger.error("Get an abnormal value: \"%s\"" % repr(output))
         return False
 
+    def get_calibration_value(self, level, is5G=True):
+        band = 1 if is5G else 0
+        cmd = command.get_calibration_value(band=band, level=level)
+        return self._protocol_get(cmd=cmd)
+
     def enable_spi(self):
         cmd = command.enable_spi(enable=True)
         return self._protocol_set(cmd=cmd)
@@ -343,15 +347,9 @@ if __name__ == '__main__':
     # s.unload_protocol_stack()
     # s.set_tx_mode_20m()
     # s.set_frequency_point(5800000)
-    print s.get_frequency_point()
-
-
-
-
-    s.disable_tssi_5g()
-    s.set_gain_and_power(0x09, 0x68)
-    s.enable_tssi_5g()
-    time.sleep(2)
-    s.disable_tssi_5g()
-    s.set_gain_and_power(0x10, 0x68)
-    s.enable_tssi_5g()
+    # print s.get_frequency_point()
+    # for x in range(28):
+    #     print s.get_calibration_value(x, is5G=False)
+    # s.disable_tssi_5g()
+    # s.set_gain_and_power(0x1F, 0x2B)
+    # s.enable_tssi_5g()

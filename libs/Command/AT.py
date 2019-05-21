@@ -192,3 +192,8 @@ def stop_web_server():
 
 def reset_button_click():
     return "reset_button_click"
+
+
+def get_calibration_value(band, level):
+    cmd = "get_table_refgain_targetpwr,{band},{level}".format(band=band, level=level)
+    return __HEAD + cmd
