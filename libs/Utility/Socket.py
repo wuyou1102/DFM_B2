@@ -251,6 +251,14 @@ class Client(object):
         cmd = command.get_calibration_value(band=band, level=level)
         return self._protocol_get(cmd=cmd)
 
+    def get_8003s_gain_power(self, is5G=True):
+        cmd = command.read_gain_pwr(is5G=is5G)
+        return self._protocol_get(cmd=cmd)
+
+    def set_tssi_time_interval(self, interval=1):
+        cmd = command.set_tssi_time_interval(interval=interval)
+        return self._protocol_set(cmd=cmd)
+
     def enable_spi(self):
         cmd = command.enable_spi(enable=True)
         return self._protocol_set(cmd=cmd)
@@ -344,12 +352,19 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
+    # print s.execute_command("AT+DFM=read_rf_pwr")
     # s.unload_protocol_stack()
     # s.set_tx_mode_20m()
     # s.set_frequency_point(5800000)
     # print s.get_frequency_point()
     # for x in range(28):
     #     print s.get_calibration_value(x, is5G=False)
-    # s.disable_tssi_5g()
-    # s.set_gain_and_power(0x1F, 0x2B)
-    # s.enable_tssi_5g()
+    s.disable_tssi_5g()
+    s.set_gain_and_power(0x06, 0x6c)
+    s.enable_tssi_5g()
+    s.time
+    # s.enable_spi()
+    # s.disable_spi()
+    # for x in range(1):
+    #     s.get_8003s_gain_power()
+    #     time.sleep(0.1)

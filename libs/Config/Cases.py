@@ -10,9 +10,11 @@ from libs.UserInterface.TestPages.FPVTest import FPV
 from libs.UserInterface.TestPages.RF_ReceiveTest import \
     Receive2410, Receive2450, Receive2475, \
     Receive5750, Receive5800, Receive5850
+from libs.UserInterface.TestPages.RF_CalibrateTest import Calibrate2400, Calibrate5800
 
 PCBA_CASES = [LampHolder, Switch, WatchDog]
 MACHINE_CASES = [LED, Switch, FPV, WatchDog]
 RF_CASES = [
     Receive2410, Receive2450, Receive2475, Receive5750, Receive5800, Receive5850,
+    Calibrate2400, Calibrate5800
 ]

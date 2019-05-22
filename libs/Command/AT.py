@@ -197,3 +197,15 @@ def reset_button_click():
 def get_calibration_value(band, level):
     cmd = "get_table_refgain_targetpwr,{band},{level}".format(band=band, level=level)
     return __HEAD + cmd
+
+
+def set_tssi_time_interval(interval=1):
+    value = {1: "00", 2: "01", 3: "10", 4: "11"}.get(interval)
+    cmd = "set_tssi_time_option,{value}".format(value=value)
+    return __HEAD + cmd
+
+
+def read_gain_pwr(is5G=True):
+    band = 1 if is5G is True else 0
+    cmd = "read_rf2g5g_pwr,{band}".format(band=band)
+    return __HEAD + cmd
