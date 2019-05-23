@@ -7,7 +7,7 @@ from libs.Utility import ExecuteResult
 from libs.Config.ErrorCode import ErrorCode
 from libs.Command import AT as command
 import Alert
-from libs.Utility import convert_freq_point
+from libs.Utility import convert_freq_point, convert_calibration_data
 
 Logger = logging.getLogger(__name__)
 
@@ -63,6 +63,10 @@ class Client(object):
         self.__serial_number = self._get(cmd=cmd)
         return self.__serial_number
 
+    def set_serial_number(self, serial):
+        cmd = command.set_serial_number(value=serial)
+        return self._set(cmd=cmd)
+
     def load_protocol_stack(self):
         cmd = command.load_protocol_stack()
         return self._set(cmd=cmd)
@@ -71,8 +75,18 @@ class Client(object):
         cmd = command.unload_protocol_stack()
         return self._set(cmd=cmd)
 
-    def set_serial_number(self, serial):
-        cmd = command.set_serial_number(value=serial)
+    def get_calibration_data(self):
+        cmd = command.get_calibration_data()
+        result = self._get(cmd=cmd)
+        if result in ["False", ""]:
+
+            self.set_calibration_data(convert_calibration_data())
+            return self.get_calibration_data()
+        else:
+            return result.split(",")
+
+    def set_calibration_data(self, data):
+        cmd = command.set_calibration_data(data=data)
         return self._set(cmd=cmd)
 
     def get_all_flag_results(self):
@@ -352,6 +366,10 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
+    lst = [str(x) for x in range(10)]
+    # print s.set_calibration_data(",".join(lst))
+    # print s.set_calibration_data("")
+    print s.get_calibration_data()
     # print s.execute_command("AT+DFM=read_rf_pwr")
     # s.unload_protocol_stack()
     # s.set_tx_mode_20m()
@@ -359,10 +377,10 @@ if __name__ == '__main__':
     # print s.get_frequency_point()
     # for x in range(28):
     #     print s.get_calibration_value(x, is5G=False)
-    s.disable_tssi_5g()
-    s.set_gain_and_power(0x06, 0x6c)
-    s.enable_tssi_5g()
-    s.time
+    # s.disable_tssi_5g()
+    # s.set_gain_and_power(0x06, 0x6c)
+    # s.enable_tssi_5g()
+    # s.time
     # s.enable_spi()
     # s.disable_spi()
     # for x in range(1):

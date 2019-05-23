@@ -10,50 +10,11 @@ from libs.Config import Path
 
 logger = logging.getLogger(__name__)
 
-CLOSE_LOOP_INITIAL_VALUE = {
-    5800: {
-        24: (0x09, 0x69),
-        23: (0x0B, 0x66),
-        22: (0x0D, 0x62),
-        21: (0x0E, 0x5F),
-        20: (0x0F, 0x5C),
-        19: (0x10, 0x58),
-        18: (0x11, 0x55),
-        17: (0x12, 0x52),
-        16: (0x14, 0x4F),
-        15: (0x15, 0x4B),
-        14: (0x16, 0x48),
-        13: (0x17, 0x44),
-        12: (0x18, 0x41),
-        11: (0x19, 0x3E),
-        10: (0x1A, 0x3B),
-        9: (0x1B, 0x38),
-    },
-    2400: {
-        18: (0x0C, 0x4B),
-        17: (0x0D, 0x48),
-        16: (0x0E, 0x45),
-        15: (0x0F, 0x42),
-        14: (0x10, 0x3F),
-        13: (0x11, 0x3C),
-        12: (0x12, 0x39),
-        11: (0x13, 0x36),
-        10: (0x14, 0x33),
-        9: (0x15, 0x30),
-        8: (0x16, 0x2D),
-        7: (0x17, 0x2A),
-        6: (0x18, 0x28),
-        5: (0x19, 0x26),
-        4: (0x1A, 0x24),
-        3: (0x1B, 0x22),
-    }
-}
-
 
 class CalibrateBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
-        self.data = CLOSE_LOOP_INITIAL_VALUE.get(self.freq)
+        self.data = Utility.CLOSE_LOOP_INITIAL_VALUE.get(self.freq)
         self.max_level = max(self.data.keys())
         self.min_level = min(self.data.keys())
         self.gain_unit = 0.5 if self.freq == 5800 else 1.0
@@ -76,15 +37,10 @@ class CalibrateBase(Base.TestPage):
         comm.set_tx_mode_20m()
         comm.set_frequency_point(self.freq * 1000)
         comm.set_tssi_time_interval(interval=1)
-        # 设置tssi time
-        # 设置 gain power (09 68)
         self.set_gain_and_power(*self.data.get(self.max_level))
         if self.GetSignalAnalyzer() is not None:
             self.GetSignalAnalyzer().SetFrequency(self.freq)
             self.PassButton.Disable()
-
-        # 等2秒 读频谱仪  24+-3
-        # 校准
 
     def start_test(self):
         if self.GetSignalAnalyzer() is None:
@@ -128,7 +84,10 @@ class CalibrateBase(Base.TestPage):
 
     def __test_calibrate_result(self, gain, power):
         self.set_gain_and_power(gain=gain, power=power)
-        rssi = self.get_tssi_input()
+        if self.GetSignalAnalyzer() is None:
+            rssi = self.get_tssi_input()
+        else:
+            rssi = self.get_transmit_power()
         cur_gain = int(self.get_8003s_gain_power(A=True), 16)
         if self.max_level - 0.5 <= float(rssi) <= self.max_level + 0.5:
             if gain - 6 <= cur_gain <= gain + 6:
@@ -161,13 +120,39 @@ class CalibrateBase(Base.TestPage):
         rssi = self.get_tssi_input()
         cali_value = self.analyze_tssi(tssi_value=rssi)
         if cali_value is None:
-            self.LogMessage("FAILFAILFAILFAILFAILFAILFAILFAIL")
+            self.LogMessage(u"校准失败")
+        else:
+            self.set_calibration_data(data=cali_value)
 
     def automatic_calibration(self):
-        self.Sleep(2)
         rssi = self.get_transmit_power()
         cali_value = self.analyze_tssi(tssi_value=rssi)
-        print cali_value
+        if cali_value is None:
+            self.LogMessage(u"校准失败")
+            self.SetResult("FAIL")
+            return
+        self.set_calibration_data(data=cali_value)
+        self.SetResult("PASS")
+        return
+
+    def set_calibration_data(self, data):
+        cali_list = self.conver_cali_dict2list(data=data)
+        device = self.get_communicate()
+        ori_list = device.get_calibration_data()
+        if self.freq == 2400:
+            ori_list[0:32] = cali_list
+        else:
+            ori_list[32:64] = cali_list
+        device.set_calibration_data(",".join(ori_list))
+
+    def conver_cali_dict2list(self, data):
+        lst = list()
+        max_level = max(data.keys())
+        min_level = min(data.keys())
+        for l in range(max_level, min_level - 1, -1):
+            for m in data.get(l):
+                lst.append(str(m))
+        return lst
 
     def get_tssi_input(self):
         try:
@@ -180,6 +165,7 @@ class CalibrateBase(Base.TestPage):
 
     def get_transmit_power(self):
         try:
+            self.Sleep(2)
             result = self.GetSignalAnalyzer().GetBurstPower()
             result = result.split(',')[2]
             _lst = result.split('E')

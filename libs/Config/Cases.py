@@ -11,10 +11,11 @@ from libs.UserInterface.TestPages.RF_ReceiveTest import \
     Receive2410, Receive2450, Receive2475, \
     Receive5750, Receive5800, Receive5850
 from libs.UserInterface.TestPages.RF_CalibrateTest import Calibrate2400, Calibrate5800
+from libs.UserInterface.TestPages.RF_TransmitTest import Transmit2400A, Transmit2400B, Transmit5800A, Transmit5800B
 
 PCBA_CASES = [LampHolder, Switch, WatchDog]
 MACHINE_CASES = [LED, Switch, FPV, WatchDog]
 RF_CASES = [
     Receive2410, Receive2450, Receive2475, Receive5750, Receive5800, Receive5850,
-    Calibrate2400, Calibrate5800
+    Calibrate2400, Transmit2400A, Transmit2400B, Calibrate5800, Transmit5800A, Transmit5800B
 ]

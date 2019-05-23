@@ -397,14 +397,14 @@ class RF_ConfigPage(wx.Panel):
 
     def __init_transmit_sizer(self):
         sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "发射功率设置"), wx.VERTICAL)
-        row_sizer1 = wx.BoxSizer(wx.HORIZONTAL)
-        row_sizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        # row_sizer1 = wx.BoxSizer(wx.HORIZONTAL)
+        # row_sizer2 = wx.BoxSizer(wx.HORIZONTAL)
         row_sizer3 = wx.BoxSizer(wx.HORIZONTAL)
         config = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer")
-        for freq in [2410, 2450, 2475]:
-            row_sizer1.Add(self.create_min_max_sizer(freq=freq, cfg=config), 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
-        for freq in [5750, 5800, 5850]:
-            row_sizer2.Add(self.create_min_max_sizer(freq=freq, cfg=config), 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+        # for freq in [2410, 2450, 2475]:
+        #     row_sizer1.Add(self.create_min_max_sizer(freq=freq, cfg=config), 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+        # for freq in [5750, 5800, 5850]:
+        #     row_sizer2.Add(self.create_min_max_sizer(freq=freq, cfg=config), 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
         ref_level, self.ref_level = self.create_attr_value_sizer("功率参考值: ", attr_name="ref_level",
                                                                  attr_value=config["ref_level"])
@@ -420,8 +420,8 @@ class RF_ConfigPage(wx.Panel):
         row_sizer3.Add(thr_level, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
         row_sizer3.Add(gain24, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
         row_sizer3.Add(gain58, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
-        sizer.Add(row_sizer1, 0, wx.EXPAND, 0)
-        sizer.Add(row_sizer2, 0, wx.EXPAND, 0)
+        # sizer.Add(row_sizer1, 0, wx.EXPAND, 0)
+        # sizer.Add(row_sizer2, 0, wx.EXPAND, 0)
         sizer.Add(row_sizer3, 0, wx.EXPAND, 0)
         return sizer
 

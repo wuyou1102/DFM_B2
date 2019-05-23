@@ -209,3 +209,11 @@ def read_gain_pwr(is5G=True):
     band = 1 if is5G is True else 0
     cmd = "read_rf2g5g_pwr,{band}".format(band=band)
     return __HEAD + cmd
+
+
+def get_calibration_data():
+    return "get_calibration_data"
+
+
+def set_calibration_data(data):
+    return "set_calibration_data({data})".format(data=data)
