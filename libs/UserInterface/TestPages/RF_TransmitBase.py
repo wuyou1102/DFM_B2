@@ -17,6 +17,7 @@ class TransmitBase(Base.TestPage):
         Base.TestPage.__init__(self, parent=parent, type=type)
         self.max_gap = 0.5 if RoadA else 3
         self.min_gap = 1 if RoadA else 3
+        self.road = 'A' if RoadA else 'B'
         option = "2400gain" if self.freq == 2400 else "5800gain"
         self.gain = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
 
@@ -27,8 +28,6 @@ class TransmitBase(Base.TestPage):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hori_sizer = wx.BoxSizer(wx.HORIZONTAL)
         hori_sizer.Add(self.__init_freq_point_sizer(), 0, wx.EXPAND, 0)
-        # hori_sizer.Add(self.__init_ant_sizer(), 1, wx.EXPAND | wx.LEFT, 5)
-        # hori_sizer.Add(self.__init_status_sizer(), 0, wx.EXPAND | wx.ALIGN_RIGHT | wx.RIGHT, 5)
         sizer.Add(hori_sizer, 0, wx.EXPAND | wx.LEFT, 15)
         self.message = wx.TextCtrl(self, wx.ID_ANY, '', style=wx.TE_MULTILINE | wx.TE_READONLY)
         sizer.Add(self.message, 1, wx.EXPAND | wx.ALL, 1)
@@ -42,66 +41,89 @@ class TransmitBase(Base.TestPage):
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1), wx.TE_READONLY)
+        self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
+                                         wx.TE_READONLY | wx.TE_CENTER)
+        self.gain_ctrl = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
+                                     wx.TE_READONLY | wx.TE_CENTER)
+        self.power_ctrl = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
+                                      wx.TE_READONLY | wx.TE_CENTER)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
-        sizer.Add(create_button(u"重设频点", "set_freq"), 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
-        sizer.Add(create_button(u"最大功率", "set_max_level"), 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
-        sizer.Add(create_button(u"最小功率", "set_min_level"), 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+        self.btn_freq = create_button(u"重设频点", "set_freq")
+        sizer.Add(self.btn_freq, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+
+        sizer.Add(self.gain_ctrl, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+        sizer.Add(self.power_ctrl, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+        self.btn_max = create_button(u"最大功率", "set_max_level")
+        self.btn_min = create_button(u"最小功率", "set_min_level")
+        sizer.Add(self.btn_max, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+        sizer.Add(self.btn_min, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         return sizer
 
     def on_button_click(self, event):
         obj = event.GetEventObject()
         name = obj.GetName()
-        if name == "":
-            print self.freq
+        if name == "set_freq":
+            self.set_frequency_point()
+        elif name == "set_max_level":
+            self.set_gain_and_power(*self.cali_max)
+        elif name == "set_min_level":
+            self.set_gain_and_power(*self.cali_min)
 
-    def on_freq_point_selected(self, event):
-        obj = event.GetEventObject()
-        uart = self.get_communicate()
-        uart.set_frequency_point(obj.Name + "000")
-        self.update_current_freq_point()
+    def set_frequency_point(self):
+        device = self.get_communicate()
+        device.set_frequency_point(self.freq * 1000)
+        self.refresh_current_freq_point()
 
-    def update_current_info(self):
-        self.update_current_freq_point()
+    def set_gain_and_power(self, gain, power):
+        device = self.get_communicate()
+        self.LogMessage(u'设置寄存器：[%s]:[%s]' % (hex(int(gain)), hex(int(power))))
+        if self.freq == 5800:
+            device.disable_tssi_5g()
+            device.set_gain_and_power(gain, power)
+            device.enable_tssi_5g()
+        else:
+            device.disable_tssi_2g()
+            device.set_gain_and_power(gain, power)
+            device.enable_tssi_2g()
+        self.refresh_current_gain_power()
 
-    def update_current_freq_point(self):
-        def update_freq():
-            self.Sleep(0.05)
+    def refresh_current_info(self):
+        self.refresh_current_freq_point()
+        self.refresh_current_gain_power()
+
+    def refresh_current_freq_point(self):
+        def get_current_freq():
             comm = self.get_communicate()
             value = comm.get_frequency_point()
             self.current_point.SetValue(value)
             if float(value) != self.freq:
                 Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")
 
-        Utility.append_thread(target=update_freq, allow_dupl=True)
+        Utility.append_thread(target=get_current_freq, allow_dupl=True)
 
-    def update_current_mcs(self):
-        def update_mcs():
-            uart = self.get_communicate()
-            value = uart.get_qam()
-            self.current_mcs.SetSelection(int(value, 16))
-
-        Utility.append_thread(target=update_mcs, allow_dupl=True)
-
-    def update_current_power(self):
-        def update_power():
-            self.Sleep(0.05)
+    def refresh_current_gain_power(self):
+        def get_current_gain_power():
             comm = self.get_communicate()
-            value = comm.get_radio_frequency_power()
-            self.slider.SetValue(value)
-            self.static_text.SetLabel(hex(value).upper())
+            value = comm.get_gain_and_power()
+            self.gain_ctrl.SetValue(value[-2:].upper())
+            self.power_ctrl.SetValue(value[-4:-2].upper())
 
-        Utility.append_thread(target=update_power, allow_dupl=True)
+        Utility.append_thread(target=get_current_gain_power, allow_dupl=True)
+
+    def __set_device(self):
+        device = self.get_communicate()
+        device.set_tx_mode_20m()  # 设置发送20M
+        device.set_frequency_point(self.freq * 1000)  # 设置频点
+        device.set_tssi_time_interval(interval=1)  # 设置切换时间
 
     def before_test(self):
         self.stop_flag = False
         self.message.SetValue("")
-        comm = self.get_communicate()
-        comm.set_tx_mode_20m()
-        comm.set_frequency_point(self.freq * 1000)
-        self.update_current_info()
-        ctrls = [self.PassButton]
+        self.__set_device()
+        self.cali_max, self.cali_min = self.get_max_min_cali_data()
+        self.refresh_current_info()
+        ctrls = [self.PassButton, self.btn_freq, self.btn_max, self.btn_min]
         if self.GetSignalAnalyzer() is not None:
             self.GetSignalAnalyzer().SetCorrOffs(self.gain)
             for ctrl in ctrls:
@@ -110,9 +132,16 @@ class TransmitBase(Base.TestPage):
             for ctrl in ctrls:
                 ctrl.Enable()
 
+    def get_max_min_cali_data(self):
+        device = self.get_communicate()
+        cali_data = device.get_calibration_data()
+        if self.freq == 2400:
+            return (cali_data[0], cali_data[1]), (cali_data[30], cali_data[31])
+        return (cali_data[32], cali_data[33]), (cali_data[62], cali_data[63])
+
     def start_test(self):
         self.FormatPrint(info="Started")
-        Utility.append_thread(self.transmit_test, thread_name="transmit_test_%s" % self.freq)
+        Utility.append_thread(self.transmit_test, thread_name="transmit_test_%s%s" % (self.freq, self.road))
 
     def check_frequency_point(self):
         comm = self.get_communicate()
@@ -125,7 +154,7 @@ class TransmitBase(Base.TestPage):
             if float(value) == self.freq:
                 self.LogMessage(u"检查通过，准备测试。")
                 return True
-            comm.set_frequency_point("%s000" % self.freq)
+            comm.set_frequency_point(self.freq * 1000)
         self.LogMessage(u"检查不通过，无法测试。")
         return False
 
@@ -137,15 +166,59 @@ class TransmitBase(Base.TestPage):
             Utility.Alert(u"频点设置不正确的，无法自动测试。")
             return
         signal_analyzer.SetFrequency(self.freq)  # 设置仪器分析频点
-        road0 = self.__test_road(0)
-        road1 = self.__test_road(1)
-        if road0 is None or road1 is None:
+        result_max = self.__test_max()
+        result_min = self.__test_min()
+        if result_max is None or result_min is None:
             return
-        if road0 and road1:
+        if result_max and result_min:
             self.SetResult("PASS")
             return
         self.SetResult("FAIL")
         return
+
+    def __test_txp(self, lower, upper):
+        self.LogMessage(u"当前测试频点功率值范围应为：[%s]-[%s]" % (lower, upper))
+        for i in range(3):
+            try:
+                txp = self.get_transmit_power()
+                self.LogMessage(u"[%s]次测试结果为：%s" % (i, txp))
+                if lower <= txp <= upper:
+                    return True
+                else:
+                    self.sleep(1)
+            except Exception as e:
+                self.LogMessage(u"当前测试结果为：%s" % e.message)
+                self.sleep(0.5)
+        return False
+
+    def __test_8003s_gain(self):
+        lower, upper = 3, 15
+        self.LogMessage(u"当前测试频点增益范围应为：[%s]-[%s]" % (lower, upper))
+        gain = int(self.get_8003s_gain_power(), 16)
+        self.LogMessage(u'从寄存器获取的8003S的[%s]路的值为：[%s]' % (self.road, gain))
+        if lower <= gain <= upper:
+            return True
+        return False
+
+    def __test_max(self):
+        self.set_gain_and_power(*self.cali_max)
+        value = 18 if self.freq == 2400 else 24
+        lower, upper = value - self.max_gap, value + self.max_gap
+        self.sleep(2)
+        txp_result = self.__test_txp(lower=lower, upper=upper)
+        gain_result = self.__test_8003s_gain()
+        if txp_result and gain_result:
+            return True
+        return False
+
+    def __test_min(self):
+        self.set_gain_and_power(*self.cali_min)
+        value = 3 if self.freq == 2400 else 9
+        lower, upper = value - self.min_gap, value + self.min_gap
+        self.sleep(2)
+        if self.__test_txp(lower=lower, upper=upper):
+            return True
+        return False
 
     def get_transmit_power(self):
         result = self.GetSignalAnalyzer().GetBurstPower()
@@ -155,6 +228,20 @@ class TransmitBase(Base.TestPage):
         value = round(float(value), 3)
         power = pow(10, int(power))
         return value * power
+
+    def get_8003s_gain_power(self):
+        device = self.get_communicate()
+        device.disable_spi()
+        gain_8003s = device.get_8003s_gain_power()
+        device.enable_spi()
+        value = gain_8003s[-2:] if self.road == "A" else gain_8003s[-4:-2]
+        return value
+
+    def sleep(self, sec):
+        for _ in xrange(sec * 100):
+            if self.stop_flag:
+                return None
+            time.sleep(0.01)
 
     def stop_test(self):
         self.stop_flag = True

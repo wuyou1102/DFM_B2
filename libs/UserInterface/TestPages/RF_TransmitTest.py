@@ -3,7 +3,6 @@ from RF_TransmitBase import TransmitBase
 from libs.Config import String
 
 
-#         for p in ['2410', '2450', '2475', '5750', '5800', '5825']:
 class Transmit2400A(TransmitBase):
     def __init__(self, parent, type):
         TransmitBase.__init__(self, parent=parent, type=type, freq=2400, RoadA=True)
@@ -30,6 +29,7 @@ class Transmit2400B(TransmitBase):
     @staticmethod
     def GetName():
         return u" 发射功率 [2400B] "
+
 
 class Transmit5800A(TransmitBase):
     def __init__(self, parent, type):

@@ -410,8 +410,10 @@ class RF_ConfigPage(wx.Panel):
                                                                  attr_value=config["ref_level"])
         thr_level, self.thr_level = self.create_attr_value_sizer("功率阀值: ", attr_name="thr_level",
                                                                  attr_value=config["thr_level"])
-        gain24, self.gain24 = self.create_attr_value_sizer("2.4G线损设置: ", attr_name="2400gain", attr_value=config["2400gain"])
-        gain58, self.gain58 = self.create_attr_value_sizer("5.8G线损设置: ", attr_name="5800gain", attr_value=config["5800gain"])
+        gain24, self.gain24 = self.create_attr_value_sizer("2.4G线损设置: ", attr_name="2400gain",
+                                                           attr_value=config["2400gain"])
+        gain58, self.gain58 = self.create_attr_value_sizer("5.8G线损设置: ", attr_name="5800gain",
+                                                           attr_value=config["5800gain"])
         self.__tran_lst.append(self.ref_level)
         self.__tran_lst.append(self.thr_level)
         self.__tran_lst.append(self.gain24)

@@ -2,12 +2,12 @@
 __HEAD = "AT+DFM="
 
 
-def get_gain_and_power():
+def get_gain_and_power():  # 获取当前中心增益和功率
     cmd = "read_refgain_targetpwr"
     return __HEAD + cmd
 
 
-def set_gain_and_power(gain, power):
+def set_gain_and_power(gain, power):  # 设置当前中心增益和功率
     cmd = "set_refgain_targetpwr,{gain},{power}".format(gain=gain, power=power)
     return __HEAD + cmd
 
@@ -194,7 +194,7 @@ def reset_button_click():
     return "reset_button_click"
 
 
-def get_calibration_value(band, level):
+def get_calibration_value(band, level):  # 获取协议栈的校准值
     cmd = "get_table_refgain_targetpwr,{band},{level}".format(band=band, level=level)
     return __HEAD + cmd
 
@@ -205,7 +205,7 @@ def set_tssi_time_interval(interval=1):
     return __HEAD + cmd
 
 
-def read_gain_pwr(is5G=True):
+def read_gain_pwr(is5G=True):  # 获取AB路的增益
     band = 1 if is5G is True else 0
     cmd = "read_rf2g5g_pwr,{band}".format(band=band)
     return __HEAD + cmd

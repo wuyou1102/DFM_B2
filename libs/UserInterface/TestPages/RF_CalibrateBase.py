@@ -89,7 +89,11 @@ class CalibrateBase(Base.TestPage):
         else:
             rssi = self.get_transmit_power()
         cur_gain = int(self.get_8003s_gain_power(A=True), 16)
-        if self.max_level - 0.5 <= float(rssi) <= self.max_level + 0.5:
+        try:
+            rssi = float(rssi)
+        except TypeError and ValueError:
+            return False
+        if self.max_level - 0.5 <= rssi <= self.max_level + 0.5:
             if gain - 6 <= cur_gain <= gain + 6:
                 return cur_gain - gain
         self.LogMessage(u"当前增益异常请检查确认，请检查确认。")
