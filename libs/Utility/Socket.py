@@ -79,7 +79,6 @@ class Client(object):
         cmd = command.get_calibration_data()
         result = self._get(cmd=cmd)
         if result in ["False", ""]:
-
             self.set_calibration_data(convert_calibration_data())
             return self.get_calibration_data()
         else:

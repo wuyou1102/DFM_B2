@@ -363,10 +363,12 @@ class ScrollButton(wx.Button):
     def select(self, select=True):
         if select:
             self.SetBackgroundColour(Color.GoogleBlue)
-            self.__case.Show()
+            wx.CallAfter(self.__case.Show)
+            # self.__case.Show()
         else:
             self.SetBackgroundColour(self.color)
-            self.__case.Hide()
+            wx.CallAfter(self.__case.Hide)
+            # self.__case.Hide()
 
     def deselect(self):
         self.SetBackgroundColour(self.color)
