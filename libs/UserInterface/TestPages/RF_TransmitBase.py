@@ -117,26 +117,41 @@ class TransmitBase(Base.TestPage):
         device.set_tx_mode_20m()  # 设置发送20M
         device.set_frequency_point(self.freq * 1000)  # 设置频点
         device.set_tssi_time_interval(interval=1)  # 设置切换时间
-        if self.road == "A":
-            pass
+        device.set_signal_0(ON=False)
+        device.set_signal_1(ON=False)
+        if self.freq == 5800:
+            device.disable_tssi_5g()
+            device.set_gain_and_power(*self.cali_max)
+            if self.road == "A":
+                device.set_signal_0(ON=True)
+            else:
+                device.set_signal_1(ON=True)
+            device.enable_tssi_5g()
         else:
-            pass
+            device.disable_tssi_2g()
+            device.set_gain_and_power(*self.cali_max)
+            if self.road == "A":
+                device.set_signal_0(ON=True)
+            else:
+                device.set_signal_1(ON=True)
+            device.enable_tssi_2g()
+        self.refresh_current_gain_power()
 
         # A路和B路切换方法（后续如果外挂切换小板调试完成，可以不用切换A / B路，同时打开测试？）：
         # 由于测试A路时B路需要关闭最后一级PA，所以B路的8003S功率控制寄存器值一直会为最大值（0X00），如果直接切到B路，直接开PA有输出过大损坏PA的风险。故切换流程如下：
         # 1，将A路的PA关闭，这时候A路和B路的PA都是关闭的。
-        # 2，将初始值和目标值修改为B路需要的值。
         # 3，将“user7_tssi_en_5g” / “user7_tssi_en_2g”设置为0：tssi
-        # disable。关闭闭环控制。这时候初始值会立刻写入A路和B路的8003S功率控制寄存器。
+        # 2，将初始值和目标值修改为B路需要的值。
         # 4，打开B路的PA
         # 5，将“user7_tssi_en_5g” / “user7_tssi_en_2g”设置为1：tssi
+
         # enable。开启闭环控制。
 
     def before_test(self):
         self.stop_flag = False
         self.message.SetValue("")
-        self.__configuring_device()
         self.cali_max, self.cali_min = self.get_max_min_cali_data()
+        self.__configuring_device()
         self.refresh_current_info()
         ctrls = [self.PassButton, self.btn_freq, self.btn_max, self.btn_min]
         if self.GetSignalAnalyzer() is not None:

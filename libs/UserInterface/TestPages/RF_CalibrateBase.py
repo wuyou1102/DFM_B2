@@ -37,6 +37,7 @@ class CalibrateBase(Base.TestPage):
         comm.set_tx_mode_20m()
         comm.set_frequency_point(self.freq * 1000)
         comm.set_tssi_time_interval(interval=1)
+        comm.set_signal_1(ON=False)
         self.set_gain_and_power(*self.data.get(self.max_level))
         if self.GetSignalAnalyzer() is not None:
             self.GetSignalAnalyzer().SetFrequency(self.freq)
@@ -70,7 +71,6 @@ class CalibrateBase(Base.TestPage):
         for _ in range(self.max_level, self.min_level - 1, -1):
             ori_gain, ori_power = self.data.get(_)
             cali_gain, cali_power = ori_gain - gain_gap, ori_power + power_gap
-            # self.LogMessage("[%02d]: %05s | %05s" % (_, hex(cali_gain), hex(cali_power)))
             tmp[_] = (cali_gain, cali_power)
         result = self.__test_calibrate_result(*tmp.get(self.max_level))
         if result is not False:
