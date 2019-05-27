@@ -20,7 +20,7 @@ class Calibrate5800(CalibrateBase):
 
 class Calibrate2400(CalibrateBase):
     def __init__(self, parent, type):
-        CalibrateBase.__init__(self, parent=parent, type=type, freq=2400)
+        CalibrateBase.__init__(self, parent=parent, type=type, freq=2450)
 
     @staticmethod
     def GetFlag(t):

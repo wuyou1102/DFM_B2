@@ -5,7 +5,7 @@ from libs.Config import String
 
 class Transmit2400A(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=2400, RoadA=True)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=2450, RoadA=True)
 
     @staticmethod
     def GetFlag(t):
@@ -19,7 +19,7 @@ class Transmit2400A(TransmitBase):
 
 class Transmit2400B(TransmitBase):
     def __init__(self, parent, type):
-        TransmitBase.__init__(self, parent=parent, type=type, freq=2400, RoadA=False)
+        TransmitBase.__init__(self, parent=parent, type=type, freq=2450, RoadA=False)
 
     @staticmethod
     def GetFlag(t):

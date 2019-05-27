@@ -19,7 +19,7 @@ class TransmitBase(Base.TestPage):
         self.min_gap = 1 if RoadA else 3
         self.cali_max, self.cali_min = 0, 0
         self.road = 'A' if RoadA else 'B'
-        option = "2400gain" if self.freq == 2400 else "5800gain"
+        option = "2400gain" if self.freq == 2450 else "5800gain"
         self.gain = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
 
     def GetSignalAnalyzer(self):
@@ -156,6 +156,7 @@ class TransmitBase(Base.TestPage):
         ctrls = [self.PassButton, self.btn_freq, self.btn_max, self.btn_min]
         if self.GetSignalAnalyzer() is not None:
             self.GetSignalAnalyzer().SetCorrOffs(self.gain)
+            self.GetSignalAnalyzer().SetFrequency(self.freq)  # 设置仪器分析频点
             for ctrl in ctrls:
                 ctrl.Disable()
         else:
@@ -165,7 +166,7 @@ class TransmitBase(Base.TestPage):
     def get_max_min_cali_data(self):
         device = self.get_communicate()
         cali_data = device.get_calibration_data()
-        if self.freq == 2400:
+        if self.freq == 2450:
             return (cali_data[0], cali_data[1]), (cali_data[30], cali_data[31])
         return (cali_data[32], cali_data[33]), (cali_data[62], cali_data[63])
 
@@ -195,16 +196,18 @@ class TransmitBase(Base.TestPage):
         if not self.check_frequency_point():
             Utility.Alert(u"频点设置不正确的，无法自动测试。")
             return
-        signal_analyzer.SetFrequency(self.freq)  # 设置仪器分析频点
-        result_max = self.__test_max()
-        result_min = self.__test_min()
-        if result_max is None or result_min is None:
+        try:
+            result_max = self.__test_max()
+            result_min = self.__test_min()
+            if result_max is None or result_min is None:
+                return
+            if result_max and result_min:
+                self.SetResult("PASS")
+                return
+            self.SetResult("FAIL")
             return
-        if result_max and result_min:
-            self.SetResult("PASS")
+        except StopIteration:
             return
-        self.SetResult("FAIL")
-        return
 
     def __test_txp(self, lower, upper):
         self.LogMessage(u"当前测试频点功率值范围应为：[%s]-[%s]" % (lower, upper))
@@ -222,9 +225,15 @@ class TransmitBase(Base.TestPage):
         return False
 
     def __test_8003s_gain(self):
-        lower, upper = 3, 15
+        if self.freq == 5800:
+            is5G = True
+            lower, upper = 3, 15
+        else:
+            is5G = False
+            lower, upper = 6, 18
+        A = True if self.road == "A" else False
         self.LogMessage(u"当前测试频点增益范围应为：[%s]-[%s]" % (lower, upper))
-        gain = int(self.get_8003s_gain_power(), 16)
+        gain = int(self.get_8003s_gain_power(is5G, A), 16)
         self.LogMessage(u'从寄存器获取的8003S的[%s]路的值为：[%s]' % (self.road, gain))
         if lower <= gain <= upper:
             return True
@@ -232,7 +241,7 @@ class TransmitBase(Base.TestPage):
 
     def __test_max(self):
         self.set_gain_and_power(*self.cali_max)
-        value = 18 if self.freq == 2400 else 24
+        value = 18 if self.freq == 2450 else 24
         lower, upper = value - self.max_gap, value + self.max_gap
         self.sleep(2)
         txp_result = self.__test_txp(lower=lower, upper=upper)
@@ -243,7 +252,7 @@ class TransmitBase(Base.TestPage):
 
     def __test_min(self):
         self.set_gain_and_power(*self.cali_min)
-        value = 3 if self.freq == 2400 else 9
+        value = 3 if self.freq == 2450 else 9
         lower, upper = value - self.min_gap, value + self.min_gap
         self.sleep(2)
         if self.__test_txp(lower=lower, upper=upper):
@@ -259,18 +268,19 @@ class TransmitBase(Base.TestPage):
         power = pow(10, int(power))
         return value * power
 
-    def get_8003s_gain_power(self):
+    def get_8003s_gain_power(self, is5G, A=True):
         device = self.get_communicate()
         device.disable_spi()
-        gain_8003s = device.get_8003s_gain_power()
+        gain_8003s = device.get_8003s_gain_power(is5G)
         device.enable_spi()
-        value = gain_8003s[-2:] if self.road == "A" else gain_8003s[-4:-2]
+        value = gain_8003s[-2:] if A else gain_8003s[-4:-2]
+        self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % value)
         return value
 
     def sleep(self, sec):
         for _ in xrange(int(sec) * 100):
             if self.stop_flag:
-                return None
+                raise StopIteration
             time.sleep(0.01)
 
     def stop_test(self):

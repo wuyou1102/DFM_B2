@@ -380,8 +380,10 @@ if __name__ == '__main__':
     # s.set_gain_and_power(0x06, 0x6c)
     # s.enable_tssi_5g()
     # s.time
-    # s.enable_spi()
-    # s.disable_spi()
+    s.enable_spi()
+    s.get_8003s_gain_power(True)
+    s.get_8003s_gain_power(False)
+    s.disable_spi()
     # for x in range(1):
     #     s.get_8003s_gain_power()
     #     time.sleep(0.1)

@@ -14,12 +14,14 @@ logger = logging.getLogger(__name__)
 class CalibrateBase(Base.TestPage):
     def __init__(self, parent, type, freq):
         self.freq = freq
+        Base.TestPage.__init__(self, parent=parent, type=type)
         self.data = Utility.CLOSE_LOOP_INITIAL_VALUE.get(self.freq)
         self.max_level = max(self.data.keys())
         self.min_level = min(self.data.keys())
         self.gain_unit = 0.5 if self.freq == 5800 else 1.0
         self.power_unit = 0.33
-        Base.TestPage.__init__(self, parent=parent, type=type)
+        option = "2400gain" if self.freq == 2450 else "5800gain"
+        self.gain = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
 
     def GetSignalAnalyzer(self):
         return self.Parent.Parent.Parent.Parent.SignalAnalyzer
@@ -41,6 +43,7 @@ class CalibrateBase(Base.TestPage):
         self.set_gain_and_power(*self.data.get(self.max_level))
         if self.GetSignalAnalyzer() is not None:
             self.GetSignalAnalyzer().SetFrequency(self.freq)
+            self.GetSignalAnalyzer().SetCorrOffs(self.gain)
             self.PassButton.Disable()
 
     def start_test(self):
@@ -63,7 +66,8 @@ class CalibrateBase(Base.TestPage):
             return None
 
     def __calibrate(self, tssi):
-        gain_8003s = int(self.get_8003s_gain_power(), 16)
+        is5G = False if self.freq == 2450 else True
+        gain_8003s = int(self.get_8003s_gain_power(is5G), 16)
         gain_gap = int(round((self.max_level - tssi) / self.gain_unit)) + (
                 self.data.get(self.max_level)[0] - gain_8003s)
         power_gap = int(round((self.max_level - tssi) / self.power_unit))
@@ -88,21 +92,25 @@ class CalibrateBase(Base.TestPage):
             rssi = self.get_tssi_input()
         else:
             rssi = self.get_transmit_power()
-        cur_gain = int(self.get_8003s_gain_power(A=True), 16)
+        is5G = False if self.freq == 2450 else True
+        cur_gain = int(self.get_8003s_gain_power(is5G, A=True), 16)
         try:
             rssi = float(rssi)
         except TypeError and ValueError:
             return False
+        self.LogMessage(u"得到当前 TSSI 值：\"%s\"" % rssi)
         if self.max_level - 0.5 <= rssi <= self.max_level + 0.5:
             if gain - 6 <= cur_gain <= gain + 6:
                 return cur_gain - gain
-        self.LogMessage(u"当前增益异常请检查确认，请检查确认。")
+            self.LogMessage(u"当前增益异常请检查确认，请检查确认。")
+            return False
+        self.LogMessage(u"当前TSSI值异常。")
         return False
 
-    def get_8003s_gain_power(self, A=True):
+    def get_8003s_gain_power(self, is5G, A=True):
         device = self.get_communicate()
         device.disable_spi()
-        gain_8003s = device.get_8003s_gain_power()
+        gain_8003s = device.get_8003s_gain_power(is5G)
         device.enable_spi()
         value = gain_8003s[-2:] if A else gain_8003s[-4:-2]
         self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % value)
@@ -143,7 +151,7 @@ class CalibrateBase(Base.TestPage):
         cali_list = self.conver_cali_dict2list(data=data)
         device = self.get_communicate()
         ori_list = device.get_calibration_data()
-        if self.freq == 2400:
+        if self.freq == 2450:
             ori_list[0:32] = cali_list
         else:
             ori_list[32:64] = cali_list
@@ -168,8 +176,22 @@ class CalibrateBase(Base.TestPage):
             dlg.Destroy()
 
     def get_transmit_power(self):
+        lst = list()
+        for x in range(10):
+            value = self.__get_transmit_power()
+            self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
+            lst.append(value)
+        self.LogMessage(u"去掉最大值：%s" % max(lst))
+        lst.remove(max(lst))
+        self.LogMessage(u"去掉最大值：%s" % min(lst))
+        lst.remove(min(lst))
+        ret = sum(lst) / len(lst)
+        self.LogMessage(u"平均值为：%s" % ret)
+        return ret
+
+    def __get_transmit_power(self):
         try:
-            self.Sleep(2)
+            self.Sleep(0.2)
             result = self.GetSignalAnalyzer().GetBurstPower()
             result = result.split(',')[2]
             _lst = result.split('E')
@@ -178,7 +200,7 @@ class CalibrateBase(Base.TestPage):
             power = pow(10, int(power))
             return value * power
         except Exception as e:
-            return self.get_transmit_power()
+            return self.__get_transmit_power()
 
     def stop_test(self):
         self.stop_flag = True
@@ -189,6 +211,7 @@ class CalibrateBase(Base.TestPage):
 
     def LogMessage(self, msg):
         msg = u"{time}:{message}\n".format(time=Utility.get_timestamp(), message=msg.strip('\r\n'))
+        logger.info(msg)
         wx.CallAfter(self.message.AppendText, msg)
         comm = self.get_communicate()
         if comm is None:
