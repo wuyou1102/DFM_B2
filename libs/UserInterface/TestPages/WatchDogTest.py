@@ -42,9 +42,10 @@ class WatchDog(Base.TestPage):
         for x in range(40):
             dlg.output(u"检查设备是否已经启动[%s]" % (x + 1))
             if Utility.is_device_connected(address="192.168.1.1", port=51341):
-                dlg.EndModal(wx.OK)
+                wx.CallAfter(dlg.EndModal, wx.OK)
+                # dlg.EndModal(wx.OK)
                 return True
-        dlg.EndModal(wx.CANCEL)
+        wx.CallAfter(dlg.EndModal, wx.CANCEL)
         return False
 
     def init_test_sizer(self):

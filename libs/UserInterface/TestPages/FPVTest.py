@@ -130,19 +130,23 @@ class FPV(Base.TestPage):
     def modify_config(self, dlg):
         if not dlg.start_web():
             self.result = "WebServer启动失败"
-            dlg.EndModal(wx.CANCEL)
+            wx.CallAfter(dlg.EndModal, wx.CANCEL)
+            # dlg.EndModal(wx.CANCEL)
             return False
         if not dlg.setup_config():
             self.result = "参数配置失败"
-            dlg.EndModal(wx.CANCEL)
+            wx.CallAfter(dlg.EndModal, wx.CANCEL)
+            # dlg.EndModal(wx.CANCEL)
             return False
         if not dlg.reboot():
             dlg.wait_for_reboot()
         if not dlg.wait_for_boot_up():
             self.result = "启动检测失败"
-            dlg.EndModal(wx.CANCEL)
+            wx.CallAfter(dlg.EndModal, wx.CANCEL)
+            # dlg.EndModal(wx.CANCEL)
             return False
-        dlg.EndModal(wx.OK)
+        wx.CallAfter(dlg.EndModal, wx.OK)
+        # dlg.EndModal(wx.OK)
         return True
 
     def set_as_connect(self):
