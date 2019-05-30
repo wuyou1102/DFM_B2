@@ -3,24 +3,25 @@ import wx
 import logging
 import Base
 from libs import Utility
-from libs.Config import Picture
 from libs.Config import Path
 import time
 import os
 
 logger = logging.getLogger(__name__)
+FREQ_5G = 5800
 
 
 class TransmitBase(Base.TestPage):
     def __init__(self, parent, type, freq, RoadA=True):
-        self.freq = freq
         Base.TestPage.__init__(self, parent=parent, type=type)
-        self.max_gap = 0.5 if RoadA else 3
-        self.min_gap = 1 if RoadA else 3
+        self.FREQ = freq
+        self.FLAG_ROAD_A = RoadA
+        self.FLAG_5G = True if self.FREQ == FREQ_5G else False
+        self.MAX_LEVEL_GAP = 0.5 if RoadA else 3
+        self.MIN_LEVEL_GAP = 1.5 if RoadA else 3
         self.cali_max, self.cali_min = 0, 0
-        self.road = 'A' if RoadA else 'B'
-        option = "2400gain" if self.freq == 2450 else "5800gain"
-        self.gain = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
+        option = "5800gain" if self.FLAG_5G else "2400gain"
+        self.SA_GAIN = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
 
     def GetSignalAnalyzer(self):
         return self.Parent.Parent.Parent.Parent.SignalAnalyzer
@@ -73,13 +74,13 @@ class TransmitBase(Base.TestPage):
 
     def set_frequency_point(self):
         device = self.get_communicate()
-        device.set_frequency_point(self.freq * 1000)
+        device.set_frequency_point(self.FREQ * 1000)
         self.refresh_current_freq_point()
 
     def set_gain_and_power(self, gain, power):
         device = self.get_communicate()
         self.LogMessage(u'设置寄存器：[%s]:[%s]' % (hex(int(gain)), hex(int(power))))
-        if self.freq == 5800:
+        if self.FLAG_5G:
             device.disable_tssi_5g()
             device.set_gain_and_power(gain, power)
             device.enable_tssi_5g()
@@ -98,7 +99,7 @@ class TransmitBase(Base.TestPage):
             comm = self.get_communicate()
             value = comm.get_frequency_point()
             self.current_point.SetValue(value)
-            if float(value) != self.freq:
+            if float(value) != self.FREQ:
                 Utility.Alert.Error(u"当前频点不是预期的频点，请手动重新设置频点。")
 
         Utility.append_thread(target=get_current_freq, allow_dupl=True)
@@ -115,14 +116,14 @@ class TransmitBase(Base.TestPage):
     def __configuring_device(self):
         device = self.get_communicate()
         device.set_tx_mode_20m()  # 设置发送20M
-        device.set_frequency_point(self.freq * 1000)  # 设置频点
+        device.set_frequency_point(self.FREQ * 1000)  # 设置频点
         device.set_tssi_time_interval(interval=1)  # 设置切换时间
         device.set_signal_0(ON=False)
         device.set_signal_1(ON=False)
-        if self.freq == 5800:
+        if self.FLAG_5G:
             device.disable_tssi_5g()
             device.set_gain_and_power(*self.cali_max)
-            if self.road == "A":
+            if self.FLAG_ROAD_A:
                 device.set_signal_0(ON=True)
             else:
                 device.set_signal_1(ON=True)
@@ -130,7 +131,7 @@ class TransmitBase(Base.TestPage):
         else:
             device.disable_tssi_2g()
             device.set_gain_and_power(*self.cali_max)
-            if self.road == "A":
+            if self.FLAG_ROAD_A:
                 device.set_signal_0(ON=True)
             else:
                 device.set_signal_1(ON=True)
@@ -155,8 +156,8 @@ class TransmitBase(Base.TestPage):
         self.refresh_current_info()
         ctrls = [self.PassButton, self.btn_freq, self.btn_max, self.btn_min]
         if self.GetSignalAnalyzer() is not None:
-            self.GetSignalAnalyzer().SetCorrOffs(self.gain)
-            self.GetSignalAnalyzer().SetFrequency(self.freq)  # 设置仪器分析频点
+            self.GetSignalAnalyzer().SetCorrOffs(self.SA_GAIN)
+            self.GetSignalAnalyzer().SetFrequency(self.FREQ)  # 设置仪器分析频点
             for ctrl in ctrls:
                 ctrl.Disable()
         else:
@@ -166,13 +167,14 @@ class TransmitBase(Base.TestPage):
     def get_max_min_cali_data(self):
         device = self.get_communicate()
         cali_data = device.get_calibration_data()
-        if self.freq == 2450:
-            return (cali_data[0], cali_data[1]), (cali_data[30], cali_data[31])
-        return (cali_data[32], cali_data[33]), (cali_data[62], cali_data[63])
+        if self.FLAG_5G:
+            return (cali_data[32], cali_data[33]), (cali_data[62], cali_data[63])
+        return (cali_data[0], cali_data[1]), (cali_data[30], cali_data[31])
 
     def start_test(self):
         self.FormatPrint(info="Started")
-        Utility.append_thread(self.transmit_test, thread_name="transmit_test_%s%s" % (self.freq, self.road))
+        thread_name = "TransmitTest%sA" % self.FREQ if self.FLAG_ROAD_A else "TransmitTest%sB" % self.FREQ
+        Utility.append_thread(self.transmit_test, thread_name=thread_name)
 
     def check_frequency_point(self):
         comm = self.get_communicate()
@@ -182,10 +184,10 @@ class TransmitBase(Base.TestPage):
             self.LogMessage(u"当前第%s次检查频点" % (x + 1))
             value = comm.get_frequency_point()
             self.LogMessage(u"当前频点为：%s" % value)
-            if float(value) == self.freq:
+            if float(value) == self.FREQ:
                 self.LogMessage(u"检查通过，准备测试。")
                 return True
-            comm.set_frequency_point(self.freq * 1000)
+            comm.set_frequency_point(self.FREQ * 1000)
         self.LogMessage(u"检查不通过，无法测试。")
         return False
 
@@ -196,86 +198,98 @@ class TransmitBase(Base.TestPage):
         if not self.check_frequency_point():
             Utility.Alert(u"频点设置不正确的，无法自动测试。")
             return
-        try:
-            result_max = self.__test_max()
-            result_min = self.__test_min()
-            if result_max is None or result_min is None:
-                return
-            if result_max and result_min:
-                self.SetResult("PASS")
-                return
+
+        result_max = self.__test_max()
+        result_min = self.__test_min()
+        if result_max is None or result_min is None:
+            self.SetResult("EMPTY")
+            return
+        if result_max and result_min:
+            self.SetResult("PASS")
+            return
+        else:
             self.SetResult("FAIL")
             return
-        except StopIteration:
-            return
+
 
     def __test_txp(self, lower, upper):
-        self.LogMessage(u"当前测试频点功率值范围应为：[%s]-[%s]" % (lower, upper))
-        for i in range(3):
-            try:
-                txp = self.get_transmit_power()
-                self.LogMessage(u"[%s]次测试结果为：%s" % (i, txp))
-                if lower <= txp <= upper:
-                    return True
-                else:
-                    self.sleep(1)
-            except Exception as e:
-                self.LogMessage(u"当前测试结果为：%s" % e.message)
-                self.sleep(0.5)
-        return False
+        try:
+            txp = self.get_transmit_power()
+            self.LogMessage(u"当前测试功率为：%s (%s-%s)" % (txp, lower, upper))
+            if lower <= txp <= upper:
+                return True
+            return False
+        except StopIteration:
+            return None
 
     def __test_8003s_gain(self):
-        if self.freq == 5800:
-            is5G = True
-            lower, upper = 3, 15
-        else:
-            is5G = False
-            lower, upper = 6, 18
-        A = True if self.road == "A" else False
+        lower, upper = 3, 15 if self.FLAG_5G else 9, 15
         self.LogMessage(u"当前测试频点增益范围应为：[%s]-[%s]" % (lower, upper))
-        gain = int(self.get_8003s_gain_power(is5G, A), 16)
-        self.LogMessage(u'从寄存器获取的8003S的[%s]路的值为：[%s]' % (self.road, gain))
+        gain = int(self.get_current_gain(self.FLAG_ROAD_A), 16)
+        self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % gain)
         if lower <= gain <= upper:
             return True
         return False
 
     def __test_max(self):
         self.set_gain_and_power(*self.cali_max)
-        value = 18 if self.freq == 2450 else 24
-        lower, upper = value - self.max_gap, value + self.max_gap
-        self.sleep(2)
+        value = 24 if self.FLAG_5G else 18
+        lower, upper = value - self.MAX_LEVEL_GAP, value + self.MAX_LEVEL_GAP
         txp_result = self.__test_txp(lower=lower, upper=upper)
         gain_result = self.__test_8003s_gain()
+        if txp_result is None:
+            return None
         if txp_result and gain_result:
             return True
         return False
 
     def __test_min(self):
         self.set_gain_and_power(*self.cali_min)
-        value = 3 if self.freq == 2450 else 9
-        lower, upper = value - self.min_gap, value + self.min_gap
-        self.sleep(2)
-        if self.__test_txp(lower=lower, upper=upper):
-            return True
-        return False
+        value = 9 if self.FLAG_5G else 3
+        lower, upper = value - self.MIN_LEVEL_GAP, value + self.MIN_LEVEL_GAP
+        return self.__test_txp(lower=lower, upper=upper)
+
 
     def get_transmit_power(self):
-        result = self.GetSignalAnalyzer().GetBurstPower()
-        result = result.split(',')[2]
-        _lst = result.split('E')
-        value, power = _lst[0], _lst[1]
-        value = round(float(value), 3)
-        power = pow(10, int(power))
-        return value * power
+        self.sleep(0.8)
+        lst = list()
+        for x in range(10):
+            self.sleep(0.2)
+            value = self.__get_transmit_power()
+            self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
+            lst.append(value)
+        self.LogMessage(u"去掉最小值/最大值：[%s/%s]" % (min(lst), max(lst)))
+        lst.remove(max(lst))
+        lst.remove(min(lst))
+        avg = sum(lst) / len(lst)
+        self.LogMessage(u"平均值为：%s" % avg)
+        return avg
 
-    def get_8003s_gain_power(self, is5G, A=True):
+    def __get_transmit_power(self):
+        try:
+            result = self.GetSignalAnalyzer().GetBurstPower()
+            result = result.split(',')[2]
+            _lst = result.split('E')
+            value, power = _lst[0], _lst[1]
+            value = round(float(value), 3)
+            power = pow(10, int(power))
+            return value * power
+        except Exception as e:
+            logger.error(e.message)
+            return self.__get_transmit_power()
+
+    def get_current_gain(self, A=True):
         device = self.get_communicate()
         device.disable_spi()
-        gain_8003s = device.get_current_gain(is5G)
+        gain_8003s = device.get_8003s_gain_power(self.FLAG_5G)
         device.enable_spi()
-        value = gain_8003s[-2:] if A else gain_8003s[-4:-2]
-        self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % value)
-        return value
+        if gain_8003s == "0000000000000000":
+            self.LogMessage(u'从寄存器获取的8003S的值异常，重新获取')
+            return self.get_current_gain(A=A)
+        else:
+            value = gain_8003s[-2:] if A else gain_8003s[-4:-2]
+            self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % value)
+            return value
 
     def sleep(self, sec):
         for _ in xrange(int(sec) * 100):
