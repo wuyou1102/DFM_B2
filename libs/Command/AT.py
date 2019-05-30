@@ -217,3 +217,13 @@ def get_calibration_data():
 
 def set_calibration_data(data):
     return "set_calibration_data({data})".format(data=data)
+
+
+def set_bandwidth(value):
+    cmd = "set_bw,{value}".format(value=value)
+    return __HEAD + cmd
+
+
+def get_bandwidth():
+    cmd = "get_bw"
+    return __HEAD + cmd

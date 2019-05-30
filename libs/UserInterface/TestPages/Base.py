@@ -144,9 +144,12 @@ class TestPage(wx.Panel):
     def SetResult(self, result):
         logger.debug("\"%s\" Result is : <%s>" % (self.get_name(), result))
         self.FormatPrint(result, symbol="=")
-        uart = self.get_communicate()
-        if uart.set_flag_result(flag=self.get_flag(), result=result2value[result]):
+        if result == "EMPTY":
             self.__parent.next_page()
+        else:
+            uart = self.get_communicate()
+            if uart.set_flag_result(flag=self.get_flag(), result=result2value[result]):
+                self.__parent.next_page()
 
     def EnablePass(self, enable=True):
         if enable and self.AUTO:

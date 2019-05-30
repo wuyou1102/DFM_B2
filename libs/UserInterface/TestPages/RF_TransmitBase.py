@@ -271,7 +271,7 @@ class TransmitBase(Base.TestPage):
     def get_8003s_gain_power(self, is5G, A=True):
         device = self.get_communicate()
         device.disable_spi()
-        gain_8003s = device.get_8003s_gain_power(is5G)
+        gain_8003s = device.get_current_gain(is5G)
         device.enable_spi()
         value = gain_8003s[-2:] if A else gain_8003s[-4:-2]
         self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % value)

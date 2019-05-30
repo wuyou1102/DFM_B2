@@ -10,12 +10,18 @@ from libs.UserInterface.TestPages.FPVTest import FPV
 from libs.UserInterface.TestPages.RF_ReceiveTest import \
     Receive2410, Receive2450, Receive2475, \
     Receive5750, Receive5800, Receive5850
-from libs.UserInterface.TestPages.RF_CalibrateTest import Calibrate2400, Calibrate5800
-from libs.UserInterface.TestPages.RF_TransmitTest import Transmit2400A, Transmit2400B, Transmit5800A, Transmit5800B
+from libs.UserInterface.TestPages.RF_CalibrateTest import Calibrate2450, Calibrate5800
+from libs.UserInterface.TestPages.RF_TransmitTest import Transmit2450A, Transmit2450B, Transmit5800A, Transmit5800B
 
 PCBA_CASES = [LampHolder, Switch, WatchDog]
 MACHINE_CASES = [LED, Switch, FPV, WatchDog]
 RF_CASES = [
     Receive2410, Receive2450, Receive2475, Receive5750, Receive5800, Receive5850,
-    Calibrate2400, Transmit2400A, Transmit2400B, Calibrate5800, Transmit5800A, Transmit5800B
+    Calibrate2450, Transmit2450A, Transmit2450B, Calibrate5800, Transmit5800A, Transmit5800B
+]
+RF_CASES_2400 = [
+    Receive5750, Receive5800, Receive5850, Calibrate5800, Transmit5800A, Transmit5800B
+]
+RF_CASE_5800 = [
+    Receive2410, Receive2450, Receive2475, Calibrate2450, Transmit2450A, Transmit2450B,
 ]

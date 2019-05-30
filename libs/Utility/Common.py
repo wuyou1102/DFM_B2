@@ -217,7 +217,7 @@ def is_device_connected(address, port=554, timeout=1):
 def convert_calibration_data(data=None):
     data = CLOSE_LOOP_INITIAL_VALUE if data is None else data
     lst = list()
-    for f in [2400, 5800]:
+    for f in [2450, 5800]:
         band_data = data.get(f)
         max_level = max(band_data.keys())
         min_level = min(band_data.keys())
