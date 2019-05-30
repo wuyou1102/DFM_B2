@@ -202,7 +202,6 @@ class TransmitBase(Base.TestPage):
         result_max = self.__test_max()
         result_min = self.__test_min()
         if result_max is None or result_min is None:
-            self.SetResult("EMPTY")
             return
         if result_max and result_min:
             self.SetResult("PASS")
@@ -210,7 +209,6 @@ class TransmitBase(Base.TestPage):
         else:
             self.SetResult("FAIL")
             return
-
 
     def __test_txp(self, lower, upper):
         try:
@@ -223,7 +221,10 @@ class TransmitBase(Base.TestPage):
             return None
 
     def __test_8003s_gain(self):
-        lower, upper = 3, 15 if self.FLAG_5G else 9, 15
+        if self.FLAG_5G:
+            lower, upper = 3, 15
+        else:
+            lower, upper = 9, 15
         self.LogMessage(u"当前测试频点增益范围应为：[%s]-[%s]" % (lower, upper))
         gain = int(self.get_current_gain(self.FLAG_ROAD_A), 16)
         self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % gain)
@@ -249,12 +250,12 @@ class TransmitBase(Base.TestPage):
         lower, upper = value - self.MIN_LEVEL_GAP, value + self.MIN_LEVEL_GAP
         return self.__test_txp(lower=lower, upper=upper)
 
-
     def get_transmit_power(self):
         self.sleep(0.8)
         lst = list()
         for x in range(10):
             self.sleep(0.2)
+            print self.stop_flag
             value = self.__get_transmit_power()
             self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
             lst.append(value)
@@ -292,7 +293,7 @@ class TransmitBase(Base.TestPage):
             return value
 
     def sleep(self, sec):
-        for _ in xrange(int(sec) * 100):
+        for _ in range(int(sec * 100)):
             if self.stop_flag:
                 raise StopIteration
             time.sleep(0.01)

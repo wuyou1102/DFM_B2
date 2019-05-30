@@ -372,7 +372,8 @@ class ScrollButton(wx.Button):
 
     def deselect(self):
         self.SetBackgroundColour(self.color)
-        self.__case.Hide()
+        wx.CallAfter(self.__case.Hide)
+        # self.__case.Hide()
 
     @property
     def color(self):

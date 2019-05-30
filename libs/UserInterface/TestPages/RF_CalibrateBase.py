@@ -47,6 +47,7 @@ class CalibrateBase(Base.TestPage):
         comm.set_tx_mode_20m()
         comm.set_frequency_point(self.FREQ * 1000)
         comm.set_tssi_time_interval(interval=1)
+        # comm.set_signal_0(ON=True)
         comm.set_signal_1(ON=False)
 
         if self.GetSignalAnalyzer() is not None:
@@ -75,6 +76,7 @@ class CalibrateBase(Base.TestPage):
 
     def __calibrate_1(self, data):  # 一共校准两次 第一次gain和power都校准
         self.set_gain_and_power(*data.get(self.MAX_LEVEL))
+
         tssi = self.get_current_tssi()
         if tssi is None:
             return None
@@ -88,8 +90,9 @@ class CalibrateBase(Base.TestPage):
                 for _ in range(self.MAX_LEVEL, self.MIN_LEVEL - 1, -1):
                     ori_gain, ori_power = data.get(_)
                     cali_gain, cali_power = ori_gain - gain_gap, ori_power + power_gap
-                    self.LogMessage(u"[第一次校准数据]<%02d>: %05s | %05s" % (_, hex(cali_gain), hex(cali_power)))
                     tmp[_] = (cali_gain, cali_power)
+                    if _ in [self.MAX_LEVEL, self.MIN_LEVEL]:
+                        self.LogMessage(u"[第一次校准数据]<%02d>: %05s | %05s" % (_, hex(cali_gain), hex(cali_power)))
                 return tmp
             else:
                 return False
@@ -115,8 +118,9 @@ class CalibrateBase(Base.TestPage):
                     for _ in range(self.MAX_LEVEL, self.MIN_LEVEL - 1, -1):
                         ori_gain, ori_power = data.get(_)
                         cali_gain, cali_power = ori_gain + gain_gap, ori_power + power_gap
-                        self.LogMessage(u"[第二次校准数据]<%02d>: %05s | %05s" % (_, hex(cali_gain), hex(cali_power)))
                         data[_] = (cali_gain, cali_power)
+                        if _ in [self.MAX_LEVEL, self.MIN_LEVEL]:
+                            self.LogMessage(u"[第一次校准数据]<%02d>: %05s | %05s" % (_, hex(cali_gain), hex(cali_power)))
                     return data
                 else:
                     self.LogMessage(u"异常:当前增益\"%s\"不在范围 [%s-%s]内" % (gain_8003s, gain_lower, gain_upper))
@@ -148,6 +152,8 @@ class CalibrateBase(Base.TestPage):
             device.disable_tssi_2g()
             device.set_gain_and_power(gain, power)
             device.enable_tssi_2g()
+        self.LogMessage(u'获取寄存器的设置值：%s' % device.get_gain_and_power())
+        self.LogMessage(u'获取寄存器的设置值：%s' % self.get_current_gain(True))
 
     def manual_calibration(self):
         data = self.__calibrate_1(data=self.INITIAL_DATA)
@@ -166,7 +172,6 @@ class CalibrateBase(Base.TestPage):
             cali_value = self.__calibrate_2(data=data)
             if cali_value is None:
                 self.LogMessage(u"数据获取失败")
-                self.SetResult("EMPTY")
                 return
             elif cali_value is False:
                 self.LogMessage(u"校准失败")
@@ -215,12 +220,13 @@ class CalibrateBase(Base.TestPage):
         for x in range(10):
             self.sleep(0.2)
             value = self.__get_transmit_power()
-            self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
+            # self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
             lst.append(value)
         self.LogMessage(u"去掉最小值/最大值：[%s/%s]" % (min(lst), max(lst)))
         lst.remove(max(lst))
         lst.remove(min(lst))
         avg = sum(lst) / len(lst)
+        self.LogMessage(repr(lst))
         self.LogMessage(u"平均值为：%s" % avg)
         return avg
 
@@ -255,7 +261,7 @@ class CalibrateBase(Base.TestPage):
             log.write(msg)
 
     def sleep(self, sec):
-        for _ in xrange(int(sec) * 100):
+        for _ in range(int(sec * 100)):
             if self.stop_flag:
                 raise StopIteration
             time.sleep(0.01)
