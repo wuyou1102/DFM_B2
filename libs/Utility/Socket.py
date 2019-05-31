@@ -7,7 +7,7 @@ from libs.Utility import ExecuteResult
 from libs.Config.ErrorCode import ErrorCode
 from libs.Command import AT as command
 import Alert
-from libs.Utility import convert_freq_point, convert_calibration_data
+from libs.Utility import convert_freq_point, convert_calibration_data_d2s
 
 Logger = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ class Client(object):
         cmd = command.get_calibration_data()
         result = self._get(cmd=cmd)
         if result in ["False", ""]:
-            self.set_calibration_data(convert_calibration_data())
+            self.set_calibration_data(convert_calibration_data_d2s())
             return self.get_calibration_data()
         else:
             return result.split(",")

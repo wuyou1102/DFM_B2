@@ -105,7 +105,7 @@ class CalibrateBase(Base.TestPage):
         if tssi is None:
             return None
         else:
-            if self.MAX_LEVEL - 0.5 <= tssi <= self.MAX_LEVEL + 0.5:
+            if self.MAX_LEVEL - 1 <= tssi <= self.MAX_LEVEL + 1:
                 gain_8003s = int(self.get_current_gain(A=True), 16)
                 gain = self.INITIAL_DATA.get(self.MAX_LEVEL)[0]
                 gain_lower = gain + self.GAIN_GAP_0

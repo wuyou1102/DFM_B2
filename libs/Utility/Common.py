@@ -214,7 +214,7 @@ def is_device_connected(address, port=554, timeout=1):
         return False
 
 
-def convert_calibration_data(data=None):
+def convert_calibration_data_d2s(data=None):
     data = CLOSE_LOOP_INITIAL_VALUE if data is None else data
     lst = list()
     for f in [2450, 5800]:
@@ -224,8 +224,12 @@ def convert_calibration_data(data=None):
         for l in range(max_level, min_level - 1, -1):
             for m in band_data.get(l):
                 lst.append(str(m))
-    return ",".join(lst)
+    return ",".join(lst) + ","
+
+
+def convert_calibration_data_s2d(string):
+    
 
 
 if __name__ == '__main__':
-    print convert_calibration_data()
+    print convert_calibration_data_d2s()

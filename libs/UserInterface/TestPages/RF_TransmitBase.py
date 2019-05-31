@@ -17,8 +17,9 @@ class TransmitBase(Base.TestPage):
         self.FREQ = freq
         self.FLAG_ROAD_A = RoadA
         self.FLAG_5G = True if self.FREQ == FREQ_5G else False
-        self.MAX_LEVEL_GAP = 0.5 if RoadA else 3
-        self.MIN_LEVEL_GAP = 1.5 if RoadA else 3
+
+        self.MAX_LEVEL_GAP = 1 if RoadA else 3
+        self.MIN_LEVEL_GAP = 1 if RoadA else 3
         self.cali_max, self.cali_min = 0, 0
         option = "5800gain" if self.FLAG_5G else "2400gain"
         self.SA_GAIN = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
@@ -182,6 +183,13 @@ class TransmitBase(Base.TestPage):
             return (cali_data[32], cali_data[33]), (cali_data[62], cali_data[63])
         return (cali_data[0], cali_data[1]), (cali_data[30], cali_data[31])
 
+    def get_middle_cali_data(self):
+        device = self.get_communicate()
+        cali_data = device.get_calibration_data()
+        if self.FLAG_5G:
+            return cali_data[46], cali_data[47]
+        return cali_data[14], cali_data[15]
+
     def start_test(self):
         self.FormatPrint(info="Started")
         thread_name = "TransmitTest%sA" % self.FREQ if self.FLAG_ROAD_A else "TransmitTest%sB" % self.FREQ
@@ -212,6 +220,8 @@ class TransmitBase(Base.TestPage):
 
         result_max = self.__test_max()
         result_min = self.__test_min()
+        result_middle = self.__test_middle()
+
         if result_max is None or result_min is None:
             return
         if result_max and result_min:
@@ -258,6 +268,12 @@ class TransmitBase(Base.TestPage):
     def __test_min(self):
         self.set_gain_and_power(*self.cali_min)
         value = 9 if self.FLAG_5G else 3
+        lower, upper = value - self.MIN_LEVEL_GAP, value + self.MIN_LEVEL_GAP
+        return self.__test_txp(lower=lower, upper=upper)
+
+    def __test_middle(self):
+        self.set_gain_and_power(*self.get_max_min_cali_data())
+        value = 17 if self.FLAG_5G else 11
         lower, upper = value - self.MIN_LEVEL_GAP, value + self.MIN_LEVEL_GAP
         return self.__test_txp(lower=lower, upper=upper)
 
