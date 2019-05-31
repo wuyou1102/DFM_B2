@@ -45,10 +45,14 @@ class TransmitBase(Base.TestPage):
         title = wx.StaticText(self, wx.ID_ANY, u"当前频点: ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.current_point = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
                                          wx.TE_READONLY | wx.TE_CENTER)
+        # self.gain_ctrl = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
+        #                              wx.TE_READONLY | wx.TE_CENTER)
+        # self.power_ctrl = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
+        #                               wx.TE_READONLY | wx.TE_CENTER)
         self.gain_ctrl = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
-                                     wx.TE_READONLY | wx.TE_CENTER)
+                                     wx.TE_CENTER)
         self.power_ctrl = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (60, -1),
-                                      wx.TE_READONLY | wx.TE_CENTER)
+                                      wx.TE_CENTER)
         sizer.Add(title, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         sizer.Add(self.current_point, 0, wx.ALIGN_CENTER_VERTICAL, 1)
         self.btn_freq = create_button(u"重设频点", "set_freq")
@@ -58,8 +62,11 @@ class TransmitBase(Base.TestPage):
         sizer.Add(self.power_ctrl, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         self.btn_max = create_button(u"最大功率", "set_max_level")
         self.btn_min = create_button(u"最小功率", "set_min_level")
+        self.btn_set = create_button(u"设置", "set")
         sizer.Add(self.btn_max, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         sizer.Add(self.btn_min, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+        sizer.Add(self.btn_set, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+
         return sizer
 
     def on_button_click(self, event):
@@ -71,6 +78,10 @@ class TransmitBase(Base.TestPage):
             self.set_gain_and_power(*self.cali_max)
         elif name == "set_min_level":
             self.set_gain_and_power(*self.cali_min)
+        elif name == "set":
+            gain = int(self.gain_ctrl.GetValue(), 16)
+            power = int(self.power_ctrl.GetValue(), 16)
+            self.set_gain_and_power(gain, power)
 
     def set_frequency_point(self):
         device = self.get_communicate()
