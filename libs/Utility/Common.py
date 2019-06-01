@@ -228,7 +228,7 @@ def convert_calibration_data_d2s(data=None):
 
 
 def convert_calibration_data_s2d(string):
-    
+    pass
 
 
 if __name__ == '__main__':

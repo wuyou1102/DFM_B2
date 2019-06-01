@@ -373,5 +373,7 @@ class Client(object):
 
 if __name__ == '__main__':
     s = Client(address='192.168.1.1')
-
-    print s.get_calibration_data()
+    print s.get_gain_and_power()
+    s.disable_spi()
+    print s.get_8003s_gain_power(False)
+    s.enable_spi()

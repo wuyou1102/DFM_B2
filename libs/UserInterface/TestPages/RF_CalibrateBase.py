@@ -175,6 +175,7 @@ class CalibrateBase(Base.TestPage):
                 return
             elif cali_value is False:
                 self.LogMessage(u"校准失败")
+                return
                 self.SetResult("FAIL")
                 return
             else:

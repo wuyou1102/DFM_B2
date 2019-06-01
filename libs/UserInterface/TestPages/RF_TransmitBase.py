@@ -19,7 +19,7 @@ class TransmitBase(Base.TestPage):
         self.FLAG_5G = True if self.FREQ == FREQ_5G else False
 
         self.MAX_LEVEL_GAP = 1 if RoadA else 3
-        self.MIN_LEVEL_GAP = 1 if RoadA else 3
+        self.MIN_LEVEL_GAP = 1.5 if RoadA else 3
         self.cali_max, self.cali_min = 0, 0
         option = "5800gain" if self.FLAG_5G else "2400gain"
         self.SA_GAIN = Utility.ParseConfig.get(Path.CONFIG, "SignalAnalyzer", option=option)
@@ -254,6 +254,7 @@ class TransmitBase(Base.TestPage):
         return False
 
     def __test_max(self):
+        self.LogMessage("====================最大值测试====================")
         self.set_gain_and_power(*self.cali_max)
         value = 24 if self.FLAG_5G else 18
         lower, upper = value - self.MAX_LEVEL_GAP, value + self.MAX_LEVEL_GAP
@@ -266,13 +267,15 @@ class TransmitBase(Base.TestPage):
         return False
 
     def __test_min(self):
+        self.LogMessage("====================最小值测试====================")
         self.set_gain_and_power(*self.cali_min)
         value = 9 if self.FLAG_5G else 3
         lower, upper = value - self.MIN_LEVEL_GAP, value + self.MIN_LEVEL_GAP
         return self.__test_txp(lower=lower, upper=upper)
 
     def __test_middle(self):
-        self.set_gain_and_power(*self.get_max_min_cali_data())
+        self.LogMessage("====================中间值测试====================")
+        self.set_gain_and_power(*self.get_middle_cali_data())
         value = 17 if self.FLAG_5G else 11
         lower, upper = value - self.MIN_LEVEL_GAP, value + self.MIN_LEVEL_GAP
         return self.__test_txp(lower=lower, upper=upper)
@@ -282,14 +285,14 @@ class TransmitBase(Base.TestPage):
         lst = list()
         for x in range(10):
             self.sleep(0.2)
-            print self.stop_flag
             value = self.__get_transmit_power()
-            self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
+            # self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
             lst.append(value)
         self.LogMessage(u"去掉最小值/最大值：[%s/%s]" % (min(lst), max(lst)))
         lst.remove(max(lst))
         lst.remove(min(lst))
         avg = sum(lst) / len(lst)
+        self.LogMessage(repr(lst))
         self.LogMessage(u"平均值为：%s" % avg)
         return avg
 
