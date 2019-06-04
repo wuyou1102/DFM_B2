@@ -220,7 +220,7 @@ class TransmitBase(Base.TestPage):
 
         result_max = self.__test_max()
         result_min = self.__test_min()
-        result_middle = self.__test_middle()
+        # result_middle = self.__test_middle()
 
         if result_max is None or result_min is None:
             return
