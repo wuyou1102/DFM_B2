@@ -20,8 +20,9 @@ RF_CASES = [
     Calibrate2450, Transmit2450A, Transmit2450B, Calibrate5800, Transmit5800A, Transmit5800B
 ]
 RF_CASES_2400 = [
-    Receive5750, Receive5800, Receive5850, Calibrate5800, Transmit5800A, Transmit5800B
-]
-RF_CASE_5800 = [
     Receive2410, Receive2450, Receive2475, Calibrate2450, Transmit2450A, Transmit2450B,
+]
+
+RF_CASES_5800 = [
+    Receive5750, Receive5800, Receive5850, Calibrate5800, Transmit5800A, Transmit5800B
 ]

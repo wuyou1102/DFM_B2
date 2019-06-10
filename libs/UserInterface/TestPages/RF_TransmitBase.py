@@ -166,7 +166,7 @@ class TransmitBase(Base.TestPage):
         self.cali_max, self.cali_min = self.get_max_min_cali_data()
         self.__configuring_device()
         self.refresh_current_info()
-        ctrls = [self.PassButton, self.btn_freq, self.btn_max, self.btn_min]
+        ctrls = [self.PassButton, self.btn_freq, self.btn_max, self.btn_min, self.btn_set]
         if self.GetSignalAnalyzer() is not None:
             self.GetSignalAnalyzer().SetCorrOffs(self.SA_GAIN)
             self.GetSignalAnalyzer().SetFrequency(self.FREQ)  # 设置仪器分析频点

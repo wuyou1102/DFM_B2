@@ -18,16 +18,17 @@ sys.setdefaultencoding('utf-8')
 
 
 class Frame(wx.Frame):
-    def __init__(self, title, type_, size=(800, 700)):
+    def __init__(self, title, type_, size=(800, 700), bandwidth="mix"):
         wx.Frame.__init__(self, None, id=wx.ID_ANY, title=title, size=size)
-        self.panel = Panel(self, type_=type_)
+        self.panel = Panel(self, type_=type_, bandwidth=bandwidth)
         self.SetBackgroundColour(Color.Azure2)
         self.Center()
 
 
 class Panel(wx.Panel):
-    def __init__(self, parent, type_):
+    def __init__(self, parent, type_, bandwidth):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, style=wx.TAB_TRAVERSAL)
+        self.bandwidth = bandwidth
         self.parent = parent
         self.type = type_
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -102,8 +103,15 @@ class Panel(wx.Panel):
             from libs.Config.Cases import MACHINE_CASES
             return MACHINE_CASES
         elif self.type == "RF":
-            from libs.Config.Cases import RF_CASES
-            return RF_CASES
+            if self.bandwidth == "2.4G":
+                from libs.Config.Cases import RF_CASES_2400
+                return RF_CASES_2400
+            elif self.bandwidth == "5.8G":
+                from libs.Config.Cases import RF_CASES_5800
+                return RF_CASES_5800
+            else:
+                from libs.Config.Cases import RF_CASES
+                return RF_CASES
         else:
             raise KeyError("Unknown type :\"%s\"" % self.type)
 
