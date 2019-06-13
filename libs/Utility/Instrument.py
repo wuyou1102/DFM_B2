@@ -29,7 +29,7 @@ def list_resources():
     return ResourceManager.list_resources()
 
 class SCPI(object):
-    def __init__(self, port, timeout=1000):
+    def __init__(self, port, timeout=3000):
         self.__port = port
         self.__timeout = timeout
         self.__session = self.__init_session()

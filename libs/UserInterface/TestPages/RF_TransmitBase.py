@@ -243,7 +243,7 @@ class TransmitBase(Base.TestPage):
 
     def __test_8003s_gain(self):
         if self.FLAG_5G:
-            lower, upper = 3, 15
+            lower, upper = 4, 16
         else:
             lower, upper = 9, 15
         self.LogMessage(u"当前测试频点增益范围应为：[%s]-[%s]" % (lower, upper))
@@ -283,7 +283,7 @@ class TransmitBase(Base.TestPage):
     def get_transmit_power(self):
         self.sleep(0.8)
         lst = list()
-        for x in range(10):
+        for x in range(5):
             self.sleep(0.2)
             value = self.__get_transmit_power()
             # self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))
@@ -319,7 +319,8 @@ class TransmitBase(Base.TestPage):
             return self.get_current_gain(A=A)
         else:
             value = gain_8003s[-2:] if A else gain_8003s[-4:-2]
-            self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % value)
+            if value == "00":
+                return self.get_current_gain(A=A)
             return value
 
     def sleep(self, sec):

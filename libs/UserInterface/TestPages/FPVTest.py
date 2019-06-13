@@ -320,9 +320,16 @@ class PreviewPanel(wx.Panel):
         self.UpdateBitmap()
 
 
+BAND_MAPPING = {
+    "A (5.8G Only)": "2",
+    "B (2.4G Only)": "1",
+    "C (2.4G & 5.8G)": "2",
+}
+
+
 class ConfigDialog(wx.Dialog):
     def __init__(self):
-        wx.Dialog.__init__(self, parent=None, id=wx.ID_ANY, title="修改配置", size=(250, 200), pos=wx.DefaultPosition)
+        wx.Dialog.__init__(self, parent=None, id=wx.ID_ANY, title="修改配置", size=(250, 220), pos=wx.DefaultPosition)
         self.panel = wx.Panel(self)
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         config_sizer = self.__init_config_sizer()
@@ -335,14 +342,25 @@ class ConfigDialog(wx.Dialog):
 
     def __init_config_sizer(self, name="rtsp"):
         def create_text_ctrl(title, value):
-            sizer = wx.BoxSizer(wx.HORIZONTAL)
+            _sizer = wx.BoxSizer(wx.HORIZONTAL)
             title = wx.StaticText(self.panel, wx.ID_ANY, title, wx.DefaultPosition, wx.DefaultSize, 0)
             title.SetFont(Font.COMMON_1)
             value = wx.TextCtrl(self.panel, wx.ID_ANY, value, wx.DefaultPosition, wx.DefaultSize, 0)
             value.SetFont(Font.COMMON_1)
-            sizer.Add(title, 0, wx.EXPAND | wx.TOP, 5)
-            sizer.Add(value, 1, wx.EXPAND | wx.ALL, 1)
-            return sizer, value
+            _sizer.Add(title, 0, wx.EXPAND | wx.TOP, 5)
+            _sizer.Add(value, 1, wx.EXPAND | wx.ALL, 1)
+            return _sizer, value
+
+        def create_choice_ctrl(title, choice, select):
+            _sizer = wx.BoxSizer(wx.HORIZONTAL)
+            title = wx.StaticText(self.panel, wx.ID_ANY, title, wx.DefaultPosition, wx.DefaultSize, 0)
+            title.SetFont(Font.COMMON_1)
+            value = wx.Choice(self.panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, sorted(choice), 0)
+            value.SetStringSelection(select)
+            value.SetFont(Font.COMMON_1)
+            _sizer.Add(title, 0, wx.EXPAND | wx.TOP, 5)
+            _sizer.Add(value, 1, wx.EXPAND | wx.ALL, 1)
+            return _sizer, value
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         config = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp')
@@ -351,11 +369,14 @@ class ConfigDialog(wx.Dialog):
         username_sizer, self.username = create_text_ctrl("用户名: ", config.get("username", "admin"))
         password_sizer, self.password = create_text_ctrl("密  码: ", config.get("password", "Password01!"))
         network_id_sizer, self.network_id = create_text_ctrl("网络ID: ", config.get("id", "666"))
+        profile_sizer, self.profile = create_choice_ctrl("频  段: ", choice=BAND_MAPPING.keys(),
+                                                         select=config.get("profile", "C (2.4G & 5.8G)"))
         sizer.Add(address_sizer, 0, wx.EXPAND, 1)
         sizer.Add(port_sizer, 0, wx.EXPAND, 1)
         sizer.Add(username_sizer, 0, wx.EXPAND, 1)
         sizer.Add(password_sizer, 0, wx.EXPAND, 1)
         sizer.Add(network_id_sizer, 0, wx.EXPAND, 1)
+        sizer.Add(profile_sizer, 0, wx.EXPAND, 1)
         return sizer
 
     def __init_button_sizer(self):
@@ -374,6 +395,7 @@ class ConfigDialog(wx.Dialog):
         data["username"] = self.username.GetValue()
         data["password"] = self.password.GetValue()
         data["id"] = self.network_id.GetValue()
+        data["profile"] = self.profile.GetStringSelection()
         Utility.ParseConfig.modify(path=Path.CONFIG, data={"rtsp": data})
         event.Skip()
 
@@ -437,9 +459,12 @@ class UpdateDeviceConfigDialog(wx.Dialog):
 
     def setup_config(self):
         network_id = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='id')
+        profile = Utility.ParseConfig.get(path=Path.CONFIG, section='rtsp', option='profile')
+        band = BAND_MAPPING.get(profile)
         logger.debug("I got network id : %s" % network_id)
+        logger.debug("I got band : %s" % band)
         self.output(u"正在修改设备配置")
-        if self.web.SetAsBS(NW_ID=int(network_id), TYF=4):
+        if self.web.SetAsBS(NW_ID=int(network_id), TYF=4, BAND=band):
             self.output(u"修改配置成功")
             return True
         self.output(u"修改配置失败")

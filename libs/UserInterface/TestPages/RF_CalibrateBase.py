@@ -81,7 +81,7 @@ class CalibrateBase(Base.TestPage):
         if tssi is None:
             return None
         else:
-            if self.MAX_LEVEL - 3 <= tssi <= self.MAX_LEVEL + 3:
+            if self.MAX_LEVEL - 3 <= tssi <= self.MAX_LEVEL + 5:
                 gain_8003s = int(self.get_current_gain(A=True), 16)
                 gain_gap = int(round((self.MAX_LEVEL - tssi) / self.GAIN_UNIT)) + (
                         data.get(self.MAX_LEVEL)[0] - gain_8003s)
@@ -138,7 +138,8 @@ class CalibrateBase(Base.TestPage):
             return self.get_current_gain(A=A)
         else:
             value = gain_8003s[-2:] if A else gain_8003s[-4:-2]
-            self.LogMessage(u'从寄存器获取的8003S的值为：[%s]' % value)
+            if value == "00":
+                return self.get_current_gain(A=A)
             return value
 
     def set_gain_and_power(self, gain, power):
@@ -217,7 +218,7 @@ class CalibrateBase(Base.TestPage):
     def get_transmit_power(self):
         self.sleep(0.8)
         lst = list()
-        for x in range(10):
+        for x in range(5):
             self.sleep(0.2)
             value = self.__get_transmit_power()
             # self.LogMessage(u"[%02d]从仪器上取值为：\"%s\"" % (x + 1, value))

@@ -69,7 +69,7 @@ class WebSever(object):
         self._token = ''
         return False
 
-    def SetAsBS(self, NW_ID, TYF):
+    def SetAsBS(self, NW_ID, TYF, BAND=2):
         self.__login()
         url = "http://{address}/write_txt.php".format(address=self._address)
         data = {
@@ -82,7 +82,7 @@ class WebSever(object):
             'NW_ID3': NW_ID + 3,
             'FN_INDEX': TYF_CONFIG[TYF][0],
             'DEV_TYPE': 0,
-            'BAND': 2,
+            'BAND': BAND,
             'UL_BW': TYF_CONFIG[TYF][1],
             'UL_MCS': TYF_CONFIG[TYF][2],
             'RF_PWR': 15,
