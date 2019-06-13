@@ -286,8 +286,8 @@ class ReceiveBase(Base.TestPage):
         result = comm.get_rssi_and_bler()
         if result is not None and int(result, 16) > 0:
             bler = int(result[8:], 16)
-            rssi0 = int(result[0:4], 16) - 65536
-            rssi1 = int(result[4:8], 16) - 65536
+            rssi1 = int(result[0:4], 16) - 65536
+            rssi0 = int(result[4:8], 16) - 65536
             lst.append(bler)
             self.rssi_0.SetValue(str(rssi0))
             self.rssi_1.SetValue(str(rssi1))
@@ -298,8 +298,8 @@ class ReceiveBase(Base.TestPage):
         comm = self.get_communicate()
         result = comm.get_rssi_and_bler()
         if result is not None and int(result, 16) > 0:
-            rssi0 = int(result[0:4], 16) - 65536
-            rssi1 = int(result[4:8], 16) - 65536
+            rssi1 = int(result[0:4], 16) - 65536
+            rssi0 = int(result[4:8], 16) - 65536
             self.rssi_0.SetValue(str(rssi0))
             self.rssi_1.SetValue(str(rssi1))
             return rssi0, rssi1

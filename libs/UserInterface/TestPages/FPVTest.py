@@ -179,8 +179,8 @@ class FPV(Base.TestPage):
             return
         if result != "0000000000000000":
             bler = int(result[8:], 16)
-            rssi0 = int(result[0:4], 16) - 65536
-            rssi1 = int(result[4:8], 16) - 65536
+            rssi1 = int(result[0:4], 16) - 65536
+            rssi0 = int(result[4:8], 16) - 65536
             wx.CallAfter(self.rssi_0.SetValue, str(rssi0))
             wx.CallAfter(self.rssi_1.SetValue, str(rssi1))
             wx.CallAfter(self.bler.SetValue, str(bler))
