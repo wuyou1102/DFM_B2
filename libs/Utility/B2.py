@@ -103,6 +103,7 @@ class WebSever(object):
         url = "http://{address}/write_txt.php".format(address=self._address)
         data = {
             'USR_ID': USR_ID,
+            'NW_ID': NW_ID,
             'NW_NUM': NW_NUM,
             'NW_ID0': NW_ID,
             'NW_ID1': NW_ID1,
@@ -110,15 +111,17 @@ class WebSever(object):
             'NW_ID3': NW_ID3,
             'FN_INDEX': 4,
             'DEV_TYPE': 1,
-            'BAND': 2,
-            'UL_BW': 3,
-            'UL_MCS': 1,
+            'BAND': 1,
+            'UL_BW': 4,
+            'UL_MCS': 5,
             'RF_PWR': 15,
             'FERQ': 0,
             'token': self._token,
             'time': int(time.time())
         }
         resp = self.__post(url=url, data=data)
+
+        print resp.content
         if resp.status_code == 200 and resp.content == '{"code":"0","message":"success"}':
             return True
         return False
@@ -176,8 +179,8 @@ class WebSever(object):
 
 if __name__ == '__main__':
     ws = WebSever('192.168.1.1')
-    # ws.Login()
-    ws.SetAsBS(4444, 5)
+    ws.Login()
+    print ws.SetAsND(USR_ID=0, NW_ID=3333)
 
     # ws.Login()
     # ws.Set(USR_ID=0, NW_ID=1, FN_INDEX=7, DEV_TYPE=1, BAND=2, UL_BW=4, UL_MCS=5, FERQ=0)
